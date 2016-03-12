@@ -34,20 +34,20 @@ void paging_init()
 	 //load page dir and enable paging
 
 	 asm volatile("                  \n\
-		    	push %ebp		   \n\
-				mov %esp, %ebp      \n\
-				mov 8(%esp), %eax	 \n\
-				mov %eax, %cr3	 \n\
-				mov %ebp, %esp	 \n\
-				pop %ebp			 \n\
+		    	push %%ebp		   \n\
+				mov %%esp, %%ebp      \n\
+				mov 8(%esp), %%eax	 \n\
+				mov %%eax, %%cr3	 \n\
+				mov %%ebp, %%esp	 \n\
+				pop %%ebp			 \n\
 
-				push %ebp			 \n\
-				mov %esp, %ebp		 \n\
-				mov %cr0, %eax		 \n\
-				or $0x80000000, %eax  \n\
-				mov %eax, %cr0		 \n\
-				mov %ebp, %esp		 \n\
-				pop %ebp			 \n\
+				push %%ebp			 \n\
+				mov %%esp, %%ebp		 \n\
+				mov %%cr0, %%eax		 \n\
+				or $0x80000000, %%eax  \n\
+				mov %%eax, %%cr0		 \n\
+				mov %%ebp, %%esp		 \n\
+				pop %%ebp			 \n\
 
 				ret 				 \n\
 		    "
