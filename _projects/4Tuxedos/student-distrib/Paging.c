@@ -22,7 +22,7 @@ void paging_init()
 		first_page_table[i] = (physAddr | PD_ENTRY_INIT_VAL_0);
 
 	}
-
+printf("phys addr: %d ||pd: %d \n", physAddr, page_directory);
 	//set the first two enties of the PD
 	 page_directory[0] = ((unsigned int)first_page_table) | PD_ENTRY_INIT_VAL_0;
 
@@ -32,7 +32,7 @@ void paging_init()
 
 
 	 //load page dir and enable paging
-
+/*
 	 asm volatile("                     \n\
 			 movl page_directory, %eax  \n\
 	 		 movl  %eax, %cr3 		    \n\
@@ -43,7 +43,7 @@ void paging_init()
 			 orl  $0x00000010, %eax 	\n\
 			 movl %eax, %cr4 			\n\
 		    "
-			);
+			);*/
 	 printf("Paging enabled!\n");
 
 }
