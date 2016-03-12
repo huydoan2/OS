@@ -9,6 +9,7 @@
 #include "debug.h"
 #include "keyboard.h"
 #include "IDT.h"
+#include "rtc.h"
 /* Macros. */
 /* Check if the bit BIT in FLAGS is set. */
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
@@ -155,6 +156,7 @@ entry (unsigned long magic, unsigned long addr)
 	 * PIC, any other initialization stuff... */
 	keyboard_init();
 
+	rtc_init();
 	/*Set up IDT to handle system calls*/
 
 

@@ -1,5 +1,5 @@
 #include "IDT.h"
-
+#include "lib.h"
 
 //Define values for IDT entry
 #define RESERVED4 0x0000
@@ -565,6 +565,11 @@ void system_calls()
  	fill_interrupt_descriptor_table_entry(&idt_enry, KERNEL_CS, RESERVED4, 0, 1, 1, SIZE_32, 0, DPL_0, PRESENT);
  	SET_IDT_ENTRY(idt_enry, keyboard_handler);
  	idt[33] = idt_enry;
+
+ 	//RTC
+ 	fill_interrupt_descriptor_table_entry(&idt_enry, KERNEL_CS, RESERVED4, 0, 1, 1, SIZE_32, 0, DPL_0, PRESENT);
+ 	SET_IDT_ENTRY(idt_enry, test_interrupts);
+ 	idt[40] = idt_enry;
 
  	/*fill in the system call entry*/
  	fill_interrupt_descriptor_table_entry(&idt_enry, KERNEL_CS, RESERVED4, 1, 1, 1, SIZE_32, 0, DPL_0, PRESENT);
