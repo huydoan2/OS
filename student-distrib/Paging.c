@@ -26,9 +26,9 @@ void paging_init()
 	//set the first two enties of the PD
 	 page_directory[0] = ((unsigned int)first_page_table) | PD_ENTRY_INIT_VAL_0;
 
-
+/*
 	 physAddr += PT_INCREMENT;
-	 page_directory[1] = (physAddr | PD_ENTRY_INIT_VAL_1);
+	 page_directory[1] = (physAddr | PD_ENTRY_INIT_VAL_1);*/
 
 
 	 //load page dir and enable paging
