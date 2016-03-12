@@ -62,7 +62,7 @@ void paging_init();
 
 void fill_pd_entry(int index, uint32_t val);
 
-void fill_pt_entry(pt_entry_t * pt, int index, uint32_t val);
+void fill_pt_entry(uint32_t * pt, int index, uint32_t val);
 
 //void get_physAddr(uint32_t * virtAddr);
 
