@@ -36,7 +36,7 @@ void paging_init()
 	 asm volatile("                     \n\
 		    	push %%ebp		         \n\
 				mov %%esp, %%ebp         \n\
-				mov 8(%esp), %%eax	     \n\
+				mov 8(%%esp), %%eax	     \n\
 				mov %%eax, %%cr3	     \n\
 				mov %%ebp, %%esp	     \n\
 				pop %%ebp			     \n\
