@@ -37,14 +37,14 @@ void paging_init()
   //set the first page directory entry 
 	for(i = 0; i < MAX_SIZE; i++){
 		if(i == 0){
-			val = (PD_ENTRY_INIT_VAL_0)|(first_pt & PHYSADDR_MASK)
+			val = (PD_ENTRY_INIT_VAL_0)|(first_pt & PHYSADDR_MASK);
 			fill_pd_entry(i, val);
 		}
 		else if (i == 1){
 			virtAddr += PT_INCREMENT;
 			physAddr = virtAddr;
 
-			val = (PD_ENTRY_INIT_VAL_1)|((physAddr & PHYSADDR_MASK);
+			val = (PD_ENTRY_INIT_VAL_1)|(physAddr & PHYSADDR_MASK);
 			fill_pd_entry(i, val);
 		}
 		else 
@@ -88,3 +88,4 @@ void mapping_virt2Phys_Addr(uint32_t* physAddr, uint32_t* virtAddr, uint32_t val
     first_pt[index] = val;
 }
 */
+
