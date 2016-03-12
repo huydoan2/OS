@@ -22,7 +22,7 @@ void paging_init()
 		first_page_table[i] = (physAddr | PD_ENTRY_INIT_VAL_0);
 
 	}
-printf("phys addr: %d ||pd: %d \n", physAddr, page_directory);
+    printf("phys addr: %d ||pd: %d ||pt: %d\n", physAddr, page_directory,first_page_table);
 	//set the first two enties of the PD
 	 page_directory[0] = ((unsigned int)first_page_table) | PD_ENTRY_INIT_VAL_0;
 
