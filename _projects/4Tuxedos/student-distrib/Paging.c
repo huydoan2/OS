@@ -1,5 +1,6 @@
 #include "Paging.h"
 #define  PT_INCREMENT 0x1000
+#define  PYHSADDR_INCREMENT 1000
 #define  PHYSADDR_MASK 0xFFC00000
 #define  PT_ENTRY_INIT_VAL 0x1B
 #define  PD_ENTRY_INIT_VAL_0 0x1B
@@ -9,7 +10,7 @@ void paging_init()
 	int i;
 	uint32_t val;
 	uint32_t virtAddr = VIRMEM_START;
-	uint32_t physAddr;
+	uint32_t physAddr = 0x00000000;
 
 	
 	//set the first page table 
@@ -19,7 +20,7 @@ void paging_init()
 		virtAddr = PT_INCREMENT*i + VIRMEM_START;
 
 		//get the physical address of current page
-		physAddr = virtAddr;
+		physAddr += PYHSADDR_INCREMENT;
 		//set page table flag
         if(i == 0){
         	val  = 0;
@@ -41,8 +42,8 @@ void paging_init()
 			fill_pd_entry(i, val);
 		}
 		else if (i == 1){
-			virtAddr += PT_INCREMENT;
-			physAddr = virtAddr;
+
+			physAddr += PYHSADDR_INCREMENT;
 
 			val = (PD_ENTRY_INIT_VAL_1)|(physAddr & PHYSADDR_MASK);
 			fill_pd_entry(i, val);
