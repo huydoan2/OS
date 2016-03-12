@@ -2,6 +2,8 @@
 #define PAGING_H
 
 #define MAX_SIZE 1024
+#define VIRMEM_START 0x00000000
+#define VIRMEM_END   0xFFFFF000
 
 typedef struct pt_entry{
 	union{
@@ -47,15 +49,22 @@ typedef struct page_table_t{
 	uint32_t pt_size;	
 } page_table_t;
 
+/**/
 static pt_entry_t first_pt[MAX_SIZE];
 static pd_entry_t page_directory[MAX_SIZE] __attribute__((aligned (4)));
 static uint32_t pd_size;
 
 void paging_init();
 
-int32_t fill_pt_entry(page_table_t * pt, uint32_t index, uint32_t val);
 
-int32_t fill_pd_entry(index, uint32_t val);
+void fill_pd_entry(int index, uint32_t val);
+
+void fill_pt_entry(pt_entry_t * pt, int index, uint32_t val);
+
+//void get_physAddr(uint32_t * virtAddr);
+
+
+//void mapping_virt2Phys_Addr(uint32_t* physAddr, uint32_t* virtAddr, uint32_t val);
 
 
 
