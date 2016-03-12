@@ -11,32 +11,41 @@ static pd_entry_t page_directory[1024] __attribute__((aligned (4)));
 static uint32_t pd_size;
 
 typedef struct pt_entry{
-	uint32_t phys_page_addr : 20;
-	uint8_t avail: 3;
-	uint8_t global	:1;
-	uint8_t zero	:1;
-	uint8_t dirty	:1;
-	uint8_t access	:1;
-	uint8_t cache_disable	:1;
-	uint8_t write_through	:1;
-	uint8_t privillege	:1;
-	uint8_t rw	:1;
-	uint8_t present	:1;
+	union{
+		uint32_t val;
+		struct{
+			uint32_t phys_page_addr : 20;
+			uint8_t avail: 3;
+			uint8_t global	:1;
+			uint8_t zero	:1;
+			uint8_t dirty	:1;
+			uint8_t access	:1;
+			uint8_t cache_disable	:1;
+			uint8_t write_through	:1;
+			uint8_t privillege	:1;
+			uint8_t rw	:1;
+			uint8_t present	:1;
+			} __attribute__((packed));
+		};
 
 }pt_entry_t;
 
 typedef struct pd_entry{
-	uint32_t pt_addr : 20;
-	uint8_t avail: 3;
-	uint8_t global	:1;
-	uint8_t size	:1;
-	uint8_t zero	:1;
-	uint8_t access	:1;
-	uint8_t cache_disable	:1;
-	uint8_t write_through	:1;
-	uint8_t privillege	:1;
-	uint8_t rw	:1;
-	uint8_t present	:1;
+	union{
+		struct{
+			uint32_t pt_addr : 20;
+			uint8_t avail: 3;
+			uint8_t global	:1;
+			uint8_t size	:1;
+			uint8_t zero	:1;
+			uint8_t access	:1;
+			uint8_t cache_disable	:1;
+			uint8_t write_through	:1;
+			uint8_t privillege	:1;
+			uint8_t rw	:1;
+			uint8_t present	:1;
+			} __attribute__((packed));
+		};
 }pd_entry_t;
 
 void paging_init();
