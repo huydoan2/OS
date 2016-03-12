@@ -9,8 +9,11 @@ char scancode [10] = {
 char getScancode()
 {
 	char c = inb(KEYBOARD_DATA);
+	//printf("%c \n", c);
 	if (c > 0)
 		return c;
+	else
+		return 0;
 }
 
 char getchar()
@@ -25,7 +28,6 @@ void keyboard_init()
 
 void keyboard_handler()
 {	
-
-	printf("Value:%c ", getchar());
 	send_eoi(keyboard_irq_num);
+	printf("Value:%c || ", getchar());
 }
