@@ -156,7 +156,10 @@ entry (unsigned long magic, unsigned long addr)
 	/* Initialize devices, memory, filesystem, enable device interrupts on the
 	 * PIC, any other initialization stuff... */
 	keyboard_init();
+
+	printf("Before paging initialization\n");
 	paging_init();
+	printf("after paging initialization\n");
 
 	//rtc_init();
 	/*Set up IDT to handle system calls*/
