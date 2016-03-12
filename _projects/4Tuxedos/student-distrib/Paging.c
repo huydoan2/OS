@@ -26,17 +26,22 @@ void paging_init()
 	//set the first two enties of the PD
 	 page_directory[0] = ((unsigned int)first_page_table) | PD_ENTRY_INIT_VAL_0;
 
-
+/*
 	 physAddr += PT_INCREMENT;
-	 page_directory[1] = (physAddr | PD_ENTRY_INIT_VAL_1);
+	 page_directory[1] = (physAddr | PD_ENTRY_INIT_VAL_1);*/
 
 
 	 //load page dir and enable paging
 
 	 asm volatile("                     \n\
 			 movl page_directory, %eax \n\
+	 		 movl  %eax, %cr3 		\n\
+			 movl  %cr0, %eax 		\n\
 			 orl  $0x80000000, %eax 	\n\
+			 movl %eax, %cr0 			\n\
+			 movl %cr4, %eax 			\n\
 			 orl  $0x00000010, %eax 	\n\
+			 movl %eax, %cr4 			\n\
 		    "
 			);
 	 printf("Paging enabled!\n");
