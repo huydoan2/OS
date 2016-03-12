@@ -16,7 +16,7 @@ void paging_init()
 	//create the empty page dir first page table
 	for(i = 0; i < MAX_SIZE; i++)
 	{
-	  	physAddr = PYHSADDR_INCREMENT*i;
+	  	physAddr = PT_INCREMENT*i;
 
 		page_directory[i] = PD_ENTRY_EMP_VAL;
 		first_page_table[i] = (physAddr | PD_ENTRY_INIT_VAL_0);
