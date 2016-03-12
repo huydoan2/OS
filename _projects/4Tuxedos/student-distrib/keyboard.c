@@ -2,14 +2,18 @@
 
 #define keyboard_irq_num 1
 
-char scancode [10] = {
-	'1','2','3','4','5','6','7','8','9','0'
+char scancode [88] = {
+	'1','2','3','4','5','6','7','8','9','0','-','=', 0 , 0,
+	'q','w','e','r','t','y','u','i','o','p','[',']','\n',0,
+	'a','s','d','f','g','h','j','k','l',';','\'','`',0,'\\',
+	'z','x','c','v','b','n','m',',','.','/',0,'*',0,' ',0,
+	0,0,0,0,0,0,0,0,0,0,0,0,'7','8','9','-','4','5','6','+','1','2','3','0','.',
+	0,0,0,0,0,0
 };
 
 char getScancode()
 {
 	char c = inb(KEYBOARD_DATA);
-	//printf("%c \n", c);
 	if (c > 0)
 		return c;
 	else
@@ -24,15 +28,12 @@ char getchar()
 void keyboard_init()
 {
 	enable_irq(keyboard_irq_num);
-}
+}        
 
 void keyboard_handler()
 {	
-	//disable_irq(keyboard_irq_num);
-	printf("Value:%c ||", getchar());
+	printf(" %c ", getchar());
 	send_eoi(keyboard_irq_num);
-	//enable_irq(keyboard_irq_num);
-
 	asm volatile("                  \n\
 		    leave                    \n\
 			iret                    \n\
