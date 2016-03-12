@@ -13,7 +13,7 @@
 
 
 
-uint32_t page_directory[MAX_SIZE] __attribute__((aligned( MAX_SIZE*4)));
+uint32_t page_directory[MAX_SIZE]   __attribute__((aligned( MAX_SIZE*4)));
 uint32_t first_page_table[MAX_SIZE] __attribute__((aligned( MAX_SIZE*4)));
 
 void paging_init();
