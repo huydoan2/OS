@@ -7,7 +7,7 @@
 void paging_init()
 {
 	int i;
-	int val;
+	uint32_t val;
 	uint32_t virtAddr = VIRMEM_START;
 	uint32_t physAddr;
 
