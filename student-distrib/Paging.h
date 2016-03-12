@@ -8,6 +8,7 @@
 #define PHYSMEM_START 0x00000000
 
 #include "types.h"
+#include "lib.h"
 
 
 

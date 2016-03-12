@@ -60,7 +60,7 @@ void fill_pd_entry(int index, uint32_t val)
 	page_directory[index] = val;
 }
 
-void fill_pt_entry(pt_entry_t * pt, int index, uint32_t val)
+void fill_pt_entry(uint32_t * pt, int index, uint32_t val)
 {
 	pt[index] = val;
 }
