@@ -53,7 +53,7 @@ typedef struct page_table_t{
 } page_table_t;
 
 /**/
-static uint32_t first_pt[MAX_SIZE];
+static pt_entry_t first_pt[MAX_SIZE];
 static pd_entry_t page_directory[MAX_SIZE] __attribute__((aligned (4)));
 static uint32_t pd_size;
 
@@ -62,7 +62,7 @@ void paging_init();
 
 void fill_pd_entry(int index, uint32_t val);
 
-void fill_pt_entry(uint32_t * pt, int index, uint32_t val);
+void fill_pt_entry(pt_entry_t * pt, int index, uint32_t val);
 
 //void get_physAddr(uint32_t * virtAddr);
 
