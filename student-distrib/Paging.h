@@ -1,14 +1,7 @@
 #ifndef PAGING_H
 #define PAGING_H
 
-typedef struct page_table_t{
-	pt_entry_t page_table[1024] __attribute__((aligned (4)));
-	uint32_t pt_size;	
-} page_table_t;
-
-
-static pd_entry_t page_directory[1024] __attribute__((aligned (4)));
-static uint32_t pd_size;
+#define MAX_SIZE 1024
 
 typedef struct pt_entry{
 	union{
@@ -32,6 +25,7 @@ typedef struct pt_entry{
 
 typedef struct pd_entry{
 	union{
+		uint32_t val;
 		struct{
 			uint32_t pt_addr : 20;
 			uint8_t avail: 3;
@@ -48,11 +42,20 @@ typedef struct pd_entry{
 		};
 }pd_entry_t;
 
+typedef struct page_table_t{
+	pt_entry_t page_table[MAX_SIZE] __attribute__((aligned (4)));
+	uint32_t pt_size;	
+} page_table_t;
+
+static pt_entry_t first_pt[MAX_SIZE];
+static pd_entry_t page_directory[MAX_SIZE] __attribute__((aligned (4)));
+static uint32_t pd_size;
+
 void paging_init();
 
-int32_t fill_pt_entry(page_table_t * pt, uint32_t index);
+int32_t fill_pt_entry(page_table_t * pt, uint32_t index, uint32_t val);
 
-int32_t fill_pd_entry(index);
+int32_t fill_pd_entry(index, uint32_t val);
 
 
 
