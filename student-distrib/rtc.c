@@ -19,13 +19,12 @@ void rtc_init(){
 
 	//set the register A
 
-	// printf ("Set Reg A");
-	// outb(REGISTER_A|NMI_DISABLE, RTC_PORT);		//disable NMI and select reg A
-	// previous = inb(CMOS_PORT);					//read current value of reg A
-	// outb((previous & 0xF0) | MASK_TURNON_FIVEBIT | RATE, CMOS_PORT);
+	outb(REGISTER_A|NMI_DISABLE, RTC_PORT);		//disable NMI and select reg A
+	previous = inb(CMOS_PORT);					//read current value of reg A
+	outb((previous & 0xF0) | MASK_TURNON_FIVEBIT | RATE, CMOS_PORT);
 	
 	//set the register B
-	printf (" Set Reg B");   
+
 	outb(REGISTER_B|NMI_DISABLE, RTC_PORT);
 	//read the value from register B	
     previous = inb(CMOS_PORT);	
@@ -36,7 +35,8 @@ void rtc_init(){
 
 	/*initialize the PIC*/
 	enable_irq(RTC_IRQ_NUM);
-	printf (" End RTC Init");
+	enable_irq(2);
 
+	/*enable the NMI*/
 	outb(inb(0x70)&0x7F,0x70);
 }
