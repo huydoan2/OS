@@ -49,7 +49,7 @@ void paging_init()
 			fill_pd_entry(i, val);
 		}
 		else 
-			page_directory[i] = 0;
+			page_directory[i].val = 0;
 	}
 
 
@@ -59,12 +59,12 @@ void paging_init()
 
 void fill_pd_entry(int index, uint32_t val)
 {
-	page_directory[index] = val;
+	page_directory[index].val = val;
 }
 
 void fill_pt_entry(pt_entry_t * pt, int index, uint32_t val)
 {
-	pt[index] = val;
+	pt[index].val = val;
 }
 
 /*
