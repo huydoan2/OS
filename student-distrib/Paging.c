@@ -16,19 +16,19 @@ void paging_init()
 	//create the empty page dir first page table
 	for(i = 0; i < MAX_SIZE; i++)
 	{
-	  	physAddr += PT_INCREMENT*i;
+	  	physAddr = PT_INCREMENT*i;
 
 		page_directory[i] = PD_ENTRY_EMP_VAL;
-		first_page_table[i] = (PT_INCREMENT*i | PD_ENTRY_INIT_VAL_0);
+		first_page_table[i] = (physAddr | PD_ENTRY_INIT_VAL_0);
 
 	}
 
 	//set the first two enties of the PD
 	 page_directory[0] = ((unsigned int)first_page_table) | PD_ENTRY_INIT_VAL_0;
 
-/*
+
 	 physAddr += PT_INCREMENT;
-	 page_directory[1] = (physAddr | PD_ENTRY_INIT_VAL_1);*/
+	 page_directory[1] = (physAddr | PD_ENTRY_INIT_VAL_1);
 
 
 	 //load page dir and enable paging
