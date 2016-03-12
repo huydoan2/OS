@@ -3,68 +3,68 @@
 #define  PYHSADDR_INCREMENT 1000
 #define  PHYSADDR_MASK 0xFFC00000
 #define  PT_ENTRY_INIT_VAL 0x1B
-#define  PD_ENTRY_INIT_VAL_0 0x1B
-#define  PD_ENTRY_INIT_VAL_1 0x9B
+#define  PD_ENTRY_EMP_VAL 0x00000002
+#define  PD_ENTRY_INIT_VAL_0 0x00000003
+#define  PD_ENTRY_INIT_VAL_1 0x00000083
 void paging_init()
 {
 	int i;
-	uint32_t val;
-	uint32_t virtAddr = VIRMEM_START;
-	uint32_t physAddr = 0x00000000;
+   // uint32_t val = 3; //set present, supervisor, read/write
+    uint32_t physAddr = PHYSMEM_START;
 
 	
-	//set the first page table 
+	//create the empty page dir first page table
 	for(i = 0; i < MAX_SIZE; i++)
 	{
-		
-		virtAddr = PT_INCREMENT*i + VIRMEM_START;
+	  	physAddr += PT_INCREMENT*i;
 
-		//get the physical address of current page
-		physAddr += PYHSADDR_INCREMENT;
-		//set page table flag
-        if(i == 0){
-        	val  = 0;
-        }
-        else{
-        	val = PT_ENTRY_INIT_VAL | (physAddr & PHYSADDR_MASK);
-        }
-        //set the page table entry 
-		//mapping_virt2Phys_Addr(physAddr, virtAddr, val);
-		fill_pt_entry(first_pt, i, val);
+		page_directory[i] = PD_ENTRY_EMP_VAL;
+		first_page_table[i] = (physAddr | PD_ENTRY_INIT_VAL_0);
 
 	}
 
-
-  //set the first page directory entry 
-	for(i = 0; i < MAX_SIZE; i++){
-		if(i == 0){
-			val = (PD_ENTRY_INIT_VAL_0)|((uint32_t)first_pt & PHYSADDR_MASK);
-			fill_pd_entry(i, val);
-		}
-		else if (i == 1){
-
-			physAddr += PYHSADDR_INCREMENT;
-
-			val = (PD_ENTRY_INIT_VAL_1)|(physAddr & PHYSADDR_MASK);
-			fill_pd_entry(i, val);
-		}
-		else 
-			page_directory[i].val = 0;
-	}
+	//set the first two enties of the PD
+	 page_directory[0] = ((unsigned int)first_page_table) | PD_ENTRY_INIT_VAL_0;
 
 
+	 physAddr += PT_INCREMENT;
+	 page_directory[1] = (physAddr | PD_ENTRY_INIT_VAL_1)
+
+
+	 //load page dir and enable paging
+
+	 asm volatile("                  \n\
+		    	push %ebp		   \n\
+				mov %esp, %ebp      \n\
+				mov 8(%esp), %eax	 \n\
+				mov %eax, %cr3	 \n\
+				mov %ebp, %esp	 \n\
+				pop %ebp			 \n\
+
+				push %ebp			 \n\
+				mov %esp, %ebp		 \n\
+				mov %cr0, %eax		 \n\
+				or $0x80000000, %eax  \n\
+				mov %eax, %cr0		 \n\
+				mov %ebp, %esp		 \n\
+				pop %ebp			 \n\
+
+				ret 				 \n\
+		    "
+			);
+	 printf("Paging enabled!\n");
 
 }
 
 
 void fill_pd_entry(int index, uint32_t val)
 {
-	page_directory[index].val = val;
+	page_directory[index] = val;
 }
 
 void fill_pt_entry(pt_entry_t * pt, int index, uint32_t val)
 {
-	pt[index].val = val;
+	pt[index] = val;
 }
 
 /*

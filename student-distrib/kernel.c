@@ -159,7 +159,7 @@ entry (unsigned long magic, unsigned long addr)
 
 	printf("Before paging initialization\n");
 	paging_init();
-	printf("after paging initialization\n");
+	
 
 	//rtc_init();
 	/*Set up IDT to handle system calls*/
