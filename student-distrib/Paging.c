@@ -19,7 +19,7 @@ void paging_init()
 	  	physAddr += PT_INCREMENT*i;
 
 		page_directory[i] = PD_ENTRY_EMP_VAL;
-		first_page_table[i] = (physAddr | PD_ENTRY_INIT_VAL_0);
+		first_page_table[i] = (PT_INCREMENT*i | PD_ENTRY_INIT_VAL_0);
 
 	}
 
