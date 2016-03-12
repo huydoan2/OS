@@ -28,7 +28,7 @@ void paging_init()
 
 
 	 physAddr += PT_INCREMENT;
-	 page_directory[1] = (physAddr | PD_ENTRY_INIT_VAL_1)
+	 page_directory[1] = (physAddr | PD_ENTRY_INIT_VAL_1);
 
 
 	 //load page dir and enable paging
