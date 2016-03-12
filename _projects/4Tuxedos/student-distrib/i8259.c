@@ -16,7 +16,7 @@ i8259_init(void)
 {
 	/*save the mask values from the master and slave PICs*/
 	master_mask = 0xff;            
-	slave_mask = 0xff;
+	slave_mask = 0xff;	
 	
 	/*start the initialization sequence*/
 	outb(ICW1, MASTER_COMMAND);			
@@ -41,7 +41,7 @@ i8259_init(void)
 	outb(ICW4, SLAVE_DATA);
 
 	
- 	/*resotre the PIC masks*/
+ 	/*resotre the PIC masks*/ 	
 	outb(master_mask, MASTER_DATA);   			
 	outb(slave_mask, SLAVE_DATA);
 }
@@ -54,13 +54,13 @@ enable_irq(uint32_t irq_num)
 	//if the interrupt request line's on the master PIC
     if(irq_num < 8) 
     {
-    	value = inb(MASTER_DATA) & ~(1 << irq_num);
+    	value = inb(MASTER_DATA) & (~(1 << irq_num));
     	outb(value, MASTER_DATA);
     } 
     else //if the interrupt request line's on the slave PIC
     {
-    	irq_num -= 8;
-    	value = inb(SLAVE_DATA) & ~(1 << irq_num);
+    	irq_num &= 7;
+    	value = inb(SLAVE_DATA) & (~(1 << irq_num));
         outb(value, SLAVE_DATA);
     }
 }
@@ -77,7 +77,7 @@ disable_irq(uint32_t irq_num)
     } 
     else //if the interrupt request line's on the slave PIC
     {
-    	irq_num -= 8;
+    	irq_num &= 7;
     	value = inb(SLAVE_DATA) | (1 << irq_num);
         outb(value, SLAVE_DATA);
     }
@@ -88,12 +88,12 @@ void
 send_eoi(uint32_t irq_num)
 {
 	//printf("Reached EOI \n");
+
 	if(irq_num >= 8)
 		outb(EOI | (irq_num & 7), SLAVE_COMMAND);
 	outb(EOI | irq_num, MASTER_COMMAND);
 
-	enable_irq(irq_num);
-
+	
 
 }
 

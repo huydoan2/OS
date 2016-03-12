@@ -28,6 +28,14 @@ void keyboard_init()
 
 void keyboard_handler()
 {	
+	//disable_irq(keyboard_irq_num);
+	printf("Value:%c ||", getchar());
 	send_eoi(keyboard_irq_num);
-	printf("Value:%c || ", getchar());
+	//enable_irq(keyboard_irq_num);
+
+	asm volatile("                  \n\
+		    leave                    \n\
+			iret                    \n\
+		    "
+			);
 }
