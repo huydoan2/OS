@@ -5,6 +5,9 @@
 #define VIRMEM_START 0x00000000
 #define VIRMEM_END   0xFFFFF000
 
+#include "types.h"
+
+
 typedef struct pt_entry{
 	union{
 		uint32_t val;
