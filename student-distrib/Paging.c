@@ -35,13 +35,11 @@ void paging_init()
 
 	 asm volatile("                     \n\
 			 movl page_directory, %%eax \n\
-	 		 movl  %%eax, %%cr3 		\n\
-			 movl  %%cr0, %%eax 		\n\
+	 		
 			 orl  $0x80000000, %%eax 	\n\
-			 movl %%eax, %%cr0 			\n\
-			 movl %%cr4, %%eax 			\n\
+			 
 			 orl  $0x00000010, %%eax 	\n\
-			 movl %%eax, %%cr4 			\n\
+			
 		    "
 			);
 	 printf("Paging enabled!\n");
