@@ -38,7 +38,7 @@ void paging_init()
   //set the first page directory entry 
 	for(i = 0; i < MAX_SIZE; i++){
 		if(i == 0){
-			val = (PD_ENTRY_INIT_VAL_0)|((void*)first_pt & PHYSADDR_MASK);
+			val = (PD_ENTRY_INIT_VAL_0)|((uint32_t)first_pt & PHYSADDR_MASK);
 			fill_pd_entry(i, val);
 		}
 		else if (i == 1){
@@ -64,7 +64,7 @@ void fill_pd_entry(int index, uint32_t val)
 
 void fill_pt_entry(pt_entry_t * pt, int index, uint32_t val)
 {
-	pt[index] = val;
+	pt[index].val = val;
 }
 
 /*
