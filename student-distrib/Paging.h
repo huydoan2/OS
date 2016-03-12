@@ -49,7 +49,7 @@ typedef struct pd_entry{
 
 typedef struct page_table_t{
 	pt_entry_t page_table[MAX_SIZE] __attribute__((aligned (4)));
-	uint32_t pt_size;	
+	//uint32_t pt_size;	
 } page_table_t;
 
 /**/
