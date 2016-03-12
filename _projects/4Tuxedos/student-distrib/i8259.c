@@ -87,13 +87,12 @@ disable_irq(uint32_t irq_num)
 void
 send_eoi(uint32_t irq_num)
 {
-	
+	//if the interrupt request line's on the slave PIC
 	if(irq_num >= 8)
 		outb(EOI | (irq_num & 7), SLAVE_COMMAND);
+	//if the interrupt request line's on the master PIC
 	else
 		outb(EOI | irq_num, MASTER_COMMAND);
-
-	
 
 }
 

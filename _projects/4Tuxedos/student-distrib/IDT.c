@@ -11,6 +11,11 @@
 #define SIZE_16 0
 #define PRESENT 1
 #define NOT_PRESENT 0
+#define RESERVED3_0 0
+#define RESERVED3_1 1
+#define RESERVED2 1
+#define RESERVED1 1
+#define RESERVED0 0
 
 
 /* 
@@ -481,7 +486,7 @@ void system_calls()
  
  	/*fill in all the exception entries*/
  	//exception_0
- 	fill_interrupt_descriptor_table_entry(&idt_enry, KERNEL_CS, RESERVED4, 0, 1, 1, SIZE_32, 0, DPL_0, PRESENT);
+ 	fill_interrupt_descriptor_table_entry(&idt_enry, KERNEL_CS, RESERVED4, RESERVED3_1, RESERVED2, RESERVED1, SIZE_32, RESERVED0, DPL_0, PRESENT);
  	SET_IDT_ENTRY(idt_enry, Exception_Handler_0);
  	idt[0] = idt_enry;
 
@@ -562,18 +567,17 @@ void system_calls()
  	idt[30] = idt_enry;
 
  	//keyboard
- 	fill_interrupt_descriptor_table_entry(&idt_enry, KERNEL_CS, RESERVED4, 0, 1, 1, SIZE_32, 0, DPL_0, PRESENT);
+ 	fill_interrupt_descriptor_table_entry(&idt_enry, KERNEL_CS, RESERVED4, RESERVED3_0, RESERVED2, RESERVED1, SIZE_32, RESERVED0, DPL_0, PRESENT);
  	SET_IDT_ENTRY(idt_enry, keyboard_handler);
  	idt[33] = idt_enry;
 
  	//RTC
- 	fill_interrupt_descriptor_table_entry(&idt_enry, KERNEL_CS, RESERVED4, 0, 1, 1, SIZE_32, 0, DPL_0, PRESENT);
+ 	fill_interrupt_descriptor_table_entry(&idt_enry, KERNEL_CS, RESERVED4, RESERVED3_0, RESERVED2, RESERVED1, SIZE_32, RESERVED0, DPL_0, PRESENT);
  	SET_IDT_ENTRY(idt_enry, test_interrupts);
  	idt[40] = idt_enry;
- 	
 
  	/*fill in the system call entry*/
- 	fill_interrupt_descriptor_table_entry(&idt_enry, KERNEL_CS, RESERVED4, 1, 1, 1, SIZE_32, 0, DPL_0, PRESENT);
+ 	fill_interrupt_descriptor_table_entry(&idt_enry, KERNEL_CS, RESERVED4, RESERVED3_1, RESERVED2, RESERVED1, SIZE_32, RESERVED0, DPL_0, PRESENT);
  	SET_IDT_ENTRY(idt_enry, system_calls);
  	idt[128] = idt_enry;
  }
