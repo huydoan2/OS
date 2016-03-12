@@ -53,7 +53,7 @@ typedef struct page_table_t{
 } page_table_t;
 
 /**/
-static pt_entry_t first_pt[MAX_SIZE];
+static uint32_t first_pt[MAX_SIZE];
 static pd_entry_t page_directory[MAX_SIZE] __attribute__((aligned (4)));
 static uint32_t pd_size;
 
