@@ -4,6 +4,7 @@
 #include "i8259.h"
 #include "lib.h"
 
+//initialize the rtc
 extern void rtc_init();
 
 
