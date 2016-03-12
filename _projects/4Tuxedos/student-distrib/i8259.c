@@ -87,11 +87,11 @@ disable_irq(uint32_t irq_num)
 void
 send_eoi(uint32_t irq_num)
 {
-	//printf("Reached EOI \n");
-
+	
 	if(irq_num >= 8)
 		outb(EOI | (irq_num & 7), SLAVE_COMMAND);
-	outb(EOI | irq_num, MASTER_COMMAND);
+	else
+		outb(EOI | irq_num, MASTER_COMMAND);
 
 	
 

@@ -8,6 +8,8 @@
 #define NUM_ROWS 25
 #define ATTRIB 0x7
 
+ #include "i8259.h"
+
 static int screen_x;
 static int screen_y;
 static char* video_mem = (char *)VIDEO;
@@ -563,18 +565,18 @@ test_interrupts(void)
 {
 
 	int32_t i;
-
-	printf("RTC handler");
 	
+	send_eoi(2);
 	send_eoi(8);
 
 	for (i=0; i < NUM_ROWS*NUM_COLS; i++) {
 		video_mem[i<<1]++;
 	}
 
-	outb(0x70, 0x0C);	// select register C
+	outb(0x0C , 0x70);	// select register C
 	inb(0x71);		// just throw away contents
 	
+
 	asm volatile("                  \n\
 		    leave                    \n\
 			iret                    \n\
