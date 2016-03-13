@@ -5,9 +5,9 @@
 #include "i8259.h"
 #include "lib.h"
 
-#define mask 0xff;
-#define EIGHT 8;
-#define SEVEN 7;
+#define mask 0xff
+#define EIGHT 8
+#define SEVEN 7
 /* Interrupt masks to determine which interrupts
  * are enabled and disabled */
 uint8_t master_mask; /* IRQs 0-7 */
@@ -55,7 +55,7 @@ enable_irq(uint32_t irq_num)
 {
 	uint8_t value;
 	//if the interrupt request line's on the master PIC
-    if(irq_num < EIGHT) 
+    if(irq_num < EIGHT)
     {
     	value = inb(MASTER_DATA) & (~(1 << irq_num));
     	outb(value, MASTER_DATA);
