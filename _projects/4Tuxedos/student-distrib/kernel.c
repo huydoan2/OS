@@ -21,9 +21,7 @@ void
 entry (unsigned long magic, unsigned long addr)
 {
 	multiboot_info_t *mbi;
-	int * i = NULL;
 
-	int a;
 
 	/* Clear the screen. */
 	clear();
@@ -160,13 +158,12 @@ entry (unsigned long magic, unsigned long addr)
 	 * PIC, any other initialization stuff... */
 	keyboard_init();
 
-	printf("Before paging initialization\n");
+	
 	paging_init();
+	printf("Paging initialized\n");
 
 
-     a = *i;
-
-	//rtc_init();
+	rtc_init();
 	/*Set up IDT to handle system calls*/
 
 
