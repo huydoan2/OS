@@ -25,9 +25,16 @@ void fill_pt_entry(uint32_t * pt, int index, uint32_t val);
 
 
 /*functions that might be useful in the future for manipulating the paging*/
-//void get_physAddr(uint32_t * virtAddr);
+void get_physAddr(uint32_t  virtAddr);
 
-//void mapping_virt2Phys_Addr(uint32_t* physAddr, uint32_t* virtAddr, uint32_t val);
+void mapping_virt2Phys_Addr(uint32_t* physAddr, uint32_t* virtAddr, uint32_t val);
+
+
+
+
+
+
+
 
 #endif
 
