@@ -115,26 +115,49 @@ void fill_pt_entry(uint32_t * pt, int index, uint32_t val)
 	pt[index] = val;
 }
 
-/*
+
 uint32_t get_physAddr(uint32_t virtAddr){
 
-	unsigned long pdindex = (unsigned long)virtAddr >> 22;
-    unsigned long ptindex = (unsigned long)virtAddr >> 12 & 0x03FF;
+	uint32_t pt_addr = 0;
+	uint32_t pt_entry;
+	uint32_t phys_addr;
+
+
+	unsigned long pd_index = (unsigned long)virtAddr >> 22;
+    unsigned long pt_index = (unsigned long)virtAddr >> 12 & 0x03FF;
+    unsigned long phys_offset_0 = (unsigned long)(virtAddr & 0x00000FFF);
+    unsigned long phys_offset_1 = (unsigned long)(virtAddr & 0x003FFFFF);
  
-    unsigned long * pd = (unsigned long *)0xFFFFF000;
-    // Here you need to check whether the PD entry is present.
- 
-    unsigned long * pt = ((unsigned long *)0xFFC00000) + (0x400 * pdindex);
-    // Here you need to check whether the PT entry is present.
- 
-    return ((pt[ptindex] & ~0xFFF) + ((unsigned long)virtualaddr & 0xFFF));
+    //unsigned long * pd = (unsigned long *)0xFFFFF000;
+    uint32_t pd_entry = page_directory[pd_index];
+    //determine the size of the page 
+    uint32_t page_size = pd_entry & 0x0000080;
+
+    if(page_size == 0){ //4kB page
+     	pt_addr = pd_entry & 0xFFFFF000;
+     	pt_entry = pt_addr[pt_index];
+
+     	phys_addr = pt_entry & 0xFFFFF000;
+     	phys_addr += phys_offset_0;
+
+     	return phys_addr;
+    }
+    else{ // 4MB page
+
+    	phys_addr = pd_entry & 0xFFC00000;
+    	phys_addr += phys_offset_1;
+
+    	return phys_addr;
+
+    }
+    
 
 }
-*/
-/*
+
+
 void mapping_virt2Phys_Addr(uint32_t* physAddr, uint32_t* virtAddr, uint32_t val){
 
     first_pt[index] = val;
 }
-*/
+
 

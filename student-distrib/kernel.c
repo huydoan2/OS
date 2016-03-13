@@ -3,6 +3,7 @@
  */
 
 #include "multiboot.h"
+#include "types.h"
 #include "x86_desc.h"
 #include "lib.h"
 #include "i8259.h"
@@ -21,6 +22,8 @@ void
 entry (unsigned long magic, unsigned long addr)
 {
 	multiboot_info_t *mbi;
+	uint32_t test_phys_addr;
+	uint32_t test_virt_addr = 0x00002000;
 
 	/* Clear the screen. */
 	clear();
@@ -162,7 +165,10 @@ entry (unsigned long magic, unsigned long addr)
 	printf("Paging initialized\n");
 
 
-	rtc_init();
+	test_phys_addr = get_physAddr(test_virt_addr);
+
+	printf("memory: %x", *test_phys_addr);
+	//rtc_init();
 	/*Set up IDT to handle system calls*/
 
 
