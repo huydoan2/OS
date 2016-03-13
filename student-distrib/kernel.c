@@ -163,7 +163,7 @@ entry (unsigned long magic, unsigned long addr)
 	printf("Paging initialized\n");
 
 
-	rtc_init();
+	//rtc_init();
 	/*Set up IDT to handle system calls*/
 
 
