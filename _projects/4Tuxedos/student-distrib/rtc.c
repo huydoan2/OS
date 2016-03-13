@@ -14,7 +14,7 @@
 #define MASK_TURNON_SIXBIT  0x40
 #define MASK_TURNON_FIVEBIT 0x20
 #define NMI_DISABLE 0x80
-#define RATE        6
+#define RATE        17
 #define POST_MASK   0x7F
 #define PREV_MASK   0xF0
 #define VIDEO 0xB8000
