@@ -46,3 +46,35 @@ void rtc_init(){
 	/*enable the NMI*/
 	outb(inb(RTC_PORT)&POST_MASK,RTC_PORT);
 }
+
+
+/*
+* void rtc_handler(void)
+*   Inputs: void
+*   Return Value: void
+*	Function: increments video memory. To be used to test rtc
+*/
+
+void
+rtc_handler(void)
+{
+
+	int32_t i;
+	
+	send_eoi(RTC_IRQ_2);
+	send_eoi(RTC_IRQ_8);
+
+	for (i=0; i < NUM_ROWS*NUM_COLS; i++) {
+		video_mem[i<<1]++;
+	}
+	
+	outb(REGISTER_C , RTC_PORT);	// select register C
+	inb(CMOS_PORT);		// just throw away contents
+	
+
+	asm volatile("                  \n\
+		    leave                    \n\
+			iret                    \n\
+		    "
+			);
+}
