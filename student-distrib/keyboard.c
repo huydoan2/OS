@@ -12,13 +12,13 @@
 //scancode array for keyboard
 //0 = no output
 //size of the scancode is 88
-char scancode [88] = {
-	'1','2','3','4','5','6','7','8','9','0','-','=', 0 , 0,
+char scancode [89] = {
+	'\0','1','2','3','4','5','6','7','8','9','0','-','=', 0 , 0,
 	'q','w','e','r','t','y','u','i','o','p','[',']','\n',0,
 	'a','s','d','f','g','h','j','k','l',';','\'','`',0,'\\',
 	'z','x','c','v','b','n','m',',','.','/',0,'*',0,' ',0,
 	0,0,0,0,0,0,0,0,0,0,0,0,'7','8','9','-','4','5','6','+','1','2','3','0','.',
-	0,0,0,0,0,0
+ 	0,0,0,0,0,0
 };
 
 /* 
@@ -35,10 +35,7 @@ char scancode [88] = {
 char getScancode()
 {
 	char c = inb(KEYBOARD_DATA);
-	if (c > 0)
-		return c;
-	else
-		return 0;
+	return c;
 }
 
 /* 
@@ -54,7 +51,11 @@ char getScancode()
  */
 char getchar()
 {
-	return scancode[getScancode()-2];
+	unsigned char c = getScancode();
+	if(c < 0x81)
+		return scancode[c-1];
+	else
+		return scancode[0];
 }
 
 /* 
@@ -86,7 +87,8 @@ void keyboard_init()
  */
 void keyboard_handler()
 {	
-	printf("%c", getchar());
+	if(getchar() != '\0')
+		printf("%c", getchar());
 	send_eoi(keyboard_irq_num);
 	asm volatile("                  \n\
 		    leave                    \n\
