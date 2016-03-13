@@ -1,3 +1,6 @@
+/*rtc.c 
+ * - function for initializing RTC and its PIC connection
+ */
 #include "rtc.h"
 
 #define RTC_PORT	0x70

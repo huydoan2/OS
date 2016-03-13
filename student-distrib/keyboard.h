@@ -1,3 +1,7 @@
+/* keyboard.h - keyboard initialization, and keyboard dirver
+ * and selectors
+ * vim:ts=4 noexpandtab
+ */
 #ifndef _KEYBORAD_H
 #define _KEYBORAD_H
 

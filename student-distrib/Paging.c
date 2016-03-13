@@ -1,41 +1,63 @@
 #include "Paging.h"
-#define  PT_INCREMENT 0x1000
-#define  PHYSADDR_MASK 0xFFC00000
-#define  PT_ENTRY_INIT_VAL 0x1B
+
+#define  PT_INCREMENT 0x1000  		//increment value for the physical address for each entry in the page table
+#define  PHYSADDR_MASK 0xFFC00000	//mask to get the physical address from a table enry
+/*entry values for page directory*/
 #define  PD_ENTRY_EMP_VAL 0x00000002
 #define  PD_ENTRY_INIT_VAL_0 0x00000103
 #define  PD_ENTRY_INIT_VAL_1 0x00000183
+/*entry value for page table*/
+#define  PT_ENTRY_EMP_VAL 0x00000002
+#define  PT_ENTRY_INIT_VAL_0 0x00000103
+#define  PT_ENTRY_INIT_VAL_1 0x00000183
+/*mask for turn on CR0 and CR4*/
 #define  TURNON_PAGING 0x80000000
 #define  TURNON_4MB_PAGE 0x00000010
+
+
+/* 
+ * paging_init
+ *   DESCRIPTION: function that initializes the page dir, page table and enable paging
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: none
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: - page directory and the first page table are allocated 
+ *				   - paging is enabled
+ *
+ */
 void paging_init()
 {
-	int i;
-   // uint32_t val = 3; //set present, supervisor, read/write
+	int i;	
+	//assign the physical address to the starting address
     uint32_t physAddr = PHYSMEM_START;
 
 	
-	//create the empty page dir first page table
+	/*initialize page directory and the first page table*/
 	for(i = 0; i < MAX_SIZE; i++)
 	{
-	  	physAddr = PT_INCREMENT*i;
 
+	  	physAddr = PT_INCREMENT*i;
 		page_directory[i] = PD_ENTRY_EMP_VAL;
 		if (i == 0){
-			first_page_table[i] = (physAddr | PD_ENTRY_EMP_VAL);
+			first_page_table[i] = (physAddr | PT_ENTRY_EMP_VAL);	//reserve the first entry in pt as NULL
 		}
 		else
-			first_page_table[i] = (physAddr | PD_ENTRY_INIT_VAL_0);
+			first_page_table[i] = (physAddr | PT_ENTRY_INIT_VAL_0);
 
 	}
 
+
+	/*assign the first and second entry of the page directory*/
 	//set the first two enties of the PD
 	 page_directory[0] = ((unsigned int)first_page_table) | PD_ENTRY_INIT_VAL_0;
-
-
+	 //increment the physical address to the next segement 
 	 physAddr += PT_INCREMENT;
 	 page_directory[1] = ((physAddr )| PD_ENTRY_INIT_VAL_1);
 
-	 //load page dir and enable paging
+	
+	/*load page dir and enable paging*/
     uint32_t CR0 = 0;
     uint32_t CR3 = 0;
     uint32_t CR4 = 0;
@@ -56,13 +78,38 @@ void paging_init()
 
 
 }
-
+/* 
+ * fill_pd_entry
+ *   DESCRIPTION: fill a single entry in the page directory
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: - index: the index of the page directory
+ * 			 - val: the value of the entry
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: the page directoy entry is set
+ *
+ */
 
 void fill_pd_entry(int index, uint32_t val)
 {
 	page_directory[index] = val;
 }
 
+
+/* 
+ * fill_pd_entry
+ *   DESCRIPTION: fill a single entry in the page table
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: - index: the index of the page directory
+ * 			 - val: the value of the entry
+ *           - pt: specify the page table
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: the page table entry is set
+ *
+ */
 void fill_pt_entry(uint32_t * pt, int index, uint32_t val)
 {
 	pt[index] = val;

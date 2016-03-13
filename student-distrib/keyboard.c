@@ -1,3 +1,10 @@
+/* keyboard.c
+ * - scancode lookup array
+ * - key stroke output functions
+ * - keyboard initialization functions
+ * vim:ts=4 noexpandtab
+ */
+
 #include "keyboard.h"
 
 #define keyboard_irq_num 1
