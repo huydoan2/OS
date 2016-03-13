@@ -1,3 +1,6 @@
+/*rtc.h 
+ * - function for initializing RTC and its PIC connection
+ */
 #ifndef RTC_H
 #define RTC_H
 

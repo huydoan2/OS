@@ -1,3 +1,8 @@
+/* IDT.h 
+ * - Defines and fills the interrupt descriptor tables, 
+ * with all the exceptions, interrupt handlers and system calls
+ * 
+ */
 #ifndef IDT_H
 #define IDT_H
 

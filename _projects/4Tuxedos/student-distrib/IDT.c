@@ -1,3 +1,9 @@
+/* IDT.c 
+ * - implementation of exception handlers, interrupt handlers, and 
+ *   system calls;
+ * - functions for filling the IDT
+ * vim:ts=4 noexpandtab
+ */
 #include "IDT.h"
 #include "lib.h"
 
