@@ -14,7 +14,7 @@
 #define MASK_TURNON_SIXBIT  0x40
 #define MASK_TURNON_FIVEBIT 0x20
 #define NMI_DISABLE 0x80
-#define RATE        18
+#define RATE        10
 #define POST_MASK   0x7F
 #define PREV_MASK   0xF0
 #define VIDEO 0xB8000
@@ -31,8 +31,7 @@ void rtc_init(){
 	outb(REGISTER_A|NMI_DISABLE, RTC_PORT);		//disable NMI and select reg A
 	previous = inb(CMOS_PORT);					//read current value of reg A
 	outb(REGISTER_A|NMI_DISABLE, RTC_PORT);		//disable NMI and select reg A
-	//outb((previous & PREV_MASK) | MASK_TURNON_FIVEBIT | RATE, CMOS_PORT);
-	outb( MASK_TURNON_FIVEBIT, CMOS_PORT);
+	outb((previous & PREV_MASK) | MASK_TURNON_FIVEBIT |RATE, CMOS_PORT);
 
 	
 	//set the register B
@@ -49,13 +48,8 @@ void rtc_init(){
 	enable_irq(RTC_IRQ_8);
 	enable_irq(RTC_IRQ_2);
 
-   	outb(REGISTER_A|NMI_DISABLE, RTC_PORT);		//disable NMI and select reg A
-	outb((previous & PREV_MASK)  | RATE, CMOS_PORT);
 	/*enable the NMI*/
 	outb(inb(RTC_PORT)&POST_MASK,RTC_PORT);
-
-
-
 }
 
 
