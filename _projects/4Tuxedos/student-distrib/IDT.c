@@ -573,16 +573,19 @@ void system_calls()
  	idt[30] = idt_enry;
 
  	//keyboard
+ 	//33 is 0x21 corresponding to irq 1
  	fill_interrupt_descriptor_table_entry(&idt_enry, KERNEL_CS, RESERVED4, RESERVED3_0, RESERVED2, RESERVED1, SIZE_32, RESERVED0, DPL_0, PRESENT);
  	SET_IDT_ENTRY(idt_enry, keyboard_handler);
  	idt[33] = idt_enry;
 
  	//RTC
+ 	//40 is 0x28 corresponding to irq 8
  	fill_interrupt_descriptor_table_entry(&idt_enry, KERNEL_CS, RESERVED4, RESERVED3_0, RESERVED2, RESERVED1, SIZE_32, RESERVED0, DPL_0, PRESENT);
  	SET_IDT_ENTRY(idt_enry, test_interrupts);
  	idt[40] = idt_enry;
 
  	/*fill in the system call entry*/
+ 	//128 is 0x80 corresponding to irq 8
  	fill_interrupt_descriptor_table_entry(&idt_enry, KERNEL_CS, RESERVED4, RESERVED3_1, RESERVED2, RESERVED1, SIZE_32, RESERVED0, DPL_0, PRESENT);
  	SET_IDT_ENTRY(idt_enry, system_calls);
  	idt[128] = idt_enry;

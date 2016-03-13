@@ -9,11 +9,14 @@
 #define REGISTER_B  0x0B
 #define REGISTER_C  0x0C
 #define REGISTER_D  0x0D
-#define RTC_IRQ_NUM 8
+#define RTC_IRQ_8   8
+#define RTC_IRQ_2   2
 #define MASK_TURNON_SIXBIT  0x40
 #define MASK_TURNON_FIVEBIT 0x20
 #define NMI_DISABLE 0x80
 #define RATE        6
+#define POST_MASK   0x7F
+#define PREV_MASK   0xF0
 
 
 void rtc_init(){
@@ -24,7 +27,7 @@ void rtc_init(){
 
 	outb(REGISTER_A|NMI_DISABLE, RTC_PORT);		//disable NMI and select reg A
 	previous = inb(CMOS_PORT);					//read current value of reg A
-	outb((previous & 0xF0) | MASK_TURNON_FIVEBIT | RATE, CMOS_PORT);
+	outb((previous & PREV_MASK) | MASK_TURNON_FIVEBIT | RATE, CMOS_PORT);
 	
 	//set the register B
 
@@ -37,9 +40,9 @@ void rtc_init(){
     outb(previous | MASK_TURNON_SIXBIT, CMOS_PORT);	
 
 	/*initialize the PIC*/
-	enable_irq(RTC_IRQ_NUM);
-	enable_irq(2);
+	enable_irq(RTC_IRQ_8);
+	enable_irq(RTC_IRQ_2);
 
 	/*enable the NMI*/
-	outb(inb(0x70)&0x7F,0x70);
+	outb(inb(RTC_PORT)&POST_MASK,RTC_PORT);
 }
