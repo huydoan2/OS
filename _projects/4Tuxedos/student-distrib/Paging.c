@@ -39,6 +39,7 @@ void paging_init()
     uint32_t CR0 = 0;
     uint32_t CR3 = 0;
     uint32_t CR4 = 0;
+    /*
     asm volatile("mov %%CR3, %0":"=c"(CR3));
 	CR3 = (unsigned int)page_directory;
 	asm volatile("mov %0, %%CR3"::"c"(CR3));  
@@ -49,7 +50,7 @@ void paging_init()
 
 	asm volatile("mov %%CR4, %0":"=c"(CR4));  
 	CR4 = CR4 | 0x00000010;
-	asm volatile("mov %0, %%CR4"::"c"(CR4));  
+	asm volatile("mov %0, %%CR4"::"c"(CR4));  */
 
 /*
 	 asm volatile(
