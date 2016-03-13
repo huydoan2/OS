@@ -5,8 +5,9 @@
 #define  PD_ENTRY_EMP_VAL 0x00000002
 #define  PD_ENTRY_INIT_VAL_0 0x00000103
 #define  PD_ENTRY_INIT_VAL_1 0x00000183
-#define  TURNON_PAGING      0x80000000
-#define  TURNON_4MB_PAGE    0x00000010
+#define  TURNON_4MB_PAGE     0x00000010
+#define  TURNON_PAGING       0x80000000
+
 void paging_init()
 {
 	int i;
