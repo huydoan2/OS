@@ -34,7 +34,7 @@ void paging_init()
 	 //load page dir and enable paging
 
 	 asm volatile(
-	 		"movl page_directory, %%eax \n"
+	 		"movl %0, %%eax \n"
 	 		"movl  %%eax, %%cr3 		\n"
 			"movl  %%cr0, %%eax 		\n"
 			"orl  $0x80000000, %%eax 	\n"
@@ -43,7 +43,7 @@ void paging_init()
 			"orl  $0x00000010, %%eax 	\n"
 			"movl %%eax, %%cr4 			\n"
 		    :
-		    :
+		    : "r" (&page_directory[0])
 		    : "%eax"
 			);
 			
