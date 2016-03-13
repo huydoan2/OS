@@ -32,18 +32,18 @@ void paging_init()
 
     printf("pd[0]: %x ||pd[1]: %x||pt: %x||pt[1023]: %x",  page_directory[0],page_directory[1],first_page_table, first_page_table[1023]);
 	 //load page dir and enable paging
-/*
+
 	 asm volatile("                     \n\
-			 movl page_directory, %eax  \n\
-	 		 movl  %eax, %cr3 		    \n\
-			 movl  %cr0, %eax 		    \n\
-			 orl  $0x80000000, %eax 	\n\
-			 movl %eax, %cr0 			\n\
-			 movl %cr4, %eax 			\n\
-			 orl  $0x00000010, %eax 	\n\
-			 movl %eax, %cr4 			\n\
+			 movl page_directory, %%eax  \n\
+	 		 movl  %%eax, %%cr3 		    \n\
+			 movl  %%cr0, %%eax 		    \n\
+			 orl  $0x80000000, %%eax 	\n\
+			 movl %%eax, %%cr0 			\n\
+			 movl %%cr4, %%eax 			\n\
+			 orl  $0x00000010, %%eax 	\n\
+			 movl %%eax, %%cr4 			\n\
 		    "
-			);*/
+			);
 			
 	 printf("Paging enabled!\n");
 
