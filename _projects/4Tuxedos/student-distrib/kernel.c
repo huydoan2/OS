@@ -23,7 +23,7 @@ entry (unsigned long magic, unsigned long addr)
 {
 	multiboot_info_t *mbi;
 	uint32_t test_phys_addr;
-	uint32_t test_virt_addr = 0x00400111;
+	uint32_t test_virt_addr = 0x00000111;
 	uint32_t test_val;
 
 	/* Clear the screen. */
