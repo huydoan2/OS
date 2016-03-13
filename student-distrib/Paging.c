@@ -30,7 +30,7 @@ void paging_init()
 	 physAddr += PT_INCREMENT;
 	 page_directory[1] = ((physAddr )| PD_ENTRY_INIT_VAL_1);
 
-    printf("pd[0]: %x ||pd[1]: %x\n",  page_directory[0],page_directory[1]);
+    printf("pd[0]: %x ||pd[1]: %x||pt: %x\n",  page_directory[0],page_directory[1],page_directory);
 	 //load page dir and enable paging
 /*
 	 asm volatile("                     \n\
