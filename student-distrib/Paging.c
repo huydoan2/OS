@@ -41,38 +41,21 @@ void paging_init()
     uint32_t CR0 = 0;
     uint32_t CR3 = 0;
     uint32_t CR4 = 0;
-    
+
+	//pass the address of page directory     
     asm volatile("mov %%CR3, %0":"=c"(CR3));
 	CR3 = (unsigned int)page_directory;
 	asm volatile("mov %0, %%CR3"::"c"(CR3));  
 
-
+	//turn on the 4 MB page
 	asm volatile("mov %%CR4, %0":"=c"(CR4));  
 	CR4 = CR4 | TURNON_4MB_PAGE;
 	asm volatile("mov %0, %%CR4"::"c"(CR4)); 
-	 
+	//enable paging 
 	asm volatile("mov %%CR0, %0":"=c"(CR0));  
 	CR0 = CR0 | TURNON_PAGING;
 	asm volatile("mov %0, %%CR0"::"c"(CR0)); 
 
-
-/*
-	 asm volatile(
-	 		"movl  %0, %%eax            \n"
-	 		"movl  %%eax, %%cr3 		\n"
-			"movl  %%cr0, %%eax 		\n"
-			"orl  $0x80000000, %%eax 	\n"
-			"movl %%eax, %%cr0 			\n"
-			"movl %%cr4, %%eax 			\n"
-			"orl  $0x00000010, %%eax 	\n"
-			"movl %%eax, %%cr4 			\n"
-		    :
-		    : "r" (page_directory)
-		    : "eax"
-			);
-	*/
-			
-	 printf("Paging enabled!\n");
 
 }
 
