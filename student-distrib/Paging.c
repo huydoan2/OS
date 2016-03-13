@@ -1,3 +1,8 @@
+/* Paging.c
+ * - delcaration of page directory and page tables
+ * - function to initializing the paging
+ * - functions for paging memory manipulation*/
+
 #include "Paging.h"
 
 #define  PT_INCREMENT 0x1000  		//increment value for the physical address for each entry in the page table

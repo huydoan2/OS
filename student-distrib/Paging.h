@@ -1,3 +1,9 @@
+/* Paging.h
+ * - delcaration of page directory and page tables
+ * - function to initializing the paging
+ * - functions for paging memory manipulation
+ * vim:ts=4 noexpandtab
+ */
 #ifndef PAGING_H
 #define PAGING_H
 
