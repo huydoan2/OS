@@ -9,6 +9,7 @@
 #include "lib.h"
 #include "x86_desc.h"
 #include "keyboard.h"
+#include "rtc.h"
 /*all the exception handlers*/
 extern void Exception_Handler_0();
 
