@@ -1,7 +1,8 @@
 #include "Paging.h"
 
 #define  PT_INCREMENT 0x1000  		//increment value for the physical address for each entry in the page table
-#define  PHYSADDR_MASK 0xFFC00000	//mask to get the physical address from a table enry
+#define  PHYSADDR_MASK_1 0xFFC00000	//mask to get the physical address from a table enry (4KB page)
+#define  PHYSADDR_MASK_0 0xFFFFF000
 /*entry values for page directory*/
 #define  PD_ENTRY_EMP_VAL 0x00000002
 #define  PD_ENTRY_INIT_VAL_0 0x00000103
@@ -13,6 +14,13 @@
 /*mask for turn on CR0 and CR4*/
 #define  TURNON_PAGING 0x80000000
 #define  TURNON_4MB_PAGE 0x00000010
+/*masks for mapping from the virtual address to the physical address*/
+#define PD_IDX_SHIFT 22
+#define PT_IDX_SHIFT 12
+#define PT_IDX_MASK 0x03FF
+#define PHYS_ADDR_OFFSET_MASK_0 0x00000FFF//the mask for 4kB page
+#define PHYS_ADDR_OFFSET_MASK_1 0x003FFFFF//the mask for 4MB page
+#define PAGE_SIZE_MASK 0x0000080 //mask to extract the page size bit from the pd 
 
 
 /* 
@@ -116,6 +124,17 @@ void fill_pt_entry(uint32_t * pt, int index, uint32_t val)
 }
 
 
+/* 
+ * get_physAddr
+ *   DESCRIPTION: get the physical address from the given a virtual address (linear address)
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: - virtAddr: the virtual (linear) address to be translated
+ *   OUTPUTS: none
+ *   RETURN VALUE: return the value of the physical address corresponding to the virtual address
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: none
+ *
+ */
 uint32_t get_physAddr(uint32_t virtAddr){
 
 	uint32_t pt_addr = 0;
@@ -123,28 +142,27 @@ uint32_t get_physAddr(uint32_t virtAddr){
 	uint32_t phys_addr;
 
 
-	unsigned long pd_index = (unsigned long)virtAddr >> 22;
-    unsigned long pt_index = (unsigned long)virtAddr >> 12 & 0x03FF;
-    unsigned long phys_offset_0 = (unsigned long)(virtAddr & 0x00000FFF);
-    unsigned long phys_offset_1 = (unsigned long)(virtAddr & 0x003FFFFF);
+	unsigned long pd_index = (unsigned long)virtAddr >> PD_IDX_SHIFT;
+    unsigned long pt_index = (unsigned long)virtAddr >> PT_IDX_SHIFT & PT_IDX_MASK;
+    unsigned long phys_offset_0 = (unsigned long)(virtAddr & PHYS_ADDR_OFFSET_MASK_0);
+    unsigned long phys_offset_1 = (unsigned long)(virtAddr & PHYS_ADDR_OFFSET_MASK_1);
  
-    //unsigned long * pd = (unsigned long *)0xFFFFF000;
     uint32_t pd_entry = page_directory[pd_index];
     //determine the size of the page 
-    uint32_t page_size = pd_entry & 0x0000080;
+    uint32_t page_size = pd_entry & PAGE_SIZE_MASK;
 
     if(page_size == 0){ //4kB page
-     	pt_addr = pd_entry & 0xFFFFF000;
+     	pt_addr = pd_entry & PHYSADDR_MASK_0;
      	pt_entry = ((uint32_t *)pt_addr)[pt_index];
 
-     	phys_addr = pt_entry & 0xFFFFF000;
+     	phys_addr = pt_entry & PHYSADDR_MASK_0;
      	phys_addr += phys_offset_0;
 
      	return phys_addr;
     }
     else{ // 4MB page
 
-    	phys_addr = pd_entry & 0xFFC00000;
+    	phys_addr = pd_entry & PHYSADDR_MASK_1;
     	phys_addr += phys_offset_1;
 
     	return phys_addr;
