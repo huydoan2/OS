@@ -581,7 +581,7 @@ void system_calls()
  	//RTC
  	//40 is 0x28 corresponding to irq 8
  	fill_interrupt_descriptor_table_entry(&idt_enry, KERNEL_CS, RESERVED4, RESERVED3_0, RESERVED2, RESERVED1, SIZE_32, RESERVED0, DPL_0, PRESENT);
- 	SET_IDT_ENTRY(idt_enry, test_interrupts);
+ 	SET_IDT_ENTRY(idt_enry, rtc_handler);
  	idt[40] = idt_enry;
 
  	/*fill in the system call entry*/

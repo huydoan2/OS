@@ -9,6 +9,6 @@
 
 //initialize the rtc
 extern void rtc_init();
-
+extern void rtc_handler(void);
 
 #endif 

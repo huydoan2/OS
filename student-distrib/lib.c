@@ -563,23 +563,9 @@ strncpy(int8_t* dest, const int8_t* src, uint32_t n)
 void
 test_interrupts(void)
 {
-
 	int32_t i;
-	
-	send_eoi(2);
-	send_eoi(8);
 
 	for (i=0; i < NUM_ROWS*NUM_COLS; i++) {
 		video_mem[i<<1]++;
 	}
-	
-	outb(0x0C , 0x70);	// select register C
-	inb(0x71);		// just throw away contents
-	
-
-	asm volatile("                  \n\
-		    leave                    \n\
-			iret                    \n\
-		    "
-			);
 }
