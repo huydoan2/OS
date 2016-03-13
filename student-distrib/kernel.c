@@ -23,7 +23,7 @@ entry (unsigned long magic, unsigned long addr)
 {
 	multiboot_info_t *mbi;
 	uint32_t test_phys_addr;
-	uint32_t test_virt_addr = 0x00002000;
+	uint32_t test_virt_addr = 0x00400000;
 	uint32_t test_val;
 
 	/* Clear the screen. */
@@ -169,7 +169,7 @@ entry (unsigned long magic, unsigned long addr)
 	test_phys_addr = get_physAddr(test_virt_addr);
 	test_val = *((uint32_t *)test_phys_addr);
 
-	printf("memory: %x", test_val);
+	printf("memory: %x\n", test_val);
 	//rtc_init();
 	/*Set up IDT to handle system calls*/
 
