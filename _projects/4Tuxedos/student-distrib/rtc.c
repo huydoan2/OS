@@ -17,7 +17,10 @@
 #define RATE        6
 #define POST_MASK   0x7F
 #define PREV_MASK   0xF0
-
+#define VIDEO 0xB8000
+#define NUM_COLS 80
+#define NUM_ROWS 25
+static char* video_mem = (char *)VIDEO;
 
 void rtc_init(){
 	char previous;
