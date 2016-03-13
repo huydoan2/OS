@@ -47,7 +47,7 @@ void paging_init()
 			"movl %%eax, %%cr4 			\n"
 		    :
 		    : "r" (page_directory)
-		    : "%%eax"
+		    : "eax"
 			);
 			
 	 printf("Paging enabled!\n");
