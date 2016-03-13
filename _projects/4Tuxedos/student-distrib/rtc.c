@@ -31,8 +31,8 @@ void rtc_init(){
 	outb(REGISTER_A|NMI_DISABLE, RTC_PORT);		//disable NMI and select reg A
 	previous = inb(CMOS_PORT);					//read current value of reg A
 	outb(REGISTER_A|NMI_DISABLE, RTC_PORT);		//disable NMI and select reg A
-
-	outb((previous & PREV_MASK) | MASK_TURNON_FIVEBIT | RATE, CMOS_PORT);
+	//outb((previous & PREV_MASK) | MASK_TURNON_FIVEBIT | RATE, CMOS_PORT);
+	outb( MASK_TURNON_FIVEBIT, CMOS_PORT);
 
 	
 	//set the register B
@@ -49,8 +49,13 @@ void rtc_init(){
 	enable_irq(RTC_IRQ_8);
 	enable_irq(RTC_IRQ_2);
 
+   	outb(REGISTER_A|NMI_DISABLE, RTC_PORT);		//disable NMI and select reg A
+	outb((previous & PREV_MASK)  | RATE, CMOS_PORT);
 	/*enable the NMI*/
 	outb(inb(RTC_PORT)&POST_MASK,RTC_PORT);
+
+
+
 }
 
 
