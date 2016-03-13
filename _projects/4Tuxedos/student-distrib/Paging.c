@@ -1,11 +1,10 @@
 #include "Paging.h"
 #define  PT_INCREMENT 0x1000
-#define  PYHSADDR_INCREMENT 1000
 #define  PHYSADDR_MASK 0xFFC00000
 #define  PT_ENTRY_INIT_VAL 0x1B
 #define  PD_ENTRY_EMP_VAL 0x00000002
-#define  PD_ENTRY_INIT_VAL_0 0x00000003
-#define  PD_ENTRY_INIT_VAL_1 0x00000083
+#define  PD_ENTRY_INIT_VAL_0 0x00000103
+#define  PD_ENTRY_INIT_VAL_1 0x00000183
 void paging_init()
 {
 	int i;
@@ -19,7 +18,11 @@ void paging_init()
 	  	physAddr = PT_INCREMENT*i;
 
 		page_directory[i] = PD_ENTRY_EMP_VAL;
-		first_page_table[i] = (physAddr | PD_ENTRY_INIT_VAL_0);
+		if (i == 0){
+			first_page_table[i] = (physAddr | PD_ENTRY_EMP_VAL);
+		}
+		else
+			first_page_table[i] = (physAddr | PD_ENTRY_INIT_VAL_0);
 
 	}
 
@@ -34,7 +37,7 @@ void paging_init()
 	 //load page dir and enable paging
 
 	 asm volatile(
-	 		"movl %0, %%eax \n"
+	 		"movl  %0, %%eax            \n"
 	 		"movl  %%eax, %%cr3 		\n"
 			"movl  %%cr0, %%eax 		\n"
 			"orl  $0x80000000, %%eax 	\n"
@@ -43,8 +46,8 @@ void paging_init()
 			"orl  $0x00000010, %%eax 	\n"
 			"movl %%eax, %%cr4 			\n"
 		    :
-		    : "r" (&page_directory[0])
-		    : "%eax"
+		    : "r" (page_directory)
+		    : "%%eax"
 			);
 			
 	 printf("Paging enabled!\n");
