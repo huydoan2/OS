@@ -167,7 +167,7 @@ entry (unsigned long magic, unsigned long addr)
 
 
 	test_phys_addr = get_physAddr(test_virt_addr);
-	test_val = *test_phys_addr;
+	test_val = *(unsigned long)test_phys_addr;
 
 	printf("memory: %x", test_val);
 	//rtc_init();
