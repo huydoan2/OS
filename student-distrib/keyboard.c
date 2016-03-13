@@ -86,7 +86,7 @@ void keyboard_init()
  */
 void keyboard_handler()
 {	
-	printf(" %c ", getchar());
+	printf("%c", getchar());
 	send_eoi(keyboard_irq_num);
 	asm volatile("                  \n\
 		    leave                    \n\

@@ -572,7 +572,7 @@ test_interrupts(void)
 	for (i=0; i < NUM_ROWS*NUM_COLS; i++) {
 		video_mem[i<<1]++;
 	}
-
+	
 	outb(0x0C , 0x70);	// select register C
 	inb(0x71);		// just throw away contents
 	
