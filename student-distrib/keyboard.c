@@ -11,6 +11,7 @@
 
 //scancode array for keyboard
 //0 = no output
+//size of the scancode is 88
 char scancode [88] = {
 	'1','2','3','4','5','6','7','8','9','0','-','=', 0 , 0,
 	'q','w','e','r','t','y','u','i','o','p','[',']','\n',0,
