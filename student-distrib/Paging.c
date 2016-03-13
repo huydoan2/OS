@@ -5,9 +5,8 @@
 #define  PD_ENTRY_EMP_VAL 0x00000002
 #define  PD_ENTRY_INIT_VAL_0 0x00000103
 #define  PD_ENTRY_INIT_VAL_1 0x00000183
-#define  TURNON_4MB_PAGE     0x00000010
-#define  TURNON_PAGING       0x80000000
-
+#define  TURNON_PAGING 0x80000000
+#define  TURNON_4MB_PAGE 0x00000010
 void paging_init()
 {
 	int i;
@@ -47,13 +46,15 @@ void paging_init()
 	CR3 = (unsigned int)page_directory;
 	asm volatile("mov %0, %%CR3"::"c"(CR3));  
 
+
 	asm volatile("mov %%CR4, %0":"=c"(CR4));  
 	CR4 = CR4 | TURNON_4MB_PAGE;
-	asm volatile("mov %0, %%CR4"::"c"(CR4));  
-
-    asm volatile("mov %%CR0, %0":"=c"(CR0));  
+	asm volatile("mov %0, %%CR4"::"c"(CR4)); 
+	 
+	asm volatile("mov %%CR0, %0":"=c"(CR0));  
 	CR0 = CR0 | TURNON_PAGING;
 	asm volatile("mov %0, %%CR0"::"c"(CR0)); 
+
 
 /*
 	 asm volatile(
