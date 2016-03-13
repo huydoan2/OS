@@ -30,7 +30,7 @@ void rtc_init(){
 
 	outb(REGISTER_A|NMI_DISABLE, RTC_PORT);		//disable NMI and select reg A
 	previous = inb(CMOS_PORT);					//read current value of reg A
-	outb((previous & PREV_MASK) | MASK_TURNON_FIVEBIT | RATE, CMOS_PORT);
+	outb((previous & PREV_MASK) | MASK_TURNON_FIVEBIT, CMOS_PORT);
 	
 	//set the register B
 
