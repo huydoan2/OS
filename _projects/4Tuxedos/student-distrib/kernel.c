@@ -165,7 +165,7 @@ entry (unsigned long magic, unsigned long addr)
 	paging_init();
 	printf("Paging initialized\n");
 
-
+/*test the memory accessing by paging */
 	test_phys_addr = get_physAddr(test_virt_addr);
 	test_val = *((uint32_t *)test_phys_addr);
 
