@@ -21,8 +21,6 @@ void
 entry (unsigned long magic, unsigned long addr)
 {
 	multiboot_info_t *mbi;
-	int * i = NULL ;
-	int a;
 
 	/* Clear the screen. */
 	clear();
@@ -163,7 +161,7 @@ entry (unsigned long magic, unsigned long addr)
 	paging_init();
 	printf("Paging initialized\n");
 
-   a = *i;
+
 	//rtc_init();
 	/*Set up IDT to handle system calls*/
 
