@@ -135,7 +135,7 @@ uint32_t get_physAddr(uint32_t virtAddr){
 
     if(page_size == 0){ //4kB page
      	pt_addr = pd_entry & 0xFFFFF000;
-     	pt_entry = pt_addr[pt_index];
+     	pt_entry = ((uint32_t *)pt_addr)[pt_index];
 
      	phys_addr = pt_entry & 0xFFFFF000;
      	phys_addr += phys_offset_0;
@@ -154,10 +154,10 @@ uint32_t get_physAddr(uint32_t virtAddr){
 
 }
 
-
+/*
 void mapping_virt2Phys_Addr(uint32_t* physAddr, uint32_t* virtAddr, uint32_t val){
 
     first_pt[index] = val;
 }
 
-
+*/
