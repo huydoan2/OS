@@ -5,6 +5,7 @@
 #include "lib.h"
 #define VIDEO 0xB8000
 #define NUM_COLS 80
+#define MAX_X_INDEX 79
 #define NUM_ROWS 25
 #define ATTRIB 0x7
 
@@ -12,6 +13,7 @@
 
 static int screen_x;
 static int screen_y;
+static int x_backup [25] = {0};
 static char* video_mem = (char *)VIDEO;
 
 /*
@@ -29,6 +31,9 @@ clear(void)
         *(uint8_t *)(video_mem + (i << 1)) = ' ';
         *(uint8_t *)(video_mem + (i << 1) + 1) = ATTRIB;
     }
+    //reset the cursor location to left top corner
+    screen_x = 0;	
+    screen_y = 0;
 }
 
 /* Standard printf().
@@ -190,14 +195,30 @@ void
 putc(uint8_t c)
 {
     if(c == '\n' || c == '\r') {
+        x_backup[screen_y] = screen_x;
         screen_y++;
         screen_x=0;
-    } else {
+    }
+    else if(c == '\b')
+    {
+    	screen_x--;
+    	if(screen_x < 0 && screen_y == 0)
+    		screen_x = 0;
+    	else if(screen_x < 0)
+    	{
+    		screen_y--;
+    		screen_x = x_backup[screen_y];
+    	}
+    	*(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = ' '; 
+    }
+    else {
         *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = c;
         *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1) + 1) = ATTRIB;
         screen_x++;
-        screen_x %= NUM_COLS;
+        if(screen_x > MAX_X_INDEX)
+        	x_backup[screen_y] = MAX_X_INDEX;
         screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
+        screen_x %= NUM_COLS;
     }
 }
 
