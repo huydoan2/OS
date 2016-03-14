@@ -12,8 +12,8 @@
 #define left_shift_off 0xAA
 #define right_shift_on 0x36
 #define right_shift_off 0xB6
-#define left_control_on 0x1E
-#define left_control_off 0x9E
+#define left_control_on 0x1D
+#define left_control_off 0x9D
 #define right_control_on 0x1D
 #define right_control_off 0x9D
 #define caps_lock_on 0x3A
