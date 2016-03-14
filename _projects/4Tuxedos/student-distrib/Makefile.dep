@@ -8,3 +8,4 @@ keyboard.o: keyboard.c keyboard.h i8259.h types.h lib.h
 lib.o: lib.c lib.h types.h i8259.h
 Paging.o: Paging.c Paging.h types.h lib.h
 rtc.o: rtc.c rtc.h i8259.h types.h lib.h
+terminal.o: terminal.c terminal.h lib.h types.h
