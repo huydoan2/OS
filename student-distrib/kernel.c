@@ -160,7 +160,7 @@ entry (unsigned long magic, unsigned long addr)
 	/* Initialize devices, memory, filesystem, enable device interrupts on the
 	 * PIC, any other initialization stuff... */
 	keyboard_init();
-	rtc_init();
+	//rtc_init();
 	
 	paging_init();
 	printf("Paging initialized\n");
