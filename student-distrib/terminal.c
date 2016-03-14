@@ -47,3 +47,4 @@ extern void set_text_color(text_t text_attrib){
 	text_color = text_attrib;
 	return;
 }
+
