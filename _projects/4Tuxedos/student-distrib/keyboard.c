@@ -12,6 +12,10 @@
 #define left_shift_off 0xAA
 #define right_shift_on 0x36
 #define right_shift_off 0xB6
+#define left_control_on 0x1E
+#define left_control_off 0x9E
+#define right_control_on 0x1D
+#define right_control_off 0x9D
 #define caps_lock_on 0x3A
 #define caps_lock_off 0xBA
 #define end_of_press 0x81
@@ -21,7 +25,7 @@
 //0 = no output
 //size of the scancode is 88
 char scancode [size_of_keys] = {
-	'\0','1','2','3','4','5','6','7','8','9','0','-','=','\b','\t',//backspace and tab
+	'\0','1','2','3','4','5','6','7','8','9','0','-','=','\b',0,//backspace and tab
 	'q','w','e','r','t','y','u','i','o','p','[',']','\n',0,//Control
 	'a','s','d','f','g','h','j','k','l',';','\'','`',0,//Left shift
   '\\','z','x','c','v','b','n','m',',','.','/',0,
@@ -33,7 +37,7 @@ char scancode [size_of_keys] = {
 
 char shift_scancode[size_of_keys] =
 {
-	'\0','!','@','#','$','%','^','&','*','(',')','_','+','\b','\t', //backspace and tab
+	'\0','!','@','#','$','%','^','&','*','(',')','_','+','\b',0, //backspace and tab
  	'Q','W','E','R','T','Y','U','I','O','P','{','}','\n',0,//Control
   'A','S','D','F','G','H','J','K','L',':','"','~',0,//Left shift
   '|','Z','X','C','V','B','N','M','<','>','?',0,//Right shift
@@ -45,7 +49,7 @@ char shift_scancode[size_of_keys] =
 
 char caps_scancode[size_of_keys] =
 {
-	'\0','1','2','3','4','5','6','7','8','9','0','-','=','\b','\t',//backspace and tab
+	'\0','1','2','3','4','5','6','7','8','9','0','-','=','\b',0,//backspace and tab
 	'Q','W','E','R','T','Y','U','I','O','P','[',']','\n',0,//Control
   'A','S','D','F','G','H','J','K','L',';','\'','`',0,//Left shift
   '\\','Z','X','C','V','B','N','M',',','.','/',0,
@@ -56,7 +60,7 @@ char caps_scancode[size_of_keys] =
 
 char caps_shift_scancode[size_of_keys] =
 {
-	'\0','!','@','#','$','%','^','&','*','(',')','_','+','\b','\t', //backspace and tab
+	'\0','!','@','#','$','%','^','&','*','(',')','_','+','\b',0, //backspace and tab
  	'q','w','e','r','t','y','u','i','o','p','{','}','\n',0,//Control
   'a','s','d','f','g','h','j','k','l',':','"','~',0,//Left shift
   '|','z','x','c','v','b','n','m','<','>','?',0,//Right shift
@@ -68,6 +72,7 @@ char caps_shift_scancode[size_of_keys] =
 
 int shift_flag = 0;				/*flag for shift*/
 int caps_lock_flag = 0;			/*flag for caps*/
+int control_flag = 0;			/*flag for control*/
 
 /* 
  * getScancode
@@ -108,15 +113,30 @@ char getchar()
 	else if(c == left_shift_off || c == right_shift_off)
 		shift_flag = 0;
 	
+	/*if the left control or right control is pressed, set the control flag to 1*/
+	if(c == left_control_on || c == right_control_on)
+		control_flag = 1;
+	/*if the left control or right control is released, set the control flag to 0*/
+	else if(c == left_control_off || c == right_control_off)
+		control_flag = 0;
+	
+
 	/*if the caps lock is pressed, change the capslock flag*/
 	if(c == caps_lock_on)
 		caps_lock_flag++;
 	else if(c == caps_lock_off)
 		caps_lock_flag = caps_lock_flag;
-	
+
 	/*reset the caps lock flag once it goes over the max*/
 	if(caps_lock_flag == max_flag)
 		caps_lock_flag = 0;	
+
+	/*if control+L, clear the display */
+	if(control_flag && c == 0x26)
+	{
+		clear();
+		return 0;
+	}
 
 	/*caps lock off case*/
 	if((caps_lock_flag % 2) ==0)
