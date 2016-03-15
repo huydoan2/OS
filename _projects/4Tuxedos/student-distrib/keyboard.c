@@ -225,20 +225,27 @@ void keyboard_handler()
 	send_eoi(keyboard_irq_num);
 	char c = getchar();
 	if(c == '\n'|| c == '\r')
-		reset_linebuffer();
-	if(c == '\b')
 	{
-		if(lb_index > 0)
-			lb_index--;
-		line_buffer[lb_index] = 0;
+		reset_linebuffer();
+		newline();
 	}
-	if(c != '\0' && lb_index < 128)			/*if the scancode value is not empty, print out the character*/
+	else if(c == '\b')
+	{
+		if(lb_index >= 0)
+		{
+			lb_index--;
+			delete();
+		}
+
+		
+	}
+	else if(c != '\0' && lb_index < 128)			/*if the scancode value is not empty, print out the character*/
 	{
 		display_c(c,lb_index);
 		if(c != '\b' && c != '\n')
 		{
-			line_buffer[lb_index] = c;
 		    lb_index++;
+			line_buffer[lb_index] = c;
 		}
 	}
 	asm volatile("                  \n\
@@ -260,11 +267,8 @@ void keyboard_handler()
  *
  */
 void reset_linebuffer()
-{
-	int i;
-	lb_index = 0;
-	for(i = 0; i<128; i++)
-		line_buffer [i] = 0;
+{	
+	lb_index = -1;	
 }
 
 /* 
