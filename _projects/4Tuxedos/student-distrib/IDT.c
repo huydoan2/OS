@@ -5,7 +5,6 @@
  * vim:ts=4 noexpandtab
  */
 #include "IDT.h"
-#include "lib.h"
 
 //Define values for IDT entry
 #define RESERVED4 0x0000

@@ -31,6 +31,7 @@ text_t text_color;
 int32_t cursor_x = 0;	//initialized to be the right upper corner 
 int32_t cursor_y = 0;
 
+
 /*--------functions for TUI in the terminal--------*/
 /*function that scrolls the screen */
 void scroll_screen(void);
