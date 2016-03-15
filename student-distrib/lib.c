@@ -34,6 +34,7 @@ clear(void)
     //reset the cursor location to left top corner
     screen_x = 0;	
     screen_y = 0;
+    cursor_update(screen_x, screen_y);
 }
 
 /* Standard printf().
@@ -198,6 +199,7 @@ putc(uint8_t c)
         x_backup[screen_y] = screen_x;
         screen_y++;
         screen_x=0;
+        //update_cursor_test(screen_x, screen_y);
     }
     else if(c == '\b')
     {
@@ -208,6 +210,7 @@ putc(uint8_t c)
     	{
     		screen_y--;
     		screen_x = x_backup[screen_y];
+    		//update_cursor_test(screen_x, screen_y);
     	}
     	*(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = ' '; 
     }
@@ -219,7 +222,10 @@ putc(uint8_t c)
         	x_backup[screen_y] = MAX_X_INDEX;
         screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
         screen_x %= NUM_COLS;
+        //update_cursor_test(screen_x, screen_y);
     }
+
+    cursor_update(screen_x, screen_y);
 }
 
 /*
@@ -590,3 +596,25 @@ test_interrupts(void)
 		video_mem[i<<1]++;
 	}
 }
+
+
+/*
+* void cursor_update(int col, int row)
+*   Inputs: Current X anf Y coordinates
+*   Return Value: none
+*	Function: Updates position of cursor
+*/
+void cursor_update(int col, int row)
+ {
+ 	//comments are from osdev need to change and remove magic numbers
+ 	//http://wiki.osdev.org/Text_Mode_Cursor
+    unsigned short position = (row*80) + col;
+ 
+    // cursor LOW port to vga INDEX register
+    outb(0x0F, 0x3D4);
+    outb((unsigned char)(position&0xFF), 0x3D5);
+
+    // cursor HIGH port to vga INDEX register
+    outb(0x0E, 0x3D4);
+    outb((unsigned char )((position>>8)&0xFF), 0x3D5);
+ }
