@@ -8,6 +8,9 @@
 #define MAX_X_INDEX 79
 #define NUM_ROWS 25
 #define ATTRIB 0x7
+#define BASE_PORT 0x3D4
+#define CURSOR_PORT 0x3D5
+#define CURSOR_MASK 0xFF
 
  #include "i8259.h"
 
@@ -599,22 +602,21 @@ test_interrupts(void)
 
 
 /*
-* void cursor_update(int col, int row)
-*   Inputs: Current X anf Y coordinates
+* void cursor_update(int row, int col)
+*   Inputs: Current X and Y coordinates
 *   Return Value: none
 *	Function: Updates position of cursor
 */
-void cursor_update(int col, int row)
+void cursor_update(int row, int col)
  {
- 	//comments are from osdev need to change and remove magic numbers
- 	//http://wiki.osdev.org/Text_Mode_Cursor
-    unsigned short position = (row*80) + col;
+    unsigned short position = (col*NUM_COLS) + row;
  
-    // cursor LOW port to vga INDEX register
-    outb(0x0F, 0x3D4);
-    outb((unsigned char)(position&0xFF), 0x3D5);
+    // cursor off
+    outb(0x0F, BASE_PORT);	// 0x0F is for the low-byte (Cursor Off)
+    outb( (unsigned char)(position & CURSOR_MASK), CURSOR_PORT);
 
-    // cursor HIGH port to vga INDEX register
-    outb(0x0E, 0x3D4);
-    outb((unsigned char )((position>>8)&0xFF), 0x3D5);
+    // cursor on
+    outb(0x0E, BASE_PORT);	// 0x0E is for the hi-byte (Cursor On)
+    outb( (unsigned char)( (position>>8) & CURSOR_MASK), CURSOR_PORT); // >>8 for getting high byte in position
  }
+
