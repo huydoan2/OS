@@ -15,7 +15,6 @@
 static int screen_x;
 static int screen_y;
 //static int max_x;
-static int x_backup [25] = {0};
 static char* video_mem = (char *)VIDEO;
 /*
 * void clear(void);
@@ -606,14 +605,14 @@ void cursor_update(int row, int col)
 *	Function: Output a character to the console 
 */
 void
-display_c(uint8_t c)
+display_c(uint8_t c, int lb_index)
 {
 	if(c == '\n' || c == '\r') {
-        x_backup[screen_y] = screen_x;
         screen_x = 0;
         screen_y++;
     }
-    /*else if (c == 11)
+    /*
+    else if (c == 11)
     {
     	screen_x--;
     	if(screen_x < 0)
@@ -627,14 +626,15 @@ display_c(uint8_t c)
     }*/
     else if(c == '\b')
     {
-    	screen_x--;
+    	if(lb_index >= 0)
+	    	screen_x--;
     	//max_x = screen_x;
     	if(screen_x < 0 && screen_y == 0)
     		screen_x = 0;
-    	else if(screen_x < 0)
+    	else if(screen_x < 0 && lb_index != 0)
     	{
     		screen_y--;
-    		screen_x = x_backup[screen_y];
+    		screen_x = NUM_COLS;
     	}
     	*(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = ' '; 
     }
@@ -644,8 +644,6 @@ display_c(uint8_t c)
         *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1) + 1) = ATTRIB;
         screen_x++;
         //max_x = screen_x;
-        if(screen_x > MAX_X_INDEX)
-        	x_backup[screen_y] = MAX_X_INDEX;
         screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
         screen_x %= NUM_COLS;
  	}
