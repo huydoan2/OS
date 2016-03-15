@@ -12,6 +12,11 @@
 #define KEYBOARD_DATA 0x60
 #define KEYBOARD_COMMAND 0x64
 
+
+extern int lb_index;
+extern char line_buffer [128];
+
+
 //initialize the keyboard
 extern void keyboard_init();
 
@@ -23,6 +28,9 @@ extern char getScancode();
 
 //access the character from the scancode array
 extern char getchar();
+
+//reset the line
+extern void reset_linebuffer();
 
 #endif
 

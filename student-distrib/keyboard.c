@@ -6,7 +6,6 @@
  */
 
 #include "keyboard.h"
-
 #define keyboard_irq_num 1
 #define left_shift_on 0x2A
 #define left_shift_off 0xAA
@@ -21,6 +20,12 @@
 #define end_of_press 0x81
 #define size_of_keys 128
 #define max_flag	8
+
+
+int lb_index = 0;
+char line_buffer [128] = {0};
+
+
 //scancode array for keyboard
 //0 = no output
 //size of the scancode is 88
@@ -30,7 +35,7 @@ char scancode [size_of_keys] = {
 	'a','s','d','f','g','h','j','k','l',';','\'','`',0,//Left shift
   '\\','z','x','c','v','b','n','m',',','.','/',0,
   '*',0,' ',0,0,0,0,0,0,0,0,0,0,0,0,0,
-  '7','8','9','-','4','5','6','+','1','2','3','0','.',
+  '7',0,'9','-',11,'5',22,'+','1',0,'3','0','.',
  	0,0,0,0,0,0, /* All Release keys are undefined */
 };
 
@@ -42,7 +47,7 @@ char shift_scancode[size_of_keys] =
   'A','S','D','F','G','H','J','K','L',':','"','~',0,//Left shift
   '|','Z','X','C','V','B','N','M','<','>','?',0,//Right shift
   '*',0,' ',0/* Caps lock */,0,0,0,0,0,0,0,0,0,0,0/* 69 - Num lock*/,0/* Scroll Lock */,
-  0/* Home key */,0/* Up Arrow */,0/* Page Up */,'-',0/* Left Arrow */,0,0/* Right Arrow */,
+  0/* Home key */,0/* Up Arrow */,0/* Page Up */,'-',11/* Left Arrow */,0,22/* Right Arrow */,
   '+',0/* 79 - End key*/,0/* Down Arrow */,0/* Page Down */,0/* Insert Key */,0/* Delete Key */,
   0,0,0,0/* F11 Key */,0/* F12 Key */,0,  /* All Release keys are undefined */ 
 };
@@ -54,7 +59,7 @@ char caps_scancode[size_of_keys] =
   'A','S','D','F','G','H','J','K','L',';','\'','`',0,//Left shift
   '\\','Z','X','C','V','B','N','M',',','.','/',0,
   '*',0,' ',0,0,0,0,0,0,0,0,0,0,0,0,0,
-  '7','8','9','-','4','5','6','+','1','2','3','0','.',
+  '7',0,'9','-',11,'5',22,'+','1',0,'3','0','.',
  	0,0,0,0,0,0, /* All Release keys are undefined */
 };
 
@@ -65,7 +70,7 @@ char caps_shift_scancode[size_of_keys] =
   'a','s','d','f','g','h','j','k','l',':','"','~',0,//Left shift
   '|','z','x','c','v','b','n','m','<','>','?',0,//Right shift
   '*',0,' ',0/* Caps lock */,0,0,0,0,0,0,0,0,0,0,0/* 69 - Num lock*/,0/* Scroll Lock */,
-  0/* Home key */,0/* Up Arrow */,0/* Page Up */,'-',0/* Left Arrow */,0,0/* Right Arrow */,
+  0/* Home key */,0/* Up Arrow */,0/* Page Up */,'-',11/* Left Arrow */,0,22/* Right Arrow */,
   '+',0/* 79 - End key*/,0/* Down Arrow */,0/* Page Down */,0/* Insert Key */,0/* Delete Key */,
   0,0,0,0/* F11 Key */,0/* F12 Key */,0,  /* All Release keys are undefined */ 
 };
@@ -212,12 +217,49 @@ void keyboard_init()
  */
 void keyboard_handler()
 {	
-	if(getchar() != '\0')			/*if the scancode value is not empty, print out the character*/
-		printf("%c", getchar());
 	send_eoi(keyboard_irq_num);
+	char c = getchar();
+	if(c == '\n'|| c == '\r')
+		reset_linebuffer();
+	if(c == '\b')
+	{
+		if(lb_index > 0)
+			lb_index--;
+		line_buffer[lb_index] = 0;
+	}
+	if(c != '\0' && lb_index < 128)			/*if the scancode value is not empty, print out the character*/
+	{
+		display_c(c);
+		if(c != '\b')
+		{
+			line_buffer[lb_index] = c;
+		    lb_index++;
+		}
+	}
 	asm volatile("                  \n\
 		    leave                    \n\
 			iret                    \n\
 		    "
 			);
 }
+
+/* 
+ * reset_linebuffer
+ *   DESCRIPTION: reset the line buffer and buffer index
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: none
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ */
+void reset_linebuffer()
+{
+	int i;
+	lb_index = 0;
+	for(i = 0; i<128; i++)
+		line_buffer [128] = 0;
+}
+
+

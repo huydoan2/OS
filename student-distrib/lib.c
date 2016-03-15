@@ -12,13 +12,11 @@
 #define CURSOR_PORT 0x3D5
 #define CURSOR_MASK 0xFF
 
- #include "i8259.h"
-
 static int screen_x;
 static int screen_y;
+//static int max_x;
 static int x_backup [25] = {0};
 static char* video_mem = (char *)VIDEO;
-
 /*
 * void clear(void);
 *   Inputs: void
@@ -188,6 +186,7 @@ puts(int8_t* s)
 	return index;
 }
 
+
 /*
 * void putc(uint8_t c);
 *   Inputs: uint_8* c = character to print
@@ -199,36 +198,15 @@ void
 putc(uint8_t c)
 {
     if(c == '\n' || c == '\r') {
-        x_backup[screen_y] = screen_x;
         screen_y++;
         screen_x=0;
-        //update_cursor_test(screen_x, screen_y);
-    }
-    else if(c == '\b')
-    {
-    	screen_x--;
-    	if(screen_x < 0 && screen_y == 0)
-    		screen_x = 0;
-    	else if(screen_x < 0)
-    	{
-    		screen_y--;
-    		screen_x = x_backup[screen_y];
-    		//update_cursor_test(screen_x, screen_y);
-    	}
-    	*(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = ' '; 
-    }
-    else {
+    } else {
         *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = c;
         *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1) + 1) = ATTRIB;
         screen_x++;
-        if(screen_x > MAX_X_INDEX)
-        	x_backup[screen_y] = MAX_X_INDEX;
-        screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
         screen_x %= NUM_COLS;
-        //update_cursor_test(screen_x, screen_y);
+        screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
     }
-
-    cursor_update(screen_x, screen_y);
 }
 
 /*
@@ -620,3 +598,56 @@ void cursor_update(int row, int col)
     outb( (unsigned char)( (position>>8) & CURSOR_MASK), CURSOR_PORT); // >>8 for getting high byte in position
  }
 
+
+/*
+* void display_c(uint8_t c);
+*   Inputs: uint_8* c = character to print
+*   Return Value: void
+*	Function: Output a character to the console 
+*/
+void
+display_c(uint8_t c)
+{
+	if(c == '\n' || c == '\r') {
+        x_backup[screen_y] = screen_x;
+        screen_x = 0;
+        screen_y++;
+    }
+    /*else if (c == 11)
+    {
+    	screen_x--;
+    	if(screen_x < 0)
+    		screen_x = 0;
+    }
+	else if (c == 22)
+	{
+    	screen_x++;
+    	if(screen_x > max_x)
+    		screen_x = max_x;
+    }*/
+    else if(c == '\b')
+    {
+    	screen_x--;
+    	//max_x = screen_x;
+    	if(screen_x < 0 && screen_y == 0)
+    		screen_x = 0;
+    	else if(screen_x < 0)
+    	{
+    		screen_y--;
+    		screen_x = x_backup[screen_y];
+    	}
+    	*(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = ' '; 
+    }
+    else 
+    {
+        *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = c;
+        *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1) + 1) = ATTRIB;
+        screen_x++;
+        //max_x = screen_x;
+        if(screen_x > MAX_X_INDEX)
+        	x_backup[screen_y] = MAX_X_INDEX;
+        screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
+        screen_x %= NUM_COLS;
+ 	}
+    cursor_update(screen_x, screen_y);
+}
