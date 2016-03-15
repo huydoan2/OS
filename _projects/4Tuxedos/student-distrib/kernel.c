@@ -25,6 +25,8 @@ entry (unsigned long magic, unsigned long addr)
 	uint32_t test_phys_addr;
 	uint32_t test_virt_addr = 0x00005111;
 	uint32_t test_val;
+	char * test;
+	int test2,i;
 
 	/* Clear the screen. */
 	clear();
@@ -170,7 +172,6 @@ entry (unsigned long magic, unsigned long addr)
 	test_val = *((uint32_t *)test_phys_addr);
 
 	printf("memory: %x\n", test_val);
-	//rtc_init();
 	/*Set up IDT to handle system calls*/
 
 
@@ -185,7 +186,13 @@ entry (unsigned long magic, unsigned long addr)
 	sti();
 
 	/* Execute the first program (`shell') ... */
-
+	test2 = keyboard_read(test);
+	printf("size of bytes read: %d\n", test2);
+	for (i = 0; i < test2; ++i)
+	{
+		printf("%c",test[i]);
+	}
+	printf("\n");
 	/* Spin (nicely, so we don't chew up cycles) */
 	asm volatile(".1: hlt; jmp .1;");
 }

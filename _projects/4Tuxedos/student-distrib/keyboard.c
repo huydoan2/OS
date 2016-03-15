@@ -140,6 +140,11 @@ char getchar()
 	if(control_flag && c == 0x26)
 	{
 		clear();
+		int i;
+		for(i = 0; i<lb_index; i++)
+		{
+			display_c(line_buffer[i],lb_index);
+		}
 		return 0;
 	}
 
@@ -229,8 +234,8 @@ void keyboard_handler()
 	}
 	if(c != '\0' && lb_index < 128)			/*if the scancode value is not empty, print out the character*/
 	{
-		display_c(c);
-		if(c != '\b')
+		display_c(c,lb_index);
+		if(c != '\b' && c != '\n')
 		{
 			line_buffer[lb_index] = c;
 		    lb_index++;
@@ -259,7 +264,26 @@ void reset_linebuffer()
 	int i;
 	lb_index = 0;
 	for(i = 0; i<128; i++)
-		line_buffer [128] = 0;
+		line_buffer [i] = 0;
 }
 
-
+/* 
+ * keyboard_read
+ *   DESCRIPTION: reset the line buffer and buffer index
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: none
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ */
+int keyboard_read(char * return_array)
+{
+	int ret_val = lb_index;
+	int i;
+	for(i = 0; i<lb_index; i++)
+ 		return_array[i] = line_buffer[i];
+ 	reset_linebuffer();
+ 	return ret_val;
+}

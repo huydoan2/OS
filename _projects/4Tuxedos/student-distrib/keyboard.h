@@ -29,8 +29,10 @@ extern char getScancode();
 //access the character from the scancode array
 extern char getchar();
 
-//reset the line
+//reset the line buffer
 extern void reset_linebuffer();
 
+//read function for keyboard
+extern int keyboard_read();
 #endif
 
