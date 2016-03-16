@@ -657,8 +657,14 @@ void newline()
     cursor_update(screen_x, screen_y);
 }
 
-void scroll_screen(){
-
+/*
+* void scroll_screen()
+*   Inputs: None
+*   Return Value: None
+*	Function: Scroll screen up 
+*/
+void scroll_screen()
+{
 	/*set the black color*/
 
 	/*determine whether the end of screen is reached*/
