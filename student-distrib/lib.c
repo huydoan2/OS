@@ -610,20 +610,7 @@ display_c(uint8_t c, int lb_index)
 	if(c == '\n' || c == '\r') {
         screen_x = 0;
         screen_y++;
-    }
-    /*
-    else if (c == 11)
-    {
-    	screen_x--;
-    	if(screen_x < 0)
-    		screen_x = 0;
-    }
-	else if (c == 22)
-	{
-    	screen_x++;
-    	if(screen_x > max_x)
-    		screen_x = max_x;
-    }*/    
+    }      
     else 
     {
         *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = c;
@@ -644,7 +631,7 @@ void delete()
     else if (screen_x < 0)
     	{
     		screen_y--;
-    		screen_x = NUM_COLS;
+    		screen_x = NUM_COLS - 1;
     	}
    	*(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = ' '; 
    	cursor_update(screen_x, screen_y);
@@ -654,4 +641,5 @@ void newline()
 {
 	screen_x = 0;
     screen_y++;
+    cursor_update(screen_x, screen_y);
 }
