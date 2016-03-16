@@ -609,25 +609,17 @@ void cursor_update(int row, int col)
 void
 display_c(uint8_t c)
 {
-	if(c == '\n' || c == '\r') {
-        screen_x = 0;
-        screen_y++;
-    }      
-    else 
-    {
-        *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = c;
-        *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1) + 1) = ATTRIB;
-        screen_x++;
-        //max_x = screen_x;
-        screen_y = (screen_y + (screen_x / NUM_COLS));
-        screen_x %= NUM_COLS;
-       
- 	}
- 	 if (screen_y > NUM_ROWS - 1)
-		{
-			scroll_screen();
-			--screen_y;
-		}
+ 	*(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = c;
+    *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1) + 1) = ATTRIB;
+    screen_x++;
+    //max_x = screen_x;
+    screen_y = (screen_y + (screen_x / NUM_COLS));
+    screen_x %= NUM_COLS;
+ 	if (screen_y > NUM_ROWS - 1)
+	{
+		scroll_screen();
+		--screen_y;
+	}
     cursor_update(screen_x, screen_y);
 }
 
@@ -650,10 +642,10 @@ void newline()
 	screen_x = 0;
     screen_y++;
     if (screen_y > NUM_ROWS - 1)
-		{
-			scroll_screen();
-			--screen_y;
-		}
+	{
+		scroll_screen();
+		--screen_y;
+	}
     cursor_update(screen_x, screen_y);
 }
 
