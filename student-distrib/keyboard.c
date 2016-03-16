@@ -69,6 +69,7 @@ char caps_shift_scancode[size_of_keys] =
 int shift_flag;				/*flag for shift*/
 int caps_lock_flag;			/*flag for caps*/
 int control_flag;			/*flag for control*/
+volatile int enter_flag;	/*flag for enter*/
 int lb_index;				/*line buffer index*/
 char line_buffer [128] = {0};		/*initialize line buffer*/
 
@@ -215,6 +216,7 @@ void keyboard_handler()
 	{
 	    lb_index++;
 		line_buffer[lb_index] = c;
+		enter_flag = 1;
 		reset_linebuffer();
 		newline();
 	}
@@ -271,6 +273,7 @@ void keyboard_open()
 	shift_flag = 0;					/*initialize the shift flag to zero*/
 	caps_lock_flag = 0;				/*initialize the caps lock flag to zero*/
 	control_flag = 0;				/*initialize flag for control*/
+	enter_flag = 0;					/*initialize enter to zero*/
 	lb_index = -1;					/*initialize line buffer index*/
 	keyboard_init();
 }
@@ -294,7 +297,7 @@ int keyboard_close()
 
 /* 
  * keyboard_read
- *   DESCRIPTION: reset the line buffer and buffer index
+ *   DESCRIPTION: read keyboard
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
  *   OUTPUTS: none
@@ -305,19 +308,22 @@ int keyboard_close()
  */
 int keyboard_read(char * buff, int num_bytes)
 {
-	int ret_val = lb_index + 1;
-	int i;
+	int i = 0;
 	if(buff == NULL)
 		return -1;
-	for(i = 0; i<lb_index; i++)
+	while(enter_flag == 0);
+ 	enter_flag = 0;
+ 	while(line_buffer[i] != '\n' && i < num_bytes )
+ 	{
  		buff[i] = line_buffer[i];
- 	reset_linebuffer();
- 	return ret_val;
+ 		i++;
+ 	}
+ 	return i;
 }
 
 /* 
  * keyboard_write
- *   DESCRIPTION: reset the line buffer and buffer index
+ *   DESCRIPTION: write keyboard
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
  *   OUTPUTS: none
@@ -338,3 +344,5 @@ int keyboard_write(char * buff, int num_bytes)
 	}
 	return i;
 }
+
+

@@ -25,8 +25,9 @@ entry (unsigned long magic, unsigned long addr)
 	//uint32_t test_phys_addr;
 	//uint32_t test_virt_addr = 0x00005111;
 	//uint32_t test_val;
-	char * test;
-	int test2,i;
+	char buff[128];
+	int num_byte = 7;
+	int i;
 
 	/* Clear the screen. */
 	clear();
@@ -182,18 +183,22 @@ entry (unsigned long magic, unsigned long addr)
 	printf("Enabling Interrupts\n");
 
 	clear(); //need to clear screen in terminal driver init
-
+	sti();
 	/* Execute the first program (`shell') ... */
 	
-	test2 = keyboard_read(test);
-	printf("size of bytes read: %d\n", test2);
-	for (i = 0; i < test2; ++i)
+	/********TESTING TERMINAL READ AND WRITE*******/
+	while(1)
 	{
-		printf("%c",test[i]);
+		i = keyboard_read(buff, num_byte);
+		keyboard_write(buff, num_byte);
+		printf("\ni = %d\n",i);
+		while(i>=0)
+		{		
+			buff[i] = 0;
+			i--;
+		}
 	}
-	printf("\n");
-
-	sti();
+	
 
 	keyboard_close();
 
