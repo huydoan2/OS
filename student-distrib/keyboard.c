@@ -141,7 +141,7 @@ char getchar()
 	{
 		clear();
 		int i;
-		for(i = 0; i<lb_index; i++)
+		for(i = 0; i<=lb_index; i++)
 		{
 			display_c(line_buffer[i]);
 		}
@@ -233,18 +233,17 @@ void keyboard_handler()
 	{
 		if(lb_index >= 0)
 		{
-			delete();
-			line_buffer[lb_index] = 0;
 			lb_index--;
+			delete();			
 		}
 	}
-	else if(c != '\0' && lb_index < 128)			/*if the scancode value is not empty, print out the character*/
+	else if(c != '\0' && lb_index < 127)			/*if the scancode value is not empty, print out the character*/
 	{
 		display_c(c);
 		if(c != '\b' && c != '\n')
 		{
-			line_buffer[lb_index] = c;
 		    lb_index++;
+			line_buffer[lb_index] = c;
 		}
 	}
 	asm volatile("                  \n\
@@ -267,7 +266,7 @@ void keyboard_handler()
  */
 void reset_linebuffer()
 {	
-	lb_index = 0;	
+	lb_index = -1;	
 }
 
 /* 
