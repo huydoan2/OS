@@ -35,7 +35,7 @@ char scancode [size_of_keys] = {
 	'a','s','d','f','g','h','j','k','l',';','\'','`',0,//Left shift
   '\\','z','x','c','v','b','n','m',',','.','/',0,
   '*',0,' ',0,0,0,0,0,0,0,0,0,0,0,0,0,
-  '7',0,'9','-',11,'5',22,'+','1',0,'3','0','.',
+  '7',0,'9','-',0,'5',0,'+','1',0,'3','0','.',
  	0,0,0,0,0,0, /* All Release keys are undefined */
 };
 
@@ -47,7 +47,7 @@ char shift_scancode[size_of_keys] =
   'A','S','D','F','G','H','J','K','L',':','"','~',0,//Left shift
   '|','Z','X','C','V','B','N','M','<','>','?',0,//Right shift
   '*',0,' ',0/* Caps lock */,0,0,0,0,0,0,0,0,0,0,0/* 69 - Num lock*/,0/* Scroll Lock */,
-  0/* Home key */,0/* Up Arrow */,0/* Page Up */,'-',11/* Left Arrow */,0,22/* Right Arrow */,
+  0/* Home key */,0/* Up Arrow */,0/* Page Up */,'-',0/* Left Arrow */,0,0/* Right Arrow */,
   '+',0/* 79 - End key*/,0/* Down Arrow */,0/* Page Down */,0/* Insert Key */,0/* Delete Key */,
   0,0,0,0/* F11 Key */,0/* F12 Key */,0,  /* All Release keys are undefined */ 
 };
@@ -59,7 +59,7 @@ char caps_scancode[size_of_keys] =
   'A','S','D','F','G','H','J','K','L',';','\'','`',0,//Left shift
   '\\','Z','X','C','V','B','N','M',',','.','/',0,
   '*',0,' ',0,0,0,0,0,0,0,0,0,0,0,0,0,
-  '7',0,'9','-',11,'5',22,'+','1',0,'3','0','.',
+  '7',0,'9','-',0,'5',0,'+','1',0,'3','0','.',
  	0,0,0,0,0,0, /* All Release keys are undefined */
 };
 
@@ -70,7 +70,7 @@ char caps_shift_scancode[size_of_keys] =
   'a','s','d','f','g','h','j','k','l',':','"','~',0,//Left shift
   '|','z','x','c','v','b','n','m','<','>','?',0,//Right shift
   '*',0,' ',0/* Caps lock */,0,0,0,0,0,0,0,0,0,0,0/* 69 - Num lock*/,0/* Scroll Lock */,
-  0/* Home key */,0/* Up Arrow */,0/* Page Up */,'-',11/* Left Arrow */,0,22/* Right Arrow */,
+  0/* Home key */,0/* Up Arrow */,0/* Page Up */,'-',0/* Left Arrow */,0,0/* Right Arrow */,
   '+',0/* 79 - End key*/,0/* Down Arrow */,0/* Page Down */,0/* Insert Key */,0/* Delete Key */,
   0,0,0,0/* F11 Key */,0/* F12 Key */,0,  /* All Release keys are undefined */ 
 };
@@ -140,11 +140,7 @@ char getchar()
 	if(control_flag && c == 0x26)
 	{
 		clear();
-		int i;
-		for(i = 0; i<=lb_index; i++)
-		{
-			display_c(line_buffer[i]);
-		}
+		reset_linebuffer();
 		return 0;
 	}
 
@@ -226,6 +222,8 @@ void keyboard_handler()
 	char c = getchar();
 	if(c == '\n'|| c == '\r')
 	{
+	    lb_index++;
+		line_buffer[lb_index] = c;
 		reset_linebuffer();
 		newline();
 	}
@@ -237,14 +235,11 @@ void keyboard_handler()
 			delete();			
 		}
 	}
-	else if(c != '\0' && lb_index < 127)			/*if the scancode value is not empty, print out the character*/
+	else if(c != '\0' && lb_index < 126)			/*if the scancode value is not empty, print out the character*/
 	{
 		display_c(c);
-		if(c != '\b' && c != '\n')
-		{
-		    lb_index++;
-			line_buffer[lb_index] = c;
-		}
+	    lb_index++;
+		line_buffer[lb_index] = c;
 	}
 	asm volatile("                  \n\
 		    leave                    \n\
