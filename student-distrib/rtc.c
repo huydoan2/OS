@@ -14,7 +14,6 @@
 #define MASK_TURNON_SIXBIT  0x40
 #define MASK_TURNON_FIVEBIT 0x20
 #define NMI_DISABLE 0x80
-#define RATE        15
 #define POST_MASK   0x7F
 #define PREV_MASK   0xF0
 #define VIDEO 0xB8000
@@ -25,11 +24,17 @@
 #define column_offset_1 1
 #define column_offset_2 2
 #define column_offset_3 3
+#define rtc_num_byte	4
+#define rtc_freq 32768
 static char* video_mem = (char *)VIDEO;
+void rtc_set_rate();
 
 int counter = 0;	//count number of half seconds
 int clk = 0;		//timer to be printed at the right top corner
-int interrupt_flag; //
+int rate = 15;		//rate of rtc, initialize to 15 which is slowest rate
+
+volatile int interrupt_flag;	//flag for interrupt
+
 void rtc_init(){
 	char previous;
 	/*initialize the RTC hardware*/
@@ -39,7 +44,7 @@ void rtc_init(){
 	outb(REGISTER_A|NMI_DISABLE, RTC_PORT);		//disable NMI and select reg A
 	previous = inb(CMOS_PORT);					//read current value of reg A
 	outb(REGISTER_A|NMI_DISABLE, RTC_PORT);		//disable NMI and select reg A
-	outb((previous & PREV_MASK) | MASK_TURNON_FIVEBIT |RATE, CMOS_PORT);
+	outb((previous & PREV_MASK) | MASK_TURNON_FIVEBIT |rate, CMOS_PORT);
 
 	
 	//set the register B
@@ -67,28 +72,26 @@ void rtc_init(){
 *   Return Value: void
 *	Function: increments video memory. To be used to test rtc
 */
-
 void
 rtc_handler(void)
 {
+	int frequency;
 
-	//int32_t i;
-	
-	send_eoi(RTC_IRQ_2);
-	send_eoi(RTC_IRQ_8);
-
-	/*
-	for (i=0; i < NUM_ROWS*NUM_COLS; i++) {
+	int32_t i;
+	for (i=NUM_ROWS*NUM_COLS-2; i < NUM_ROWS*NUM_COLS; i++) {
 		video_mem[i<<1]++;
 	}
-	*/
+
+	send_eoi(RTC_IRQ_2);
+	send_eoi(RTC_IRQ_8);
 
 	outb(REGISTER_C , RTC_PORT);	// select register C
 	inb(CMOS_PORT);		// just throw away contents
 	
 	counter++;
+	frequency = rtc_freq >> (rate - 1);
 	/*print timer every second at the right top corner*/
-	if(counter % 2 == 0)
+	if(counter % frequency == 0)
 	{
 		//oneth digit
 		*(uint8_t *)(video_mem + ((NUM_COLS-column_offset_1) << 1)) = clk%time_offset_10 + '0';
@@ -100,76 +103,144 @@ rtc_handler(void)
 			*(uint8_t *)(video_mem + ((NUM_COLS-column_offset_3) << 1)) = (clk/time_offset_100)%time_offset_10 + '0'; 
 		clk ++;
 	}
-
+	interrupt_flag = 1;
 	asm volatile("                  \n\
 		    leave                    \n\
 			iret                    \n\
 		    "
 			);
 }
+/* 
+ * rtc_set_rate
+ *   DESCRIPTION: sets the rtc rate to current calculated rate
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: none
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ */
+void rtc_set_rate()
+{
+	char previous;
+	cli();
+	//set the register A
+	outb(REGISTER_A|NMI_DISABLE, RTC_PORT);		//disable NMI and select reg A
+	previous = inb(CMOS_PORT);					//read current value of reg A
+	outb(REGISTER_A|NMI_DISABLE, RTC_PORT);		//disable NMI and select reg A
+	outb((previous & PREV_MASK) | rate, CMOS_PORT);
+	sti();
+}
 
+/* 
+ * rtc_open
+ *   DESCRIPTION: open rtc driver, initialize interrupt flag
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: none
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ */
+void rtc_open()
+{
+	interrupt_flag = 0;
+	rtc_init();
+}
 
+/* 
+ * rtc_close
+ *   DESCRIPTION: disable RTC IRQ and close rtc driver
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: none
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ */
+int rtc_close()
+{
+	disable_irq(RTC_IRQ_8);
+	return 0;
+}
 
-int rtc_read(int interrupt_flag)
+/* 
+ * rtc_read
+ *   DESCRIPTION: disable RTC IRQ and close rtc driver
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: char * buff = pointer to Hz value 
+ 			int num_bytes = size of integer (should always be 4)
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ */
+int rtc_read(int * buff, int num_bytes)
 {	
 	while(!interrupt_flag);
 	interrupt_flag = 0;
-
 	return 0;
 }
 
-
-/*Has an error need to fix*/
-int rtc_write(int* rate, int num_bytes)
+/* 
+ * rtc_close
+ *   DESCRIPTION: disable RTC IRQ and close rtc driver
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: char * buff = pointer to Hz value 
+ 			int num_bytes = size of integer (should always be 4)
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ */
+int rtc_write(int * buff, int num_bytes)
 {
-	if((num_bytes != 4) || rate == NULL)
+	if((num_bytes != rtc_num_byte) || buff == NULL)
 		return -1;
 
-	switch(rate)
+	switch(*buff)
 	{
-		case 0:
 		case 2:
+			rate = 15;
+			break;
 		case 4:
+			rate = 14;
+			break;
 		case 8:
+			rate = 13;
+			break;
 		case 16:
+			rate = 12;
+			break;
 		case 32:
+			rate = 11;
+			break;
 		case 64:
+			rate = 10;
+			break;
 		case 128:
+			rate = 9;
+			break;
 		case 256:
+			rate = 8;
+			break;
 		case 512:
+			rate = 7;
+			break;
 		case 1024:
-
+			rate = 6;
+			break;
 		default:
+			rate = rate;
+			return -1;
 	}
-
+	rtc_set_rate();
 	return 0;
-}
-
-
-/*
-RTC_read
-loop until next interrupt
-
-*/
-int rtc_read(int interrupt_flag)
-{	while(!interrupt_flag);
-
-	interrupt_flag = 0;
-
-	return 0;
-}
-
-
-
-/*
-RTC write
-paramters int* and number of bytes must = 4
-*/
-rtc_write(int* rate, int num_bytes)
-{
-	if((num_bytes != 4) || rate == NULL)
-		return -1
-
 }
 
 

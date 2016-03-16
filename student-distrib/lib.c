@@ -8,6 +8,7 @@
 #define MAX_X_INDEX 79
 #define NUM_ROWS 25
 #define ATTRIB 0x7
+#define ATTRIB_SHIFT 8
 #define BASE_PORT 0x3D4
 #define CURSOR_PORT 0x3D5
 #define CURSOR_MASK 0xFF
@@ -628,27 +629,6 @@ display_c(uint8_t c)
     cursor_update(screen_x, screen_y);
 }
 
-void
-putc(uint8_t c)
-{
-    if(c == '\n' || c == '\r') {
-        screen_y++;
-        screen_x=0;
-    } else {
-        *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = c;
-        *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1) + 1) = ATTRIB;
-        screen_x++;
-        screen_x %= NUM_COLS;
-        screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
-    }
-    if (screen_y > NUM_ROWS - 1)
-	{
-		scroll_screen();
-		--screen_y;
-	}
-    cursor_update(screen_x, screen_y);
-}
-
 void delete()
 {
 	screen_x--;	
@@ -696,7 +676,7 @@ void scroll_screen()
 
 	for (i = 0; i < NUM_COLS; ++i)
 	{
-		blank_row[i] = ATTRIB << 8;
+		blank_row[i] = ATTRIB << ATTRIB_SHIFT;
 	}
 	
 	//move NUM_COLS -1 rows to the top of the screen

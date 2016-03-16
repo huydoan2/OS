@@ -11,10 +11,11 @@
 //Define values for Keyboard
 #define KEYBOARD_DATA 0x60
 #define KEYBOARD_COMMAND 0x64
+#define size_of_keys 128
 
 
 extern int lb_index;
-extern char line_buffer [128];
+extern char line_buffer [size_of_keys];
 
 
 //initialize the keyboard

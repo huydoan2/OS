@@ -38,6 +38,7 @@
 void Exception_Handler_0(){
 
 	//print out the error message
+    clear();
 	printf("Exception: Divide-by-zero Error. \n");
 
 	//stop the execution 
@@ -59,6 +60,7 @@ void Exception_Handler_0(){
 void Exception_Handler_1(){
 
 	//print out the error message
+    clear();
 	printf("Exception: Debug. \n");
 
 	//stop the execution 
@@ -80,6 +82,7 @@ void Exception_Handler_1(){
 void Exception_Handler_2(){
 
 	//print out the error message
+    clear();
 	printf("Exception: Non-maskable Interrupt. \n");
 
 	//stop the execution 
@@ -101,6 +104,7 @@ void Exception_Handler_2(){
 void Exception_Handler_3(){
 
 	//print out the error message
+    clear();
 	printf("Exception: Breakpoint. \n");
 
 	//stop the execution 
@@ -122,6 +126,7 @@ void Exception_Handler_3(){
 void Exception_Handler_4(){
 
 	//print out the error message
+    clear();
 	printf("Exception: Overflow. \n");
 
 	//stop the execution 
@@ -143,6 +148,7 @@ void Exception_Handler_4(){
 void Exception_Handler_5(){
 
 	//print out the error message
+    clear();
 	printf("Exception: Bound Range Exceeded. \n");
 
 	//stop the execution 
@@ -164,6 +170,7 @@ void Exception_Handler_5(){
 void Exception_Handler_6(){
 
 	//print out the error message
+    clear();
 	printf("Exception: Invalid Opcode. \n");
 
 	//stop the execution 
@@ -185,6 +192,7 @@ void Exception_Handler_6(){
 void Exception_Handler_7(){
 
 	//print out the error message
+    clear();
 	printf("Exception: Device Not Available. \n");
 
 	//stop the execution 
@@ -206,6 +214,7 @@ void Exception_Handler_7(){
 void Exception_Handler_8(){
 
 	//print out the error message
+    clear();
 	printf("Exception: Double Fault. \n");
 
 	//stop the execution 
@@ -227,6 +236,7 @@ void Exception_Handler_8(){
 void Exception_Handler_9(){
 
 	//print out the error message
+    clear();
 	printf("Exception: Coprocessor Segment Overrun. \n");
 
 	//stop the execution 
@@ -248,6 +258,7 @@ void Exception_Handler_9(){
 void Exception_Handler_10(){
 
 	//print out the error message
+    clear();
 	printf("Exception: Invalid TSS. \n");
 
 	//stop the execution 
@@ -269,6 +280,7 @@ void Exception_Handler_10(){
 void Exception_Handler_11(){
 
 	//print out the error message
+    clear();
 	printf("Exception: Segment Not Present. \n");
 
 	//stop the execution 
@@ -290,6 +302,7 @@ void Exception_Handler_11(){
 void Exception_Handler_12(){
 
 	//print out the error message
+    clear();
 	printf("Exception: Stack-Segment Fault. \n");
 
 	//stop the execution 
@@ -311,6 +324,7 @@ void Exception_Handler_12(){
 void Exception_Handler_13(){
 
 	//print out the error message
+    clear();
 	printf("Exception: General Protection Fault. \n");
 
 	//stop the execution 
@@ -332,6 +346,7 @@ void Exception_Handler_13(){
 void Exception_Handler_14(){
 
 	//print out the error message
+    clear();
 	printf("Exception: Page Fault. \n");
 
 	//stop the execution 
@@ -353,6 +368,7 @@ void Exception_Handler_14(){
 void Exception_Handler_16()
 {
 	//print out the error message
+    clear();
 	printf("EXCPETION: x87 Floating-Point Exception\n");
 	//stop the execution 
 	while(1);
@@ -372,6 +388,7 @@ void Exception_Handler_16()
 void Exception_Handler_17()
 {
 	//print out the error message
+    clear();
 	printf("EXCPETION: Alignment Check\n");
 	//stop the execution 
 	while(1);
@@ -391,6 +408,7 @@ void Exception_Handler_17()
 void Exception_Handler_18()
 {
 	//print out the error message
+    clear();
 	printf("EXCPETION: Machine Check\n");
 	//stop the execution 
 	while(1);
@@ -410,6 +428,7 @@ void Exception_Handler_18()
 void Exception_Handler_19()
 {
 	//print out the error message
+    clear();
 	printf("EXCPETION: SIMD Floating-Point Exception\n");
 	//stop the execution 
 	while(1);
@@ -429,6 +448,7 @@ void Exception_Handler_19()
 void Exception_Handler_20()
 {
 	//print out the error message
+    clear();
 	printf("EXCPETION: Virtualization Exception\n");
 	//stop the execution 
 	while(1);
@@ -448,6 +468,7 @@ void Exception_Handler_20()
 void Exception_Handler_30()
 {
 	//print out the error message
+    clear();
 	printf("EXCPETION: Security Exception\n");
 	//stop the execution 
 	while(1);

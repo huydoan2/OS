@@ -16,6 +16,10 @@
 /* Check if the bit BIT in FLAGS is set. */
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
 
+#define size_of_keys 128
+#define rtc_num_byte 4
+#define rtc_buff_size 5
+
 /* Check if MAGIC is valid and print the Multiboot information structure
    pointed by ADDR. */
 void
@@ -25,8 +29,11 @@ entry (unsigned long magic, unsigned long addr)
 	//uint32_t test_phys_addr;
 	//uint32_t test_virt_addr = 0x00005111;
 	//uint32_t test_val;
-	char buff[128];
-	int num_byte = 7;
+	int rtc_buff[rtc_buff_size] = {2,4,8,16,32};
+	int rtc_index = 0;
+
+	char buff[size_of_keys];
+	int num_byte = size_of_keys;
 	int i;
 
 	/* Clear the screen. */
@@ -163,7 +170,7 @@ entry (unsigned long magic, unsigned long addr)
 	/* Initialize devices, memory, filesystem, enable device interrupts on the
 	 * PIC, any other initialization stuff... */
 	keyboard_open();
-	rtc_init();
+	rtc_open();
 	paging_init();
 
 	/*test the memory accessing by paging */
@@ -189,18 +196,25 @@ entry (unsigned long magic, unsigned long addr)
 	/********TESTING TERMINAL READ AND WRITE*******/
 	while(1)
 	{
+		//keyboard read write test
 		i = keyboard_read(buff, num_byte);
 		keyboard_write(buff, num_byte);
-		printf("\ni = %d\n",i);
+		printf("\nbytes written = %d\n",i);
 		while(i>=0)
 		{		
 			buff[i] = 0;
 			i--;
 		}
+		//rtc read write test
+		rtc_write(rtc_buff+rtc_index,rtc_num_byte);
+		rtc_read(rtc_buff+rtc_index,rtc_num_byte);
+		rtc_index = (rtc_index+1)%rtc_buff_size;
 	}
 	
 
 	keyboard_close();
+	rtc_close();
+
 
 	/* Spin (nicely, so we don't chew up cycles) */
 	asm volatile(".1: hlt; jmp .1;");
