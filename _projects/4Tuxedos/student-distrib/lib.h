@@ -18,6 +18,7 @@ void cursor_update(int col, int row);
 void display_c(uint8_t c);
 void delete();
 void newline();
+void scroll_screen();
 void* memset(void* s, int32_t c, uint32_t n);
 void* memset_word(void* s, int32_t c, uint32_t n);
 void* memset_dword(void* s, int32_t c, uint32_t n);

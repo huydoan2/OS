@@ -6,17 +6,17 @@
  #include "terminal.h"
 
 
-void scroll_screen(void){
+// void scroll_screen(void){
 
-	/*set the black color*/
+// 	/*set the black color*/
 
-	/*determine whether the end of screen is reached*/
+// 	determine whether the end of screen is reached
 
-		/*move the currnet video display up by a line*/
+// 		/*move the currnet video display up by a line*/
 
-		/*set blank to the last line of the video*/
+// 		/*set blank to the last line of the video*/
 
-}
+// }
 
 //DO we even need this ???
 void blink_cursor(void){
