@@ -11,11 +11,13 @@
 #define BASE_PORT 0x3D4
 #define CURSOR_PORT 0x3D5
 #define CURSOR_MASK 0xFF
+#define MOVING_NUM (NUM_COLS*(NUM_ROWS - 1))*2
 
 static int screen_x;
 static int screen_y;
 //static int max_x;
 static char* video_mem = (char *)VIDEO;
+static uint16_t blank_row[NUM_COLS];
 /*
 * void clear(void);
 *   Inputs: void
@@ -617,9 +619,15 @@ display_c(uint8_t c)
         *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1) + 1) = ATTRIB;
         screen_x++;
         //max_x = screen_x;
-        screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
+        screen_y = (screen_y + (screen_x / NUM_COLS));
         screen_x %= NUM_COLS;
+       
  	}
+ 	 if (screen_y > NUM_ROWS - 1)
+		{
+			scroll_screen();
+			--screen_y;
+		}
     cursor_update(screen_x, screen_y);
 }
 
@@ -641,5 +649,36 @@ void newline()
 {
 	screen_x = 0;
     screen_y++;
+    if (screen_y > NUM_ROWS - 1)
+		{
+			scroll_screen();
+			--screen_y;
+		}
     cursor_update(screen_x, screen_y);
+}
+
+void scroll_screen(){
+
+	/*set the black color*/
+
+	/*determine whether the end of screen is reached*/
+
+		/*move the currnet video display up by a line*/
+
+		/*set blank to the last line of the video*/
+	int i;
+
+	uint32_t last_line = (VIDEO + (NUM_ROWS - 1)*NUM_COLS*sizeof(uint16_t));		//the address of the last row in video memory
+
+	for (i = 0; i < NUM_COLS; ++i)
+	{
+		blank_row[i] = ATTRIB << 8;
+	}
+	
+	//move NUM_COLS -1 rows to the top of the screen
+	memcpy(video_mem, (void*)(VIDEO + NUM_COLS*sizeof(uint16_t)), MOVING_NUM);
+
+	//make the last row blank
+	memcpy((void*)last_line, blank_row, NUM_COLS*2);
+	
 }
