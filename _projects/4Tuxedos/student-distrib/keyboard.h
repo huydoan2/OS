@@ -32,7 +32,17 @@ extern char getchar();
 //reset the line buffer
 extern void reset_linebuffer();
 
+//open keyboard driver
+extern void keyboard_open();
+
+//close keyboard driver
+extern int keyboard_close();
+
 //read function for keyboard
-extern int keyboard_read();
+extern int keyboard_read(char * buff, int num_bytes);
+
+//write function for keyboard
+extern int keyboard_write(char * buff, int num_bytes);
+
 #endif
 
