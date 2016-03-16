@@ -22,9 +22,6 @@
 #define max_flag	8
 
 
-int lb_index = 0;
-char line_buffer [128] = {0};
-
 
 //scancode array for keyboard
 //0 = no output
@@ -75,9 +72,11 @@ char caps_shift_scancode[size_of_keys] =
   0,0,0,0/* F11 Key */,0/* F12 Key */,0,  /* All Release keys are undefined */ 
 };
 
-int shift_flag = 0;				/*flag for shift*/
-int caps_lock_flag = 0;			/*flag for caps*/
-int control_flag = 0;			/*flag for control*/
+int shift_flag;				/*flag for shift*/
+int caps_lock_flag;			/*flag for caps*/
+int control_flag;			/*flag for control*/
+int lb_index;				/*line buffer index*/
+char line_buffer [128];		/*line buffer*/
 
 /* 
  * getScancode
@@ -202,6 +201,9 @@ void keyboard_init()
 {
 	shift_flag = 0;					/*initialize the shift flag to zero*/
 	caps_lock_flag = 0;				/*initialize the caps lock flag to zero*/
+	control_flag = 0;				/*initialize flag for control*/
+	lb_index = 0;					/*initialize line buffer index*/
+	line_buffer [128] = {0};		/*initialize line buffer*/
 	enable_irq(keyboard_irq_num);
 }        
 
