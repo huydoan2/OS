@@ -42,7 +42,7 @@ char shift_scancode[size_of_keys] =
  	'Q','W','E','R','T','Y','U','I','O','P','{','}','\n',0,//Control
   	'A','S','D','F','G','H','J','K','L',':','"','~',0,//Left shift
   	'|','Z','X','C','V','B','N','M','<','>','?',0,//Right shift
-  	'*',0,' ',,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  	'*',0,' ',0,0,0,0,0,0,0,0,0,0,0,0,0,
   	'7',0,'9','-',0,'5',0,'+','1',0,'3','0','.',0,0,0,0,0,0, /* All Release keys are undefined */
 };
 
@@ -62,7 +62,7 @@ char caps_shift_scancode[size_of_keys] =
  	'q','w','e','r','t','y','u','i','o','p','{','}','\n',0,//Control
  	'a','s','d','f','g','h','j','k','l',':','"','~',0,//Left shift
  	'|','z','x','c','v','b','n','m','<','>','?',0,//Right shift
- 	'*',0,' ',,0,0,0,0,0,0,0,0,0,0,0,0,0,
+ 	'*',0,' ',0,0,0,0,0,0,0,0,0,0,0,0,0,
  	'7',0,'9','-',0,'5',0,'+','1',0,'3','0','.',0,0,0,0,0,0, /* All Release keys are undefined */
 };
 
@@ -70,7 +70,7 @@ int shift_flag;				/*flag for shift*/
 int caps_lock_flag;			/*flag for caps*/
 int control_flag;			/*flag for control*/
 int lb_index;				/*line buffer index*/
-char line_buffer [128];		/*line buffer*/
+char line_buffer [128] = {0};		/*initialize line buffer*/
 
 /* 
  * getScancode
@@ -197,7 +197,6 @@ void keyboard_init()
 	caps_lock_flag = 0;				/*initialize the caps lock flag to zero*/
 	control_flag = 0;				/*initialize flag for control*/
 	lb_index = 0;					/*initialize line buffer index*/
-	line_buffer [128] = {0};		/*initialize line buffer*/
 	enable_irq(keyboard_irq_num);
 }        
 
