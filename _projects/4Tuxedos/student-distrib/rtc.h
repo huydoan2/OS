@@ -10,5 +10,7 @@
 //initialize the rtc
 extern void rtc_init();
 extern void rtc_handler(void);
+extern int rtc_read(int interrupt_flag);
+extern int rtc_write(int* rate, int num_bytes);
 
 #endif 

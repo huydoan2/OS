@@ -107,3 +107,72 @@ rtc_handler(void)
 		    "
 			);
 }
+
+
+
+int rtc_read(int interrupt_flag)
+{	while(!interrupt_flag);
+
+	interrupt_flag = 0;
+
+	return 0;
+}
+
+
+/*Has an error need to fix*/
+// int rtc_write(int* rate, int num_bytes)
+// {
+// 	if((num_bytes != 4) || rate == NULL)
+// 		return -1;
+
+// 	switch(rate)
+// 	{
+// 		case 0:
+// 		case 2:
+// 		case 4:
+// 		case 8:
+// 		case 16:
+// 		case 32:
+// 		case 64:
+// 		case 128:
+// 		case 256:
+// 		case 512:
+// 		case 1024:
+
+// 		default:
+// 	}
+
+// 	return 0;
+// }
+
+
+/*
+RTC_read
+loop until next interrupt
+
+int rtc_read(int interrupt_flag)
+{	while(!interrupt_flag);
+
+	interrupt_flag = 0;
+
+	return 0;
+}
+
+*/
+
+
+/*
+RTC write
+paramters int* and number of bytes must = 4
+
+rtc_write(int* rate, int num_bytes)
+{
+	if((num_bytes != 4) || rate == NULL)
+		return -1
+
+}
+*/
+
+/*Bootblock + 4096* Num of iNodes +1 gets you to data blocks*/
+
+/*file system close wont do anything*/
