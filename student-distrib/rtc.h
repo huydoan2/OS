@@ -9,10 +9,12 @@
 
 //initialize the rtc
 extern void rtc_init();
+
+//handler for rtc
 extern void rtc_handler(void);
 
 //open rtc driver
-extern void rtc_open();
+extern int rtc_open();
 
 //close rtc driver
 extern int rtc_close();

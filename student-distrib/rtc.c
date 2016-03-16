@@ -144,10 +144,11 @@ void rtc_set_rate()
  *   SIDE EFFECTS: 
  *
  */
-void rtc_open()
+int rtc_open()
 {
 	interrupt_flag = 0;
 	rtc_init();
+	return 0;
 }
 
 /* 

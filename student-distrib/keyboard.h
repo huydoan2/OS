@@ -34,7 +34,7 @@ extern char getchar();
 extern void reset_linebuffer();
 
 //open keyboard driver
-extern void keyboard_open();
+extern int keyboard_open();
 
 //close keyboard driver
 extern int keyboard_close();

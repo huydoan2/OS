@@ -270,7 +270,7 @@ void reset_linebuffer()
  *   SIDE EFFECTS: 
  *
  */
-void keyboard_open()
+int keyboard_open()
 {
 	shift_flag = 0;					/*initialize the shift flag to zero*/
 	caps_lock_flag = 0;				/*initialize the caps lock flag to zero*/
@@ -278,6 +278,7 @@ void keyboard_open()
 	enter_flag = 0;					/*initialize enter to zero*/
 	lb_index = -1;					/*initialize line buffer index*/
 	keyboard_init();
+	return 0;
 }
 
 /* 
