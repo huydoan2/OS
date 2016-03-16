@@ -193,10 +193,6 @@ char getchar()
  */
 void keyboard_init()
 {
-	shift_flag = 0;					/*initialize the shift flag to zero*/
-	caps_lock_flag = 0;				/*initialize the caps lock flag to zero*/
-	control_flag = 0;				/*initialize flag for control*/
-	lb_index = 0;					/*initialize line buffer index*/
 	enable_irq(keyboard_irq_num);
 }        
 
@@ -260,6 +256,43 @@ void reset_linebuffer()
 }
 
 /* 
+ * keyboard_open
+ *   DESCRIPTION: open keyboard driver
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: none
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ */
+void keyboard_open()
+{
+	shift_flag = 0;					/*initialize the shift flag to zero*/
+	caps_lock_flag = 0;				/*initialize the caps lock flag to zero*/
+	control_flag = 0;				/*initialize flag for control*/
+	lb_index = -1;					/*initialize line buffer index*/
+	keyboard_init();
+}
+
+/* 
+ * keyboard_close
+ *   DESCRIPTION: close keyboard driver
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: none
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ */
+int keyboard_close()
+{
+	return 0;
+}
+
+
+/* 
  * keyboard_read
  *   DESCRIPTION: reset the line buffer and buffer index
  *-----------------------------------------------------------------------------------
@@ -270,12 +303,38 @@ void reset_linebuffer()
  *   SIDE EFFECTS: 
  *
  */
-int keyboard_read(char * return_array)
+int keyboard_read(char * buff, int num_bytes)
 {
-	int ret_val = lb_index;
+	int ret_val = lb_index + 1;
 	int i;
+	if(buff == NULL)
+		return -1;
 	for(i = 0; i<lb_index; i++)
- 		return_array[i] = line_buffer[i];
+ 		buff[i] = line_buffer[i];
  	reset_linebuffer();
  	return ret_val;
+}
+
+/* 
+ * keyboard_write
+ *   DESCRIPTION: reset the line buffer and buffer index
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: none
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ */
+int keyboard_write(char * buff, int num_bytes)
+{
+	int i =0;
+	if(buff == NULL || num_bytes < 0)
+		return -1;
+	while(buff[i] != '\0' && i < num_bytes)
+	{
+		display_c(buff[i]);
+		i++;
+	}
+	return i;
 }

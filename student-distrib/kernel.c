@@ -22,9 +22,9 @@ void
 entry (unsigned long magic, unsigned long addr)
 {
 	multiboot_info_t *mbi;
-	uint32_t test_phys_addr;
-	uint32_t test_virt_addr = 0x00005111;
-	uint32_t test_val;
+	//uint32_t test_phys_addr;
+	//uint32_t test_virt_addr = 0x00005111;
+	//uint32_t test_val;
 	char * test;
 	int test2,i;
 
@@ -161,17 +161,17 @@ entry (unsigned long magic, unsigned long addr)
 
 	/* Initialize devices, memory, filesystem, enable device interrupts on the
 	 * PIC, any other initialization stuff... */
-	keyboard_init();
+	keyboard_open();
 	rtc_init();
-	
 	paging_init();
-	printf("Paging initialized\n");
 
-/*test the memory accessing by paging */
+	/*test the memory accessing by paging */
+	/*
 	test_phys_addr = get_physAddr(test_virt_addr);
 	test_val = *((uint32_t *)test_phys_addr);
-
 	printf("memory: %x\n", test_val);
+	*/
+	
 	/*Set up IDT to handle system calls*/
 
 
@@ -183,9 +183,8 @@ entry (unsigned long magic, unsigned long addr)
 
 	clear(); //need to clear screen in terminal driver init
 
-	sti();
-
 	/* Execute the first program (`shell') ... */
+	
 	test2 = keyboard_read(test);
 	printf("size of bytes read: %d\n", test2);
 	for (i = 0; i < test2; ++i)
@@ -193,6 +192,11 @@ entry (unsigned long magic, unsigned long addr)
 		printf("%c",test[i]);
 	}
 	printf("\n");
+
+	sti();
+
+	keyboard_close();
+
 	/* Spin (nicely, so we don't chew up cycles) */
 	asm volatile(".1: hlt; jmp .1;");
 }
