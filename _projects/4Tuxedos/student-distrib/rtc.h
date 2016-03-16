@@ -10,7 +10,16 @@
 //initialize the rtc
 extern void rtc_init();
 extern void rtc_handler(void);
-extern int rtc_read(int interrupt_flag);
-extern int rtc_write(int* rate, int num_bytes);
 
+//open rtc driver
+extern void rtc_open();
+
+//close rtc driver
+extern int rtc_close();
+
+//read function for rtc
+extern int rtc_read(int * buff, int num_bytes);
+
+//write function for rtc
+extern int rtc_write(int * buff, int num_bytes);
 #endif 

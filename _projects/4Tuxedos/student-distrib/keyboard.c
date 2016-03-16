@@ -19,7 +19,9 @@
 #define caps_lock_off 0xBA
 #define end_of_press 0x81
 #define size_of_keys 128
+#define max_keys 126
 #define max_flag	8
+#define L_pressed 0x26
 
 
 
@@ -71,7 +73,7 @@ int caps_lock_flag;			/*flag for caps*/
 int control_flag;			/*flag for control*/
 volatile int enter_flag;	/*flag for enter*/
 int lb_index;				/*line buffer index*/
-char line_buffer [128] = {0};		/*initialize line buffer*/
+char line_buffer [size_of_keys] = {0};		/*initialize line buffer*/
 
 /* 
  * getScancode
@@ -131,14 +133,14 @@ char getchar()
 		caps_lock_flag = 0;	
 
 	/*if control+L, clear the display */
-	if(control_flag && c == 0x26)
+	if(control_flag && c == L_pressed)
 	{
 		clear();
 		reset_linebuffer();
 		return 0;
 	}
 
-	/*caps lock off case*/
+	/*caps lock off case, checking if it's even or odd*/
 	if((caps_lock_flag % 2) ==0)
 	{
 		/*caps lock off and shift on*/
@@ -228,7 +230,7 @@ void keyboard_handler()
 			delete();			
 		}
 	}
-	else if(c != '\0' && lb_index < 126)			/*if the scancode value is not empty, print out the character*/
+	else if(c != '\0' && lb_index < max_keys)			/*if the scancode value is not empty, print out the character*/
 	{
 		display_c(c);
 	    lb_index++;
@@ -259,7 +261,7 @@ void reset_linebuffer()
 
 /* 
  * keyboard_open
- *   DESCRIPTION: open keyboard driver
+ *   DESCRIPTION: open keyboard driver and initialize keyboard flags and keyboard
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
  *   OUTPUTS: none
@@ -299,7 +301,8 @@ int keyboard_close()
  * keyboard_read
  *   DESCRIPTION: read keyboard
  *-----------------------------------------------------------------------------------
- *   INPUTS: none
+ *   INPUTS: char * buff = buffer to copy chars from the line buffer 
+ 			int num_bytes = number of bytes
  *   OUTPUTS: none
  *   RETURN VALUE: none
  *-----------------------------------------------------------------------------------
@@ -325,7 +328,8 @@ int keyboard_read(char * buff, int num_bytes)
  * keyboard_write
  *   DESCRIPTION: write keyboard
  *-----------------------------------------------------------------------------------
- *   INPUTS: none
+ *   INPUTS: char * buff = buffer that has characters to be written
+ 			int num_bytes = number of bytes to write
  *   OUTPUTS: none
  *   RETURN VALUE: none
  *-----------------------------------------------------------------------------------
