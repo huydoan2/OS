@@ -605,7 +605,7 @@ void cursor_update(int row, int col)
 *	Function: Output a character to the console 
 */
 void
-display_c(uint8_t c, int lb_index)
+display_c(uint8_t c)
 {
 	if(c == '\n' || c == '\r') {
         screen_x = 0;
@@ -629,10 +629,10 @@ void delete()
     if(screen_x < 0 && screen_y == 0)
     	screen_x = 0;
     else if (screen_x < 0)
-    	{
-    		screen_y--;
-    		screen_x = NUM_COLS - 1;
-    	}
+	{
+		screen_y--;
+		screen_x = NUM_COLS - 1;
+	}
    	*(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = ' '; 
    	cursor_update(screen_x, screen_y);
 }

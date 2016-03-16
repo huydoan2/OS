@@ -143,7 +143,7 @@ char getchar()
 		int i;
 		for(i = 0; i<lb_index; i++)
 		{
-			display_c(line_buffer[i],lb_index);
+			display_c(line_buffer[i]);
 		}
 		return 0;
 	}
@@ -233,19 +233,18 @@ void keyboard_handler()
 	{
 		if(lb_index >= 0)
 		{
-			lb_index--;
 			delete();
+			line_buffer[lb_index] = 0;
+			lb_index--;
 		}
-
-		
 	}
 	else if(c != '\0' && lb_index < 128)			/*if the scancode value is not empty, print out the character*/
 	{
-		display_c(c,lb_index);
+		display_c(c);
 		if(c != '\b' && c != '\n')
 		{
-		    lb_index++;
 			line_buffer[lb_index] = c;
+		    lb_index++;
 		}
 	}
 	asm volatile("                  \n\
@@ -268,7 +267,7 @@ void keyboard_handler()
  */
 void reset_linebuffer()
 {	
-	lb_index = -1;	
+	lb_index = 0;	
 }
 
 /* 
