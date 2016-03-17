@@ -8,7 +8,7 @@
 
 #define max_dentries 62
 
-bootblock_t bootblock;
+bootblock_t* bootblock;
 dentry_t* dentry_file_system;
 inode_t* inode_file_system;
 
@@ -76,11 +76,11 @@ int32_t read_dentry_by_index(uint32_t index, struct dentry_t* dentry)
 	return 0;
 }
 
-int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length)
-{
+// int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length)
+// {
 
-	if(inode >= bootblock.num_inodes || offset >= inode_file_system[inode].length_in_B)
-		return -1;
+// 	if(inode >= bootblock.num_inodes || offset >= inode_file_system[inode].length_in_B)
+// 		return -1;
 
-	return 0;
-}
+// 	return 0;
+// }
