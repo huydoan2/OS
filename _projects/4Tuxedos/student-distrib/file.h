@@ -27,14 +27,6 @@ printf("Module %d loaded at address: 0x%#x\n", mod_count, (unsigned int)mod->mod
 printf("Module %d ends at address: 0x%#x\n", mod_count, (unsigned int)mod->mod_end);
 */
 
-typedef struct bootblock_t{
-	int32_t num_dentries;
-	int32_t num_inodes;
-	int32_t num_dblocks;
-	int32_t reserved[13];
-	//need dir entries here???
-} bootblock_t;
-
 
 typedef struct dentry_t{
 	int8_t filename[32];
@@ -43,11 +35,19 @@ typedef struct dentry_t{
 	int32_t reserved[6];
 } dentry_t;
 
+typedef struct bootblock_t{
+	int32_t num_dentries;
+	int32_t num_inodes;
+	int32_t num_dblocks;
+	int32_t reserved[13];
+	//need dir entries here???
+	dentry_t directory[62];
+} bootblock_t;
+
 typedef struct inode_t{
 	int8_t length_in_B;
-	int32_t data_block[]; //how many blocks?
+	int32_t data_block[1023];
 } inode_t;
-
 
 int32_t read_dentry_by_name(const uint8_t* fname, struct dentry_t* dentry);
 
