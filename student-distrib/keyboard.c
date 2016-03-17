@@ -214,22 +214,25 @@ void keyboard_handler()
 {	
 	send_eoi(keyboard_irq_num);
 	char c = getchar();
+	//handle next line input
 	if(c == '\n'|| c == '\r')
 	{
 	    lb_index++;
 		line_buffer[lb_index] = c;
 		enter_flag = 1;
-		reset_linebuffer();
+		reset_linebuffer();	//reset line buffer by reset the index
 		newline();
 	}
+	//handle the backspace input
 	else if(c == '\b')
 	{
 		if(lb_index >= 0)
 		{
 			lb_index--;
-			delete();			
+			delete(); //delete the character 
 		}
 	}
+	//limit the maximum number of input characters
 	else if(c != '\0' && lb_index < max_keys)			/*if the scancode value is not empty, print out the character*/
 	{
 		display_c(c);
@@ -267,7 +270,7 @@ void reset_linebuffer()
  *   OUTPUTS: none
  *   RETURN VALUE: none
  *-----------------------------------------------------------------------------------
- *   SIDE EFFECTS: 
+ *   SIDE EFFECTS: all the flags and PIC are initialized 
  *
  */
 int keyboard_open()
@@ -289,7 +292,7 @@ int keyboard_open()
  *   OUTPUTS: none
  *   RETURN VALUE: none
  *-----------------------------------------------------------------------------------
- *   SIDE EFFECTS: 
+ *   SIDE EFFECTS: does nothing
  *
  */
 int keyboard_close()
@@ -308,15 +311,21 @@ int keyboard_close()
  *   RETURN VALUE: none
  *-----------------------------------------------------------------------------------
  *   SIDE EFFECTS: 
+ *			- the characters from the line buffer is stored in the input buffer
+ *			- the line buffer and its index variable are cleared 
  *
  */
 int keyboard_read(char * buff, int num_bytes)
 {
 	int i = 0;
+	//check if the input is valid
 	if(buff == NULL)
 		return -1;
+
+	//wait for the user to finish typing (hit enter)
 	while(enter_flag == 0);
  	enter_flag = 0;
+ 	//copy the characters in the line buffer
  	while(line_buffer[i] != '\n' && i < num_bytes )
  	{
  		buff[i] = line_buffer[i];
@@ -327,7 +336,7 @@ int keyboard_read(char * buff, int num_bytes)
 
 /* 
  * keyboard_write
- *   DESCRIPTION: write keyboard
+ *   DESCRIPTION: write keyboard, display the content from the buffer to the screen
  *-----------------------------------------------------------------------------------
  *   INPUTS: char * buff = buffer that has characters to be written
  			int num_bytes = number of bytes to write
@@ -335,13 +344,16 @@ int keyboard_read(char * buff, int num_bytes)
  *   RETURN VALUE: none
  *-----------------------------------------------------------------------------------
  *   SIDE EFFECTS: 
+ *			- characters passed in by the buffer are displayed on the screen
  *
  */
 int keyboard_write(char * buff, int num_bytes)
 {
 	int i =0;
+	//Check if the inputs are valid
 	if(buff == NULL || num_bytes < 0)
 		return -1;
+	//write character to the screen
 	while(buff[i] != '\0' && i < num_bytes)
 	{
 		display_c(buff[i]);

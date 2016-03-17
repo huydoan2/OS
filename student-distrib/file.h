@@ -4,6 +4,13 @@
 #ifndef FILE_H
 #define FILE_H
 
+/*define constants for the file system*/
+#define FILENAME_MAX_SIZE	32
+#define DENTRY_RESERVED_SIZE	6
+#define BOOTBLOCK_RESERVED_SIZE	13
+#define DENTRY_MAX_NUM	63
+#define DATA_BLOCK_MAX_ENTRY	1023
+
 #include "types.h"
 
 //handler for file
@@ -28,31 +35,37 @@ printf("Module %d ends at address: 0x%#x\n", mod_count, (unsigned int)mod->mod_e
 */
 
 
+/*structure for each entry in a directory*/
 typedef struct dentry_t{
-	int8_t filename[32];
+	int8_t filename[FILENAME_MAX_SIZE];
 	int32_t file_type;
 	int32_t inode_num;
-	int32_t reserved[6];
+	int32_t reserved[DENTRY_RESERVED_SIZE];
 } dentry_t;
-
+/*structure for the bootblock*/
 typedef struct bootblock_t{
 	int32_t num_dentries;
 	int32_t num_inodes;
 	int32_t num_dblocks;
-	int32_t reserved[13];
-	//need dir entries here???
-	dentry_t directory[62];
-} bootblock_t;
+	int32_t reserved[BOOTBLOCK_RESERVED_SIZE];
+	dentry_t directory_entry[DENTRY_MAX_NUM];
 
+} bootblock_t;
+/*structure for an inode*/
 typedef struct inode_t{
 	int8_t length_in_B;
-	int32_t data_block[1023];
+	int32_t data_block[DATA_BLOCK_MAX_ENTRY];
 } inode_t;
 
+/*function that parses the given file system to our data structures*/
+void parse_fileSystem()
+/*function that finds the directory entry by its name*/
 int32_t read_dentry_by_name(const uint8_t* fname, struct dentry_t* dentry);
 
+/*function that finds the directory entry by the index number*/
 int32_t read_dentry_by_index(uint32_t index, struct dentry_t* dentry);
 
+/*function that reads data from the data block*/
 int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length);
 
 #endif 

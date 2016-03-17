@@ -6,10 +6,9 @@
 #include "lib.h"
 
 
-#define max_dentries 62
 
 bootblock_t* bootblock;
-dentry_t* dentry_file_system;
+//SHOULD WE CHANGE THIS TO A LINKED-LIST?? SO THAT THE SIZE OF THE STRUCTURE CAN BE CHANGED DURING THE RUNTIME
 inode_t* inode_file_system;
 
 
@@ -43,7 +42,7 @@ int32_t read_dentry_by_name(const uint8_t* fname, struct dentry_t* dentry)
 {
 	int i;
 
-	for(i = 0; i < max_dentries; i++)
+	for(i = 0; i < DENTRY_MAX_NUM; i++)
 	{
 
 		//if(condition is true)
@@ -63,7 +62,7 @@ int32_t read_dentry_by_name(const uint8_t* fname, struct dentry_t* dentry)
 int32_t read_dentry_by_index(uint32_t index, struct dentry_t* dentry)
 {
 	//check if index is valid
-	if(index > max_dentries)
+	if(index > DENTRY_MAX_NUM)
 	{
 		return -1;
 	}
