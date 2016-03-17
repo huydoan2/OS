@@ -43,6 +43,8 @@ bootblock_t *bootblock;
 inode_t *inodes = (inode_t*)(bootblock + 1) //gets you to starting i node
 
 something similar is done to get data blocks
+
+
 */
 
 /*structure for each entry in a directory*/
@@ -65,13 +67,13 @@ typedef struct bootblock_t{
 
 /*structure for an inode*/
 typedef struct inode_t{
-	int8_t length_in_B;
+	int32_t length_in_B;
 	int32_t data_block[DATA_BLOCK_MAX_ENTRY];
 } inode_t;
 
-int32_t reserved[BOOTBLOCK_RESERVED_SIZE];
-	//need dir entries here???
-	dentry_t directory[DENTRY_MAX_NUM];
+
+
+void parsing_fileSystem();
 
 /*function that finds the directory entry by its name*/
 int32_t read_dentry_by_name(const uint8_t* fname, struct dentry_t* dentry);

@@ -7,19 +7,58 @@
 
 
 
-#define max_dentries 62
-
+#define max_dentries 63
+#define BLOCK_SIZE    4096
 //data conflict here with header file need to decide
-bootblock_t* bootblock;
-dentry_t* dentry_file_system;
-inode_t* inode_file_system;
+bootblock_t * bootblock;
+dentry_t directory_entry[max_dentries];
+inode_t inode_array[max_dentries];
 
-/*
-this gives an error, why??
-bootblock.directory_entry[index].filename
-bootblock.directory_entry[index].file_type
-bootblock.directory_entry[index].inode_num
-*/
+uint32_t inode_startAddr;
+uint32_t datablock_startAddr;
+uint32_t fileSys_startAddr;
+
+void parsing_fileSystem(uint32_t * startAddr){
+
+	int i, j, k;
+	int32_t dir_entry_starAddr = fileSys_startAddr + 64;
+	int32_t curr_inode_addr;
+
+	/*starting addresses*/
+	fileSys_startAddr = startAddr;
+
+	inode_startAddr = curr_inode_addr = fileSys_startAddr + BLOCK_SIZE;
+
+/*fill in the boot block*/
+	bootblock->num_dentries = fileSys_startAddr[0];
+	bootblock->num_inodes = fileSys_startAddr[1];
+	bootblock->num_dblocks = fileSys_startAddr[2];
+
+	datablock_startAddr = inode_startAddr + BLOCK_SIZE * bootblock->num_inodes;
+	//reserved[BOOTBLOCK_RESERVED_SIZE];
+
+	for (i = 0; i < max_dentries; ++i){
+
+		strcpy(bootblock->directory_entry[i].filename, dir_entry_starAddr);
+		bootblock->directory_entry[i].file_type = dir_entry_starAddr[4];
+		bootblock->directory_entry[i].inode_num = dir_entry_starAddr[5];
+		dir_entry_starAddr += 64;
+	//ved[DENTRY_RESERVED_SIZE];
+
+	}
+
+/*fill in the inode array*/
+	for (i = 0; i < bootblock->num_inodes, ++i){
+		inode_array[i].length_in_B = curr_inode_addr[0];
+		for(j = 0 ; j < inode_array[i].length_in_B; ++j){
+			inode_array[i].data_block[j] =  curr_inode_addr[j+1];
+		}
+	 	curr_inode_addr += BLOCK_SIZE;
+	}
+	
+
+}
+
 
 
 int file_open()
@@ -55,7 +94,7 @@ int32_t read_dentry_by_name(const uint8_t* fname, struct dentry_t* dentry)
 	for(i = 0; i < max_dentries; i++)
 	{
 
-		if(bootblock->directory_entry[i].filename == fname)
+		if(strcmp(bootblock->directory_entry[i].filename, fname, strlen(fname))
 		{
 			strcpy(dentry->filename, bootblock->directory_entry[i].filename);
 			dentry->file_type = bootblock->directory_entry[i].file_type;
