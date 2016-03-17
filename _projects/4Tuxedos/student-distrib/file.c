@@ -7,9 +7,19 @@
 
 
 
+#define max_dentries 62
+
+//data conflict here with header file need to decide
 bootblock_t* bootblock;
-//SHOULD WE CHANGE THIS TO A LINKED-LIST?? SO THAT THE SIZE OF THE STRUCTURE CAN BE CHANGED DURING THE RUNTIME
+dentry_t* dentry_file_system;
 inode_t* inode_file_system;
+
+/*
+this gives an error, why??
+bootblock.directory_entry[index].filename
+bootblock.directory_entry[index].file_type
+bootblock.directory_entry[index].inode_num
+*/
 
 
 int file_open()
@@ -42,17 +52,17 @@ int32_t read_dentry_by_name(const uint8_t* fname, struct dentry_t* dentry)
 {
 	int i;
 
-	for(i = 0; i < DENTRY_MAX_NUM; i++)
+	for(i = 0; i < max_dentries; i++)
 	{
 
-		//if(condition is true)
-		// {
-		// 	strcpy(dentry->filename, dentry_file_system[index].filename);
-		// 	dentry->file_type = dentry_file_system[index].file_type;
-		// 	dentry->inode_num = dentry_file_system[index].inode_num;
+		if(bootblock->directory_entry[i].filename == fname)
+		{
+			strcpy(dentry->filename, bootblock->directory_entry[i].filename);
+			dentry->file_type = bootblock->directory_entry[i].file_type;
+			dentry->inode_num = bootblock->directory_entry[i].inode_num;
 
-		// 	return 0;
-		// }
+			return 0;
+		}
 	}
 
 	return -1;
@@ -62,15 +72,15 @@ int32_t read_dentry_by_name(const uint8_t* fname, struct dentry_t* dentry)
 int32_t read_dentry_by_index(uint32_t index, struct dentry_t* dentry)
 {
 	//check if index is valid
-	if(index > DENTRY_MAX_NUM)
+	if(index > max_dentries)
 	{
 		return -1;
 	}
 
 	//index is valid, copy information from dentry_file_system
-	strcpy(dentry->filename, dentry_file_system[index].filename);
-	dentry->file_type = dentry_file_system[index].file_type;
-	dentry->inode_num = dentry_file_system[index].inode_num;
+	strcpy(dentry->filename, bootblock->directory_entry[index].filename);
+	dentry->file_type = bootblock->directory_entry[index].file_type;
+	dentry->inode_num = bootblock->directory_entry[index].inode_num;
 
 	return 0;
 }
@@ -78,7 +88,7 @@ int32_t read_dentry_by_index(uint32_t index, struct dentry_t* dentry)
 // int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length)
 // {
 
-// 	if(inode >= bootblock.num_inodes || offset >= inode_file_system[inode].length_in_B)
+// 	if(inode >= bootblock->num_inodes || offset >= inode_file_system[inode].length_in_B)
 // 		return -1;
 
 // 	return 0;

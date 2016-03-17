@@ -4,14 +4,15 @@
 #ifndef FILE_H
 #define FILE_H
 
-/*define constants for the file system*/
+#include "types.h"
+
+
 #define FILENAME_MAX_SIZE	32
 #define DENTRY_RESERVED_SIZE	6
 #define BOOTBLOCK_RESERVED_SIZE	13
 #define DENTRY_MAX_NUM	63
 #define DATA_BLOCK_MAX_ENTRY	1023
 
-#include "types.h"
 
 //handler for file
 extern void file_handler(void);
@@ -30,10 +31,19 @@ extern int file_write(int* buff, int num_bytes);
 
 //bootblock starting address
 /*
+
+file syststem is contiguous
+
+Confirmed mod->mod_start is starting address of bootblock
 printf("Module %d loaded at address: 0x%#x\n", mod_count, (unsigned int)mod->mod_start);
 printf("Module %d ends at address: 0x%#x\n", mod_count, (unsigned int)mod->mod_end);
-*/
 
+TA said this to get
+bootblock_t *bootblock;
+inode_t *inodes = (inode_t*)(bootblock + 1) //gets you to starting i node
+
+something similar is done to get data blocks
+*/
 
 /*structure for each entry in a directory*/
 typedef struct dentry_t{
@@ -42,6 +52,8 @@ typedef struct dentry_t{
 	int32_t inode_num;
 	int32_t reserved[DENTRY_RESERVED_SIZE];
 } dentry_t;
+
+
 /*structure for the bootblock*/
 typedef struct bootblock_t{
 	int32_t num_dentries;
@@ -49,16 +61,18 @@ typedef struct bootblock_t{
 	int32_t num_dblocks;
 	int32_t reserved[BOOTBLOCK_RESERVED_SIZE];
 	dentry_t directory_entry[DENTRY_MAX_NUM];
-
 } bootblock_t;
+
 /*structure for an inode*/
 typedef struct inode_t{
 	int8_t length_in_B;
 	int32_t data_block[DATA_BLOCK_MAX_ENTRY];
 } inode_t;
 
-/*function that parses the given file system to our data structures*/
-void parse_fileSystem()
+int32_t reserved[BOOTBLOCK_RESERVED_SIZE];
+	//need dir entries here???
+	dentry_t directory[DENTRY_MAX_NUM];
+
 /*function that finds the directory entry by its name*/
 int32_t read_dentry_by_name(const uint8_t* fname, struct dentry_t* dentry);
 

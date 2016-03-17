@@ -189,7 +189,7 @@ entry (unsigned long magic, unsigned long addr)
 	 * without showing you any output */
 	printf("Enabling Interrupts\n");
 
-	//clear(); //need to clear screen in terminal driver init
+	clear(); //need to clear screen in terminal driver init
 	sti();
 	/* Execute the first program (`shell') ... */
 	
