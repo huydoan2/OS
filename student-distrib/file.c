@@ -38,7 +38,7 @@ int file_write(int * buff, int num_bytes)
 	return -1;
 }
 
-
+ 
 int32_t read_dentry_by_name(const uint8_t* fname, struct dentry_t* dentry)
 {
 	int i;
@@ -68,6 +68,7 @@ int32_t read_dentry_by_index(uint32_t index, struct dentry_t* dentry)
 		return -1;
 	}
 
+	//index is valid, copy information from dentry_file_system
 	strcpy(dentry->filename, dentry_file_system[index].filename);
 	dentry->file_type = dentry_file_system[index].file_type;
 	dentry->inode_num = dentry_file_system[index].inode_num;
