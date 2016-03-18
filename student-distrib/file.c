@@ -25,58 +25,68 @@ void parsing_fileSystem(uint32_t * startAddr){
 
 	int i, j;
 	/*starting addresses*/
-	fileSys_startAddr = startAddr;
-	uint32_t* dir_entry_startAddr = fileSys_startAddr + 16;
-	uint32_t* curr_inode_addr;
-
-	
-
+	fileSys_startAddr = startAddr;	//starting address for the entire system 
+	uint32_t* dir_entry_startAddr = fileSys_startAddr + 16; 	//starting address for directory entries
+	uint32_t* curr_inode_addr;	//current address for the inode
+	/*assign the starting address of the inode array */
 	inode_startAddr = curr_inode_addr = fileSys_startAddr + BLOCK_SIZE/4;
 
 	/*fill in the boot block*/
 	bootblock.num_dentries = fileSys_startAddr[0];
 	bootblock.num_inodes = fileSys_startAddr[1];
 	bootblock.num_dblocks = fileSys_startAddr[2];
-
+	/*obtain the starting address of the data block array*/
 	datablock_startAddr = inode_startAddr + (BLOCK_SIZE/4) * bootblock.num_inodes;
 	//reserved[BOOTBLOCK_RESERVED_SIZE];
 
+	/*parsing all the directory entries*/
 	for (i = 0; i < bootblock.num_dentries; i++){
 
 		strcpy((int8_t *)bootblock.directory_entry[i].filename, (int8_t *)dir_entry_startAddr);
 		bootblock.directory_entry[i].file_type = dir_entry_startAddr[8];
 		bootblock.directory_entry[i].inode_num = dir_entry_startAddr[9];
 		dir_entry_startAddr += 16;
+		 //printf("i: %d || filename: %s  || file_type: %d || inode_num: %d\n", i, bootblock.directory_entry[i].filename,bootblock.directory_entry[i].file_type,bootblock.directory_entry[i].inode_num);
 
 	}
-  
-   	printf("actual data start addr : %x \n", curr_inode_addr );
 
-	/*fill in the inode array*/
+
+	/*parsing the inode array*/
 	for (i = 0; i < bootblock.num_inodes; i++){
 		inode_array[i].length_in_B = curr_inode_addr[0];
 		
 		for(j = 0 ; j < (inode_array[i].length_in_B/4096)+1; j++){
 			inode_array[i].data_block[j] =  curr_inode_addr[j+1];
-
 			test++;
 		}
 	 	curr_inode_addr += BLOCK_SIZE/4;
 	}
 
 	datablock_startAddr = curr_inode_addr;
-	printf("i: %d, len: %d \n", 0, inode_array[0].length_in_B);
-	printf("i: %d, len: %d \n", 1, inode_array[1].length_in_B);
-	printf("i: %d, len: %d \n", 2, inode_array[2].length_in_B);
-	printf("i: %d, len: %d \n", 3, inode_array[3].length_in_B);
-	printf("i: %d, len: %d \n", 4, inode_array[4].length_in_B);
-	printf("i: %d, len: %d \n", 5, inode_array[5].length_in_B);
-	printf("i: %d, len: %d \n", 6, inode_array[6].length_in_B);
+
+	/*debug printing, will be removed later */
+	//  printf("i: %d, len: %d \n", 0, inode_array[0].length_in_B);
+	//  printf("i: %d, len: %d \n", 1, inode_array[13].length_in_B);
+	//  printf("i: %d, len: %d \n", 2, inode_array[16].length_in_B);
+	//  printf("i: %d, len: %d \n", 3, inode_array[27].length_in_B);
+	//  printf("i: %d, len: %d \n", 4, inode_array[25].length_in_B);
+	//  printf("i: %d, len: %d \n", 5, inode_array[23].length_in_B);
+	//  printf("i: %d, len: %d \n", 6, inode_array[12].length_in_B);
+	//  printf("i: %d, len: %d \n", 7, inode_array[9].length_in_B);
+	// printf("i: %d, len: %d \n", 8, inode_array[1].length_in_B);
+	// printf("i: %d, len: %d \n", 9, inode_array[2].length_in_B);
+	// printf("i: %d, len: %d \n", 10, inode_array[7].length_in_B);
+	// printf("i: %d, len: %d \n", 11, inode_array[20].length_in_B);
+	// printf("i: %d, len: %d \n", 12, inode_array[19].length_in_B);
+	// printf("i: %d, len: %d \n", 13, inode_array[0].length_in_B);
+	// printf("i: %d, len: %d \n", 14, inode_array[6].length_in_B);
+	// printf("i: %d, len: %d \n", 15, inode_array[22].length_in_B);
 
 
 
-	printf("actual data block number: %d \n", test);
-	printf("actual data start addr : %x \n", curr_inode_addr );
+
+	// printf("actual data block number: %d \n", test);
+	// printf("actual data start addr : %x \n", curr_inode_addr );
 
 
 
