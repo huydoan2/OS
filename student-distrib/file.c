@@ -200,7 +200,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 
 	for(i = 0; i < num_blocks; i++)
 	{
-		read_start_addr = get_block_addr(inode_array[inode].data_block[offset]/4);
+		read_start_addr = get_block_addr(inode_array[inode].data_block[offset]);
 
 		/*determine how many bytes we still have to read*/
 		if(length < 4096){
