@@ -195,7 +195,7 @@ entry (unsigned long magic, unsigned long addr)
 	/* Enable interrupts */
 	/* Do not enable the following until after you have set up your
 	 * IDT correctly otherwise QEMU will triple fault and simple close
-	 * without showing you any output */
+	 * without showing you any output *1
 	printf("Enabling Interrupts\n");
 
 
@@ -205,7 +205,7 @@ entry (unsigned long magic, unsigned long addr)
 	/* Execute the first program (`shell') ... */
 	
 	/********TESTING TERMINAL READ AND WRITE*******/
-	index = 4;
+	index = 1;
 	read_dentry_by_index(index, &dentry);
 	printf("before reading data \n");
 	read_data(dentry.inode_num, 0,  buffer, 1000);
