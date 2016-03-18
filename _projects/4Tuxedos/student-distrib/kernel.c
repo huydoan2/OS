@@ -30,7 +30,7 @@ entry (unsigned long magic, unsigned long addr)
 	uint32_t fileSys_startAddr;
 	dentry_t dentry;
 	uint32_t index;
-	 uint8_t* buffer;
+	uint8_t buffer[3000] = {0};
 
 	//uint32_t test_phys_addr;
 	//uint32_t test_virt_addr = 0x00005111;
@@ -199,24 +199,23 @@ entry (unsigned long magic, unsigned long addr)
 	printf("Enabling Interrupts\n");
 
 
-	//clear(); //need to clear screen in terminal driver init
+	clear(); //need to clear screen in terminal driver init
 	printf("before parsing. address: %x \n", fileSys_startAddr);
 	parsing_fileSystem(fileSys_startAddr);
 	sti();
 	/* Execute the first program (`shell') ... */
 	
 	/********TESTING TERMINAL READ AND WRITE*******/
-	index = 2;
-	printf("before read by index \n");
+	index = 10;
 	read_dentry_by_index(index, &dentry);
-	//read_data(dentry.inode_num, 9,  buffer, 32);
-/*
+	printf("before reading data \n");
+	read_data(dentry.inode_num, 0,  buffer, 1000);
 	printf("test text: ");
-	for (i = 0; i < 4; ++i){
+	for (i = 0; i < 1000; ++i){
 		printf("%c",buffer[i]);
 	}
 	printf("\n");
-*/
+
 	while(1)
 	{
 		//keyboard read write test
