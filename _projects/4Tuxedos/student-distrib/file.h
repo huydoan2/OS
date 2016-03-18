@@ -14,20 +14,34 @@
 #define DATA_BLOCK_MAX_ENTRY	1023
 
 
+
+
+//open file driver
+extern int32_t dir_open(int32_t* buff, int32_t num_bytes);
+
+//close file driver
+extern int32_t dir_close(int32_t* buff, int32_t num_bytes);
+
+//read function for file
+extern int32_t dir_read(int32_t* buff, int32_t num_bytes);
+
+//write function for file
+extern int32_t dir_write(int32_t* buff, int32_t num_bytes);
+
 //handler for file
 extern void file_handler(void);
 
 //open file driver
-extern int file_open();
+extern int32_t file_open(int32_t* buff, int32_t num_bytes);
 
 //close file driver
-extern int file_close();
+extern int32_t file_close(int32_t* buff, int32_t num_bytes);
 
 //read function for file
-extern int file_read(int* buff, int num_bytes);
+extern int32_t file_read(int32_t* buff, int32_t num_bytes);
 
 //write function for file
-extern int file_write(int* buff, int num_bytes);
+extern int32_t file_write(int32_t* buff, int32_t num_bytes);
 
 //bootblock starting address
 /*
@@ -85,3 +99,4 @@ int32_t read_dentry_by_index(uint32_t index, struct dentry_t* dentry);
 int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length);
 
 #endif 
+

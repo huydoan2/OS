@@ -24,11 +24,12 @@ uint32_t* fileSys_startAddr;
 void parsing_fileSystem(uint32_t * startAddr){
 
 	int i, j;
+	/*starting addresses*/
+	fileSys_startAddr = startAddr;
 	uint32_t* dir_entry_starAddr = fileSys_startAddr + 64;
 	uint32_t* curr_inode_addr;
 
-	/*starting addresses*/
-	fileSys_startAddr = startAddr;
+	
 
 	inode_startAddr = curr_inode_addr = fileSys_startAddr + BLOCK_SIZE;
 
@@ -62,13 +63,34 @@ void parsing_fileSystem(uint32_t * startAddr){
 
 }
 
+//open file driver
+int32_t dir_open(int32_t* buff, int32_t num_bytes){
+ 	return 0;
+}
 
-int file_open()
+//close file driver
+int32_t dir_close(int32_t* buff, int32_t num_bytes){
+	return 0;
+}
+
+//read function for file
+int32_t dir_read(int32_t* buff, int32_t num_bytes){
+
+	return 0;
+}
+
+//write function for file
+int32_t dir_write(int32_t* buff, int32_t num_bytes){
+	return 0;
+}
+
+
+int32_t file_open(int32_t* buff, int32_t num_bytes)
 {
 	return 0;
 }
 
-int file_close()
+int32_t file_close(int32_t* buff, int32_t num_bytes)
 {
 	return 0;
 }
@@ -79,15 +101,13 @@ void file_handler(void)
 }
 
 
-int file_read(int * buff, int num_bytes)
+int32_t file_read(int32_t * buff, int32_t num_bytes)
 {
-	// dentry_t dentry;
-	// read_dentry_by_name(buff, &dentry);
-	// read_data(dentry.inode_num, 0, buff, num_bytes);
+	
 	return 0;
 }
 
-int file_write(int * buff, int num_bytes)
+int32_t file_write(int32_t * buff, int32_t num_bytes)
 {
 	return -1;
 }

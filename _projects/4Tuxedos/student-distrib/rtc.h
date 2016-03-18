@@ -14,10 +14,10 @@ extern void rtc_init();
 extern void rtc_handler(void);
 
 //open rtc driver
-extern int rtc_open();
+extern int rtc_open(int * buff, int num_bytes);
 
 //close rtc driver
-extern int rtc_close();
+extern int rtc_close(int * buff, int num_bytes);
 
 //read function for rtc
 extern int rtc_read(int * buff, int num_bytes);
