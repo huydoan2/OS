@@ -200,20 +200,19 @@ entry (unsigned long magic, unsigned long addr)
 
 
 	clear(); //need to clear screen in terminal driver init
-	printf("before parsing. address: %x \n", fileSys_startAddr);
 	parsing_fileSystem(fileSys_startAddr);
 	sti();
 	/* Execute the first program (`shell') ... */
 	
 	/********TESTING TERMINAL READ AND WRITE*******/
-	index = 10;
+	index = 4;
 	read_dentry_by_index(index, &dentry);
 	printf("before reading data \n");
 	read_data(dentry.inode_num, 0,  buffer, 1000);
 	printf("test text: ");
-	for (i = 0; i < 1000; ++i){
-		printf("%c",buffer[i]);
-	}
+	
+	printf("%s",buffer);
+	
 	printf("\n");
 
 	while(1)
