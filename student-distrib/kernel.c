@@ -12,6 +12,7 @@
 #include "IDT.h"
 #include "rtc.h"
 #include "Paging.h"
+#include "file.h"
 /* Macros. */
 /* Check if the bit BIT in FLAGS is set. */
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
@@ -26,6 +27,11 @@ void
 entry (unsigned long magic, unsigned long addr)
 {
 	multiboot_info_t *mbi;
+	uint32_t fileSys_startAddr;
+	dentry_t dentry;
+	uint32_t index;
+	 uint8_t* buffer;
+
 	//uint32_t test_phys_addr;
 	//uint32_t test_virt_addr = 0x00005111;
 	//uint32_t test_val;
@@ -35,6 +41,8 @@ entry (unsigned long magic, unsigned long addr)
 	char buff[size_of_keys];
 	int num_byte = size_of_keys;
 	int i;
+	int32_t * buf;
+	int32_t num_bytes;
 
 	/* Clear the screen. */
 	clear();
@@ -69,6 +77,7 @@ entry (unsigned long magic, unsigned long addr)
 		int mod_count = 0;
 		int i;
 		module_t* mod = (module_t*)mbi->mods_addr;
+		fileSys_startAddr = mod->mod_start;
 		while(mod_count < mbi->mods_count) {
 			printf("Module %d loaded at address: 0x%#x\n", mod_count, (unsigned int)mod->mod_start);
 			printf("Module %d ends at address: 0x%#x\n", mod_count, (unsigned int)mod->mod_end);
@@ -170,7 +179,7 @@ entry (unsigned long magic, unsigned long addr)
 	/* Initialize devices, memory, filesystem, enable device interrupts on the
 	 * PIC, any other initialization stuff... */
 	keyboard_open();
-	rtc_open();
+	rtc_open(buf, num_bytes);
 	paging_init();
 
 	/*test the memory accessing by paging */
@@ -189,11 +198,25 @@ entry (unsigned long magic, unsigned long addr)
 	 * without showing you any output */
 	printf("Enabling Interrupts\n");
 
-	clear(); //need to clear screen in terminal driver init
+
+	//clear(); //need to clear screen in terminal driver init
+	printf("before parsing. address: %x \n", fileSys_startAddr);
+	parsing_fileSystem(fileSys_startAddr);
 	sti();
 	/* Execute the first program (`shell') ... */
 	
 	/********TESTING TERMINAL READ AND WRITE*******/
+	index = 2;
+	printf("before read by index \n");
+	read_dentry_by_index(index, &dentry);
+	//read_data(dentry.inode_num, 9,  buffer, 32);
+/*
+	printf("test text: ");
+	for (i = 0; i < 4; ++i){
+		printf("%c",buffer[i]);
+	}
+	printf("\n");
+*/
 	while(1)
 	{
 		//keyboard read write test
@@ -209,11 +232,12 @@ entry (unsigned long magic, unsigned long addr)
 		rtc_write(rtc_buff+rtc_index,rtc_num_byte);
 		rtc_read(rtc_buff+rtc_index,rtc_num_byte);
 		rtc_index = (rtc_index+1)%rtc_buff_size;
+
 	}
 	
 
 	keyboard_close();
-	rtc_close();
+	rtc_close(buf, num_bytes);
 
 
 	/* Spin (nicely, so we don't chew up cycles) */

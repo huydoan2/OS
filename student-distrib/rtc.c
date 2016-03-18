@@ -144,7 +144,7 @@ void rtc_set_rate()
  *   SIDE EFFECTS: 
  *
  */
-int rtc_open()
+int rtc_open(int * buff, int num_bytes)
 {
 	interrupt_flag = 0;
 	rtc_init();
@@ -162,7 +162,7 @@ int rtc_open()
  *   SIDE EFFECTS: 
  *
  */
-int rtc_close()
+int rtc_close(int * buff, int num_bytes)
 {
 	disable_irq(RTC_IRQ_8);
 	return 0;
