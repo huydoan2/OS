@@ -30,7 +30,7 @@ entry (unsigned long magic, unsigned long addr)
 	uint32_t fileSys_startAddr;
 	dentry_t dentry;
 	uint32_t index;
-	uint8_t buffer[3000] = {0};
+	uint8_t buffer[6000] = {0};
 
 	//uint32_t test_phys_addr;
 	//uint32_t test_virt_addr = 0x00005111;
@@ -205,14 +205,14 @@ entry (unsigned long magic, unsigned long addr)
 	/* Execute the first program (`shell') ... */
 	
 	/********TESTING TERMINAL READ AND WRITE*******/
-	index = 3;
+	index = 1;
 	read_dentry_by_index(index, &dentry);
 	printf("before reading data \n");
-	read_data(dentry.inode_num, 0,  buffer, 1000);
+	read_data(dentry.inode_num, 0,  buffer, 6000);
 	//print out the file selected 
-	printf("test text:\n ");
-	printf("%s",buffer);
-	printf("\n");
+	// printf("test text:\n ");
+	// printf("%s",buffer);
+	// printf("\n");
 
 	while(1)
 	{
