@@ -9,18 +9,32 @@
 
 #define max_dentries 63
 #define BLOCK_SIZE    4096
+#define ADDRPERBLOCK  1024
+#define SKIPENTRY     16
 
  uint8_t * get_block_addr(int32_t block_num);		//get the starting address of the given block number
 
-//data conflict here with header file need to decide
-bootblock_t bootblock;
-dentry_t directory_entry[max_dentries];
-inode_t inode_array[max_dentries];
+/*variables that hold the file system structure*/
+bootblock_t bootblock;	//boot block structure
+dentry_t directory_entry[max_dentries];	//data entry structure
+inode_t inode_array[max_dentries];	//inode array
 int test = 0;
+
+/*starting addresses for the file system*/
 uint32_t* inode_startAddr;
 uint32_t* datablock_startAddr;
 uint32_t* fileSys_startAddr;
 
+/* 
+ * parsing_fileSystem
+ *   DESCRIPTION: parsing a given file system into data structures for further use
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: - startAddr: the starting address for the file system
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: - store the file system in to data structures 
+ */
 void parsing_fileSystem(uint32_t * startAddr){
 
 	int i, j;
@@ -29,23 +43,24 @@ void parsing_fileSystem(uint32_t * startAddr){
 	uint32_t* dir_entry_startAddr = fileSys_startAddr + 16; 	//starting address for directory entries
 	uint32_t* curr_inode_addr;	//current address for the inode
 	/*assign the starting address of the inode array */
-	inode_startAddr = curr_inode_addr = fileSys_startAddr + BLOCK_SIZE/4;
+	inode_startAddr = curr_inode_addr = fileSys_startAddr + ADDRPERBLOCK;
 
-	/*fill in the boot block*/
-	bootblock.num_dentries = fileSys_startAddr[0];
+	/*fill in the boot block - statistic information */
+	bootblock.num_dentries = fileSys_startAddr[0];	
 	bootblock.num_inodes = fileSys_startAddr[1];
 	bootblock.num_dblocks = fileSys_startAddr[2];
+
 	/*obtain the starting address of the data block array*/
-	datablock_startAddr = inode_startAddr + (BLOCK_SIZE/4) * bootblock.num_inodes;
-	//reserved[BOOTBLOCK_RESERVED_SIZE];
+	datablock_startAddr = inode_startAddr + (ADDRPERBLOCK) * bootblock.num_inodes;
 
 	/*parsing all the directory entries*/
 	for (i = 0; i < bootblock.num_dentries; i++){
-
+		//fill in the current directory entry 
 		strcpy((int8_t *)bootblock.directory_entry[i].filename, (int8_t *)dir_entry_startAddr);
 		bootblock.directory_entry[i].file_type = dir_entry_startAddr[8];
 		bootblock.directory_entry[i].inode_num = dir_entry_startAddr[9];
-		dir_entry_startAddr += 16;
+		//go to the next directory entry
+		dir_entry_startAddr += SKIPENTRY; 
 		 //printf("i: %d || filename: %s  || file_type: %d || inode_num: %d\n", i, bootblock.directory_entry[i].filename,bootblock.directory_entry[i].file_type,bootblock.directory_entry[i].inode_num);
 
 	}
@@ -54,39 +69,17 @@ void parsing_fileSystem(uint32_t * startAddr){
 	/*parsing the inode array*/
 	for (i = 0; i < bootblock.num_inodes; i++){
 		inode_array[i].length_in_B = curr_inode_addr[0];
-		
-		for(j = 0 ; j < (inode_array[i].length_in_B/4096)+1; j++){
+		//fill in the data block entry (data block numbers)
+		for(j = 0 ; j < (inode_array[i].length_in_B/BLOCK_SIZE)+1; j++){
 			inode_array[i].data_block[j] =  curr_inode_addr[j+1];
 			test++;
 		}
-	 	curr_inode_addr += BLOCK_SIZE/4;
+		//go to the next inode block 
+	 	curr_inode_addr += ADDRPERBLOCK;
 	}
 
 	datablock_startAddr = curr_inode_addr;
 
-	/*debug printing, will be removed later */
-	//  printf("i: %d, len: %d \n", 0, inode_array[0].length_in_B);
-	//  printf("i: %d, len: %d \n", 1, inode_array[13].length_in_B);
-	//  printf("i: %d, len: %d \n", 2, inode_array[16].length_in_B);
-	//  printf("i: %d, len: %d \n", 3, inode_array[27].length_in_B);
-	//  printf("i: %d, len: %d \n", 4, inode_array[25].length_in_B);
-	//  printf("i: %d, len: %d \n", 5, inode_array[23].length_in_B);
-	//  printf("i: %d, len: %d \n", 6, inode_array[12].length_in_B);
-	//  printf("i: %d, len: %d \n", 7, inode_array[9].length_in_B);
-	// printf("i: %d, len: %d \n", 8, inode_array[1].length_in_B);
-	// printf("i: %d, len: %d \n", 9, inode_array[2].length_in_B);
-	// printf("i: %d, len: %d \n", 10, inode_array[7].length_in_B);
-	// printf("i: %d, len: %d \n", 11, inode_array[20].length_in_B);
-	// printf("i: %d, len: %d \n", 12, inode_array[19].length_in_B);
-	// printf("i: %d, len: %d \n", 13, inode_array[0].length_in_B);
-	// printf("i: %d, len: %d \n", 14, inode_array[6].length_in_B);
-	// printf("i: %d, len: %d \n", 15, inode_array[22].length_in_B);
-
-
-
-
-	// printf("actual data block number: %d \n", test);
-	// printf("actual data start addr : %x \n", curr_inode_addr );
 
 
 
@@ -142,6 +135,18 @@ int32_t file_write(int32_t * buff, int32_t num_bytes)
 }
 
  
+/* 
+ * read_dentry_by_name
+ *   DESCRIPTION: obtain a directory entry with given entry name
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: - name: the name of the file 
+ 			 - dentry: returned directory entry
+ *   OUTPUTS: none
+ *   RETURN VALUE: -1: failed 
+ 					0: successed
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: - store target directory entry into dentry
+ */
 int32_t read_dentry_by_name(const uint8_t* fname, struct dentry_t* dentry)
 {
 	int i;
@@ -162,7 +167,18 @@ int32_t read_dentry_by_name(const uint8_t* fname, struct dentry_t* dentry)
 	return -1;
 }
 
-
+/* 
+ * read_dentry_by_index
+ *   DESCRIPTION: obtain a directory entry with given entry index
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: - index: entry for the directory entry array
+ 			 - dentry: returned directory entry
+ *   OUTPUTS: none
+ *   RETURN VALUE: -1: failed 
+ 					0: successed
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: - store target directory entry into dentry
+ */
 int32_t read_dentry_by_index(uint32_t index, struct dentry_t* dentry)
 {
 	//check if index is valid
@@ -181,14 +197,13 @@ int32_t read_dentry_by_index(uint32_t index, struct dentry_t* dentry)
 
 int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length)
 {
-	//int32_t i,l;
-	//int32_t num_blocks;
-	int32_t j , idx = 0;
-	uint8_t * read_start_addr;
-	int block_offset;
-	int block_idx_offset;
 	
-
+	int32_t j , idx = 0;	//idx holds the number bytes read
+	uint8_t * read_start_addr;	//the starting address of the file system 
+	int block_offset;		//data block offset
+	int block_idx_offset;   //starting position of the data block
+	
+	/*check if the inputs are valid*/
 	//bad inode number
 	if(inode >= bootblock.num_inodes)	
 		return -1;
@@ -196,143 +211,90 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 	if(offset > inode_array[inode].length_in_B || offset < 0)
 		return -1;
 
+	/*calculate block offset adn block entry offset*/
 	block_offset = offset/BLOCK_SIZE;
 	block_idx_offset = offset % BLOCK_SIZE;
 
-	//if length exceeds the file capacity, read the whole file
-	// if(length > inode_array[inode].length_in_B)
-	// {
-	// 	num_blocks = (inode_array[inode].length_in_B / 4096)+1;
-	// 	length = inode_array[inode].length_in_B;
-	// 	//remaining_bytes = inode_array[inode].length_in_B; 
-	// }
-	// else
-	// {
-	// 	num_blocks = (length / 4096)+1;
-	// 	//remaining_bytes = length;
-	// }
-	
+
+	/*check if the requested length exceed the maximum length */
 	if(length > inode_array[inode].length_in_B)
 	{
 		length = inode_array[inode].length_in_B;
 	}
 	
+	/*read data with the given length*/
 	while(length > 0)
 	{
+		//find the starting address of the data block 
 		read_start_addr = block_idx_offset + get_block_addr(inode_array[inode].data_block[block_offset]);
 
-
+		//handle the offset
 		if(block_idx_offset != 0){
+			//if the length is larger than the remaining blcok
 			if(length > BLOCK_SIZE - block_idx_offset)
-			{
+			{	//read everything remains in this block
 				for(j = 0; j < BLOCK_SIZE - block_idx_offset; ++j)
 				{
 					buf[idx] = read_start_addr[j];
 					++idx;
 				}
-				length -= (BLOCK_SIZE - block_idx_offset);
-				block_idx_offset = 0;
-				++block_offset;
+				length -= (BLOCK_SIZE - block_idx_offset);	//decremen the length
+				block_idx_offset = 0;	
+				++block_offset;	//increment block index 
 				continue;
 			}
-			else
-			{
+			else	//if the length is smaller than the size of the remaining block
+			{	
+				//read data of the size of length
 				for(j = 0; j < length; ++j)
 				{
 					buf[idx] = read_start_addr[j];
 					++idx;
 				}				
-				length = 0;
+				length = 0;		//clear the length, the read is finished 
 				break;
 			}
 
 		}
-		/*determine how many bytes we still have to read*/
-		if(length < 4096){
+		/*if the length is smaller the size of one data block*/
+		if(length < BLOCK_SIZE){
 		
-		 	for(j = 0; j < length; ++j)
+		 	for(j = 0; j < length; ++j)	//read the size of the length
 			{
 				buf[idx] = (read_start_addr[j]);
 				idx++;	
 			}
 			length = 0;		//finish reading, length is 0
 		}
-		else{
-			for(j = 0; j < 4096; j++)
+		else{ //if the length is larger thanthe lenght of a block
+			for(j = 0; j < BLOCK_SIZE; j++)
 			{
 				buf[idx] = (read_start_addr[j]);
 				idx++;
 			
 			}
-			length -= 4096;
+			length -= BLOCK_SIZE;	//decrement the length 
 		}
-		block_offset++;
+		block_offset++;	//increment the index for the data block array 
 	
 	}
-	// 	if(length < 4096){
-	// 		 l = (length/4)+1;
-	// 	 	for(j = 0; j < l; ++j)
-	// 		{
-	// 			if(length < 4){
-	// 				switch (length){
-	// 					case 1:
-	// 						buf[idx] = (read_start_addr[j] & 0x00FF);
-	// 						idx++;
-	// 						break;
-	// 					case 2:
-	// 						buf[idx] = (read_start_addr[j] & 0x00FF);
-	// 						idx++;
-	// 						buf[idx] = (read_start_addr[j] & 0xFF00) >> 8;
-	// 						idx++;
-	// 						break;
-	// 					case 3:	
-	// 						buf[idx] = (read_start_addr[j] & 0x00FF);
-	// 						idx++;
-	// 						buf[idx] = (read_start_addr[j] & 0xFF00) >> 8;
-	// 						idx++;
-	// 						buf[idx] = (read_start_addr[j] & 0x00FF0000) >> 16;
-	// 						idx++;
-	// 					break;
-
-	// 				}
-	// 			}
-	// 			else{
-	// 			buf[idx] = (read_start_addr[j] & 0x00FF);
-	// 			idx++;
-	// 			buf[idx] = (read_start_addr[j] & 0xFF00) >> 8;
-	// 			idx++;
-	// 			buf[idx] = (read_start_addr[j] & 0x00FF0000) >> 16;
-	// 			idx++;
-	// 			buf[idx] = (read_start_addr[j] & 0xFF000000) >> 24;
-	// 			idx++;
-	// 			//decrement the length 
-	// 			length -= 4;
-	// 			}
-	// 		}
-	// 	}
-	// 	else{
-	// 		for(j = 0; j < 1024; j++)
-	// 		{
-	// 			buf[idx] = (read_start_addr[j] & 0x00FF);
-	// 			idx++;
-	// 			buf[idx] = (read_start_addr[j] & 0xFF00) >> 8;
-	// 			idx++;
-	// 			buf[idx] = (read_start_addr[j] & 0x00FF0000) >> 16;
-	// 			idx++;
-	// 			buf[idx] = (read_start_addr[j] & 0xFF000000) >> 24;
-	// 			idx++;
-	// 		}
-	// 		length -= 4096;
-	// 	}
-	// 	block_offset++;
 	
-	// }
 	
-	return idx;
+	return idx;	//return the number of bytes read 
 
 }
 
+/* 
+ * get_block_addr
+ *   DESCRIPTION: obtain the starting address of a data block
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: - block_num: index for the data block array in the inode structure
 
+ *   OUTPUTS: the starting address of the data block
+ *   RETURN VALUE:
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: none
+ */
 uint8_t * get_block_addr(int32_t block_num)
 {
 	return (uint8_t *)(datablock_startAddr + (BLOCK_SIZE/4) * block_num);
