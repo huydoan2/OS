@@ -53,7 +53,7 @@ entry (unsigned long magic, unsigned long addr)
 	int num_byte = size_of_keys;
 	int32_t * buf;
 	int32_t num_bytes;
-
+   /*file descriptor variables*/
 	int32_t fd_rtc;
 	int32_t fd_file;
 	int32_t fd_dir;
@@ -229,7 +229,6 @@ entry (unsigned long magic, unsigned long addr)
 	{
 		display_printf("%s\n",(int8_t*)buffer);
 	}
-	
 	fd_file = open((uint8_t*)"verylargetxtwithverylongname.txt");
 	read(fd_file, buffer, 32);
 	printf("TEXT READ:\n ");
@@ -238,18 +237,7 @@ entry (unsigned long magic, unsigned long addr)
 	printf("TEXT READ:\n ");
 	display_printf("%s\n",(int8_t *)buffer);	
 
-
-	//index = 2;
-	//read_dentry_by_index(index, &dentry);
-	//read_data(dentry.inode_num, 4103,  buffer, 25);
-	//print out the file selected 
-	// printf("TEXT READ:\n ");
-	// display_s((int8_t *)buffer);
 	printf("\n");
-
-
-
-
 	
 	/********TESTING READ AND WRITE for Terminal and RTC*******/
 	while(1)

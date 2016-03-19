@@ -86,7 +86,7 @@ typedef struct inode_t{
 } inode_t;
 
 
-
+/*function that parses a filesystem to data structures*/
 void parsing_fileSystem();
 
 /*function that finds the directory entry by its name*/
