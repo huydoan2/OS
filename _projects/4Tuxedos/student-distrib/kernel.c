@@ -205,15 +205,16 @@ entry (unsigned long magic, unsigned long addr)
 	/* Execute the first program (`shell') ... */
 	
 	/********TESTING TERMINAL READ AND WRITE*******/
-	index = 1;
+	index = 2;
 	read_dentry_by_index(index, &dentry);
 	printf("before reading data \n");
 	read_data(dentry.inode_num, 0,  buffer, 6000);
 	//print out the file selected 
-	// printf("test text:\n ");
-	// printf("%s",buffer);
-	// printf("\n");
-
+	printf("test text:\n ");
+	//printf("%s",buffer);
+	display_s(buffer);
+	printf("\n");
+	//printf("ELF              ä‚4   Ü   \n");
 	while(1)
 	{
 		//keyboard read write test

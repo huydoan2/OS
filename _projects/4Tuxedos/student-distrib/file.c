@@ -146,7 +146,7 @@ int32_t read_dentry_by_name(const uint8_t* fname, struct dentry_t* dentry)
 {
 	int i;
 
-	for(i = 0; i < max_dentries; i++)
+	for(i = 0; i < bootblock.num_dentries; i++)
 	{
 
 		if(strncmp((int8_t *)bootblock.directory_entry[i].filename, (int8_t *)fname, strlen((int8_t *)fname)))
@@ -166,7 +166,7 @@ int32_t read_dentry_by_name(const uint8_t* fname, struct dentry_t* dentry)
 int32_t read_dentry_by_index(uint32_t index, struct dentry_t* dentry)
 {
 	//check if index is valid
-	if(index > max_dentries)
+	if(index > bootblock.num_dentries)
 	{
 		return -1;
 	}
@@ -181,9 +181,11 @@ int32_t read_dentry_by_index(uint32_t index, struct dentry_t* dentry)
 
 int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length)
 {
-	int32_t i,j, idx =0;
+	int32_t i,j,l, idx =0;
 	int32_t num_blocks;
 	uint32_t * read_start_addr;
+	int block_offset;
+	int block_idx_offset;
 	
 
 	//bad inode number
@@ -193,13 +195,14 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 	if(offset > (inode_array[inode].length_in_B/ 4096)+1 || offset < 0)
 		return -1;
 
-	//read_start_block = offset / (BLOCK_SIZE/4);
-	//read_start_block_offset = offset % BLOCK_SIZE;
+	block_offset = offset/BLOCK_SIZE;
+	block_idx_offset = offset % BLOCK_SIZE;
 
 	//if length exceeds the file capacity, read the whole file
 	if(length > inode_array[inode].length_in_B)
 	{
 		num_blocks = (inode_array[inode].length_in_B / 4096)+1;
+		length = inode_array[inode].length_in_B;
 		//remaining_bytes = inode_array[inode].length_in_B; 
 	}
 	else
@@ -207,15 +210,42 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 		num_blocks = (length / 4096)+1;
 		//remaining_bytes = length;
 	}
-
+	
 	for(i = 0; i < num_blocks; i++)
 	{
-		read_start_addr = get_block_addr(inode_array[inode].data_block[offset]);
-
+		read_start_addr = get_block_addr(inode_array[inode].data_block[block_offset]);
+		if(i == 0){
+			read_start_addr += (block_idx_offset/4);
+		}
 		/*determine how many bytes we still have to read*/
 		if(length < 4096){
-		 	for(j = 0; j < length/4; j++)
+			 l = (length/4)+1;
+		 	for(j = 0; j < l; ++j)
 			{
+				if(length < 4){
+					switch (length){
+						case 1:
+							buf[idx] = (read_start_addr[j] & 0x00FF);
+							idx++;
+							break;
+						case 2:
+							buf[idx] = (read_start_addr[j] & 0x00FF);
+							idx++;
+							buf[idx] = (read_start_addr[j] & 0xFF00) >> 8;
+							idx++;
+							break;
+						case 3:	
+							buf[idx] = (read_start_addr[j] & 0x00FF);
+							idx++;
+							buf[idx] = (read_start_addr[j] & 0xFF00) >> 8;
+							idx++;
+							buf[idx] = (read_start_addr[j] & 0x00FF0000) >> 16;
+							idx++;
+						break;
+
+					}
+				}
+				else{
 				buf[idx] = (read_start_addr[j] & 0x00FF);
 				idx++;
 				buf[idx] = (read_start_addr[j] & 0xFF00) >> 8;
@@ -224,6 +254,9 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 				idx++;
 				buf[idx] = (read_start_addr[j] & 0xFF000000) >> 24;
 				idx++;
+				//decrement the length 
+				length -= 4;
+				}
 			}
 		}
 		else{
@@ -240,10 +273,12 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 			}
 			length -= 4096;
 		}
-		offset++;
+		block_offset++;
+	
 	}
 	
 	return length;
+	
 }
 
 
