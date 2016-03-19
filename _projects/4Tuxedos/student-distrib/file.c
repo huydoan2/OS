@@ -96,14 +96,28 @@ int32_t dir_close(){
 	return 0;
 }
 
-//read function for file
+/* 
+ * dir_read
+ *   DESCRIPTION: reads a directory file 
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: - offset: the index for the directory entry
+ *           
+ *   OUTPUTS: - buff: the filename of the next directory entry
+ *   RETURN VALUE: - 1: if a directory entry is read
+ *				   - 0: is the reach the end of the directory 
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: - store the file system in to data structures 
+ */
 int32_t dir_read(int32_t* buff, uint32_t offset, int32_t num_bytes){
-//
+
 	dentry_t dentry;
+	//check if the input offset is valid
 	if(offset >= bootblock.num_dentries)
 		return 0;
 
+	//obtain the directory entry
 	read_dentry_by_index(offset, &dentry);
+	//obtian the file name of that entry 
 	strcpy((int8_t*)buff,dentry.filename);
 
 	return 1;
@@ -130,7 +144,17 @@ void file_handler(void)
 	
 }
 
-
+/* 
+ * file_read
+ *   DESCRIPTION: reads a regular file with given inode
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: - offset: the index for the directory entry
+ *           
+ *   OUTPUTS: - buff: the data read from the data blocks
+ *   RETURN VALUE: - the number of bytes that has been read
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: none 
+ */
 int32_t file_read(int32_t * buff, uint32_t offset,int32_t num_bytes)
 {
 	uint32_t inode = *buff;
@@ -150,10 +174,10 @@ int32_t file_write(int32_t * buff, int32_t num_bytes)
  *   DESCRIPTION: obtain a directory entry with given entry name
  *-----------------------------------------------------------------------------------
  *   INPUTS: - name: the name of the file 
- 			 - dentry: returned directory entry
- *   OUTPUTS: none
+ *			 
+ *   OUTPUTS: - dentry: returned directory entry
  *   RETURN VALUE: -1: failed 
- 					0: successed
+ *					0: successed
  *-----------------------------------------------------------------------------------
  *   SIDE EFFECTS: - store target directory entry into dentry
  */
@@ -161,14 +185,17 @@ int32_t read_dentry_by_name(const uint8_t* fname, struct dentry_t* dentry)
 {
 	int i, len= strlen((int8_t *)fname);
 
+	/*truncate the length to 31 if the length is longer*/
 	if(len > NAME_MAX_LEN)
 		len = NAME_MAX_LEN;
 
+	/*traverse the directory entries to match with input filename*/
 	for(i = 0; i < bootblock.num_dentries; i++)
 	{
 
 		if(strncmp((int8_t *)bootblock.directory_entry[i].filename, (int8_t *)fname, len ) == 0)
 		{
+			/*if match has been found, then copy the directory entry*/
 			strcpy((int8_t *)dentry->filename, (int8_t *)bootblock.directory_entry[i].filename);
 			dentry->file_type = bootblock.directory_entry[i].file_type;
 			dentry->inode_num = bootblock.directory_entry[i].inode_num;
@@ -186,7 +213,7 @@ int32_t read_dentry_by_name(const uint8_t* fname, struct dentry_t* dentry)
  *-----------------------------------------------------------------------------------
  *   INPUTS: - index: entry for the directory entry array
  			 - dentry: returned directory entry
- *   OUTPUTS: none
+ *   OUTPUTS: - dentry: dentry that contains the desired directory entry
  *   RETURN VALUE: -1: failed 
  					0: successed
  *-----------------------------------------------------------------------------------
@@ -303,8 +330,8 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
  *-----------------------------------------------------------------------------------
  *   INPUTS: - block_num: index for the data block array in the inode structure
 
- *   OUTPUTS: the starting address of the data block
- *   RETURN VALUE:
+ *   OUTPUTS: none
+ *   RETURN VALUE:the starting address of the data block
  *-----------------------------------------------------------------------------------
  *   SIDE EFFECTS: none
  */
