@@ -181,8 +181,9 @@ int32_t read_dentry_by_index(uint32_t index, struct dentry_t* dentry)
 
 int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length)
 {
-	int32_t i,j,l, idx =0;
-	int32_t num_blocks;
+	//int32_t i,l;
+	//int32_t num_blocks;
+	int32_t j , idx = 0;
 	uint8_t * read_start_addr;
 	int block_offset;
 	int block_idx_offset;
@@ -334,7 +335,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 
 uint8_t * get_block_addr(int32_t block_num)
 {
-	return datablock_startAddr + (BLOCK_SIZE/4) * block_num;
+	return (uint8_t *)(datablock_startAddr + (BLOCK_SIZE/4) * block_num);
 }
 
 

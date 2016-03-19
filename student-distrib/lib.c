@@ -168,7 +168,24 @@ format_char_switch:
 
 	return (buf - format);
 }
-
+/* Modified printf() using display_c instead of putc
+ * Only supports the following format strings:
+ * %%  - print a literal '%' character
+ * %x  - print a number in hexadecimal
+ * %u  - print a number as an unsigned integer
+ * %d  - print a number as a signed integer
+ * %c  - print a character
+ * %s  - print a string
+ * %#x - print a number in 32-bit aligned hexadecimal, i.e.
+ *       print 8 hexadecimal digits, zero-padded on the left.
+ *       For example, the hex number "E" would be printed as
+ *       "0000000E".
+ *       Note: This is slightly different than the libc specification
+ *       for the "#" modifier (this implementation doesn't add a "0x" at
+ *       the beginning), but I think it's more flexible this way.
+ *       Also note: %x is the only conversion specifier that can use
+ *       the "#" modifier to alter output.
+ * */
 int32_t
 display_printf(int8_t *format, ...)
 {
@@ -720,7 +737,7 @@ void cursor_update(int row, int col)
 
 /*
 * void display_c(uint8_t c);
-*   Inputs: uint_8* c = character to print
+*   Inputs: uint_8 c = character to print
 *   Return Value: void
 *	Function: Output a character to the console 
 */
@@ -729,20 +746,32 @@ display_c(uint8_t c)
 {
  	*(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = c;
     *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1) + 1) = ATTRIB;
+    
+    //update screen x and screen y
     screen_x++;
     screen_y = (screen_y + (screen_x / NUM_COLS));
     screen_x %= NUM_COLS;
+
+    //if the screen_y goes over the max y, scroll the screen
  	if (screen_y > NUM_ROWS - 1)
 	{
 		scroll_screen();
 		--screen_y;
 	}
+	//update the cursor location
     cursor_update(screen_x, screen_y);
 }
 
+/*
+* void display_s(int8_t* s);
+*   Inputs: uint_8* s = string to print
+*   Return Value: number of char printed
+*	Function: Output a string to the console 
+*/
 int32_t
 display_s(int8_t* s)
 {
+	//loop until the end of the string and print it
 	register int32_t index = 0;
 	while(s[index] != '\0') {
 		display_c(s[index]);
@@ -752,29 +781,52 @@ display_s(int8_t* s)
 	return index;
 }
 
+/*
+* void delete();
+*   Inputs: none
+*   Return Value: void
+*	Function: delete a character in terminal by updating the screen_x and screen_y
+*				update the cursor
+*/
 void delete()
 {
+	//update screen x
 	screen_x--;	
+
+	//if it's in the top left already, dont' move
     if(screen_x < 0 && screen_y == 0)
     	screen_x = 0;
+    //if it's in the middle and goes to previous line, update the screen x and y
     else if (screen_x < 0)
 	{
 		screen_y--;
 		screen_x = NUM_COLS - 1;
 	}
+	//put a empty char in the space
    	*(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = ' '; 
+   	//update the cursor
    	cursor_update(screen_x, screen_y);
 }
 
+/*
+* void newline();
+*   Inputs: none
+*   Return Value: void
+*	Function: add a new line in terminal by updating the screen_x and screen_y
+*				update the cursor
+*/
 void newline()
 {
+	//update screen x and y
 	screen_x = 0;
     screen_y++;
-    if (screen_y > NUM_ROWS - 1)
+    //if the screen_y goes over the max y, scroll the screen
+ 	if (screen_y > NUM_ROWS - 1)
 	{
 		scroll_screen();
 		--screen_y;
 	}
+	//update the cursor
     cursor_update(screen_x, screen_y);
 }
 

@@ -27,20 +27,26 @@ void
 entry (unsigned long magic, unsigned long addr)
 {
 	multiboot_info_t *mbi;
+	
+	/*file system test variables*/
 	uint32_t fileSys_startAddr;
 	dentry_t dentry;
 	uint32_t index;
 	uint8_t buffer[6000] = {0};
 
-	//uint32_t test_phys_addr;
-	//uint32_t test_virt_addr = 0x00005111;
-	//uint32_t test_val;
+	/*paging test variables*/
+	uint32_t test_phys_addr;
+	uint32_t test_virt_addr = 0x00005111;
+	uint32_t test_val;
+	
+	/*RTC test variables*/
 	int rtc_buff[rtc_buff_size] = {2,4,8,16,32};
 	int rtc_index = 0;
 
+	/*keyboard and terminal test variables*/
+	int i;
 	char buff[size_of_keys];
 	int num_byte = size_of_keys;
-	int i;
 	int32_t * buf;
 	int32_t num_bytes;
 
@@ -183,11 +189,9 @@ entry (unsigned long magic, unsigned long addr)
 	paging_init();
 
 	/*test the memory accessing by paging */
-	/*
 	test_phys_addr = get_physAddr(test_virt_addr);
 	test_val = *((uint32_t *)test_phys_addr);
 	printf("memory: %x\n", test_val);
-	*/
 	
 	/*Set up IDT to handle system calls*/
 
@@ -200,21 +204,20 @@ entry (unsigned long magic, unsigned long addr)
 
 
 	clear(); //need to clear screen in terminal driver init
-	parsing_fileSystem(fileSys_startAddr);
+	parsing_fileSystem(fileSys_startAddr); //initialize file system
 	sti();
 	/* Execute the first program (`shell') ... */
 	
-	/********TESTING TERMINAL READ AND WRITE*******/
+	/********TESTING FILE SYSTEM*******/
 	index = 2;
 	read_dentry_by_index(index, &dentry);
-	printf("before reading data \n");
 	read_data(dentry.inode_num, 4103,  buffer, 25);
 	//print out the file selected 
-	printf("test text:\n ");
-	//printf("%s",buffer);
-	display_s(buffer);
+	printf("TEXT READ:\n ");
+	display_s((int8_t *)buffer);
 	printf("\n");
-	//printf("ELF              ä‚4   Ü   \n");
+
+	/********TESTING READ AND WRITE for Terminal and RTC*******/
 	while(1)
 	{
 		//keyboard read write test
