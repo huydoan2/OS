@@ -208,7 +208,7 @@ entry (unsigned long magic, unsigned long addr)
 	index = 2;
 	read_dentry_by_index(index, &dentry);
 	printf("before reading data \n");
-	read_data(dentry.inode_num, 0,  buffer, 6000);
+	read_data(dentry.inode_num, 4103,  buffer, 25);
 	//print out the file selected 
 	printf("test text:\n ");
 	//printf("%s",buffer);

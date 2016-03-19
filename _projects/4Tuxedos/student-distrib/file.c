@@ -10,7 +10,7 @@
 #define max_dentries 63
 #define BLOCK_SIZE    4096
 
- uint32_t * get_block_addr(int32_t block_num);		//get the starting address of the given block number
+ uint8_t * get_block_addr(int32_t block_num);		//get the starting address of the given block number
 
 //data conflict here with header file need to decide
 bootblock_t bootblock;
@@ -183,7 +183,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 {
 	int32_t i,j,l, idx =0;
 	int32_t num_blocks;
-	uint32_t * read_start_addr;
+	uint8_t * read_start_addr;
 	int block_offset;
 	int block_idx_offset;
 	
@@ -192,97 +192,147 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 	if(inode >= bootblock.num_inodes)	
 		return -1;
 	//bad offset
-	if(offset > (inode_array[inode].length_in_B/ 4096)+1 || offset < 0)
+	if(offset > inode_array[inode].length_in_B || offset < 0)
 		return -1;
 
 	block_offset = offset/BLOCK_SIZE;
 	block_idx_offset = offset % BLOCK_SIZE;
 
 	//if length exceeds the file capacity, read the whole file
+	// if(length > inode_array[inode].length_in_B)
+	// {
+	// 	num_blocks = (inode_array[inode].length_in_B / 4096)+1;
+	// 	length = inode_array[inode].length_in_B;
+	// 	//remaining_bytes = inode_array[inode].length_in_B; 
+	// }
+	// else
+	// {
+	// 	num_blocks = (length / 4096)+1;
+	// 	//remaining_bytes = length;
+	// }
+	
 	if(length > inode_array[inode].length_in_B)
 	{
-		num_blocks = (inode_array[inode].length_in_B / 4096)+1;
 		length = inode_array[inode].length_in_B;
-		//remaining_bytes = inode_array[inode].length_in_B; 
-	}
-	else
-	{
-		num_blocks = (length / 4096)+1;
-		//remaining_bytes = length;
 	}
 	
-	for(i = 0; i < num_blocks; i++)
+	while(length > 0)
 	{
-		read_start_addr = get_block_addr(inode_array[inode].data_block[block_offset]);
-		if(i == 0){
-			read_start_addr += (block_idx_offset/4);
+		read_start_addr = block_idx_offset + get_block_addr(inode_array[inode].data_block[block_offset]);
+
+
+		if(block_idx_offset != 0){
+			if(length > BLOCK_SIZE - block_idx_offset)
+			{
+				for(j = 0; j < BLOCK_SIZE - block_idx_offset; ++j)
+				{
+					buf[idx] = read_start_addr[j];
+					++idx;
+				}
+				length -= (BLOCK_SIZE - block_idx_offset);
+				block_idx_offset = 0;
+				++block_offset;
+				continue;
+			}
+			else
+			{
+				for(j = 0; j < length; ++j)
+				{
+					buf[idx] = read_start_addr[j];
+					++idx;
+				}				
+				length = 0;
+				break;
+			}
+
 		}
 		/*determine how many bytes we still have to read*/
 		if(length < 4096){
-			 l = (length/4)+1;
-		 	for(j = 0; j < l; ++j)
+		
+		 	for(j = 0; j < length; ++j)
 			{
-				if(length < 4){
-					switch (length){
-						case 1:
-							buf[idx] = (read_start_addr[j] & 0x00FF);
-							idx++;
-							break;
-						case 2:
-							buf[idx] = (read_start_addr[j] & 0x00FF);
-							idx++;
-							buf[idx] = (read_start_addr[j] & 0xFF00) >> 8;
-							idx++;
-							break;
-						case 3:	
-							buf[idx] = (read_start_addr[j] & 0x00FF);
-							idx++;
-							buf[idx] = (read_start_addr[j] & 0xFF00) >> 8;
-							idx++;
-							buf[idx] = (read_start_addr[j] & 0x00FF0000) >> 16;
-							idx++;
-						break;
-
-					}
-				}
-				else{
-				buf[idx] = (read_start_addr[j] & 0x00FF);
-				idx++;
-				buf[idx] = (read_start_addr[j] & 0xFF00) >> 8;
-				idx++;
-				buf[idx] = (read_start_addr[j] & 0x00FF0000) >> 16;
-				idx++;
-				buf[idx] = (read_start_addr[j] & 0xFF000000) >> 24;
-				idx++;
-				//decrement the length 
-				length -= 4;
-				}
+				buf[idx] = (read_start_addr[j]);
+				idx++;	
 			}
+			length = 0;		//finish reading, length is 0
 		}
 		else{
-			for(j = 0; j < 1024; j++)
+			for(j = 0; j < 4096; j++)
 			{
-				buf[idx] = (read_start_addr[j] & 0x00FF);
+				buf[idx] = (read_start_addr[j]);
 				idx++;
-				buf[idx] = (read_start_addr[j] & 0xFF00) >> 8;
-				idx++;
-				buf[idx] = (read_start_addr[j] & 0x00FF0000) >> 16;
-				idx++;
-				buf[idx] = (read_start_addr[j] & 0xFF000000) >> 24;
-				idx++;
+			
 			}
 			length -= 4096;
 		}
 		block_offset++;
 	
 	}
+	// 	if(length < 4096){
+	// 		 l = (length/4)+1;
+	// 	 	for(j = 0; j < l; ++j)
+	// 		{
+	// 			if(length < 4){
+	// 				switch (length){
+	// 					case 1:
+	// 						buf[idx] = (read_start_addr[j] & 0x00FF);
+	// 						idx++;
+	// 						break;
+	// 					case 2:
+	// 						buf[idx] = (read_start_addr[j] & 0x00FF);
+	// 						idx++;
+	// 						buf[idx] = (read_start_addr[j] & 0xFF00) >> 8;
+	// 						idx++;
+	// 						break;
+	// 					case 3:	
+	// 						buf[idx] = (read_start_addr[j] & 0x00FF);
+	// 						idx++;
+	// 						buf[idx] = (read_start_addr[j] & 0xFF00) >> 8;
+	// 						idx++;
+	// 						buf[idx] = (read_start_addr[j] & 0x00FF0000) >> 16;
+	// 						idx++;
+	// 					break;
+
+	// 				}
+	// 			}
+	// 			else{
+	// 			buf[idx] = (read_start_addr[j] & 0x00FF);
+	// 			idx++;
+	// 			buf[idx] = (read_start_addr[j] & 0xFF00) >> 8;
+	// 			idx++;
+	// 			buf[idx] = (read_start_addr[j] & 0x00FF0000) >> 16;
+	// 			idx++;
+	// 			buf[idx] = (read_start_addr[j] & 0xFF000000) >> 24;
+	// 			idx++;
+	// 			//decrement the length 
+	// 			length -= 4;
+	// 			}
+	// 		}
+	// 	}
+	// 	else{
+	// 		for(j = 0; j < 1024; j++)
+	// 		{
+	// 			buf[idx] = (read_start_addr[j] & 0x00FF);
+	// 			idx++;
+	// 			buf[idx] = (read_start_addr[j] & 0xFF00) >> 8;
+	// 			idx++;
+	// 			buf[idx] = (read_start_addr[j] & 0x00FF0000) >> 16;
+	// 			idx++;
+	// 			buf[idx] = (read_start_addr[j] & 0xFF000000) >> 24;
+	// 			idx++;
+	// 		}
+	// 		length -= 4096;
+	// 	}
+	// 	block_offset++;
 	
-	return length;
+	// }
 	
+	return idx;
+
 }
 
 
-uint32_t * get_block_addr(int32_t block_num)
+uint8_t * get_block_addr(int32_t block_num)
 {
 	return datablock_startAddr + (BLOCK_SIZE/4) * block_num;
 }
