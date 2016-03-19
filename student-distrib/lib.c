@@ -629,6 +629,18 @@ display_c(uint8_t c)
     cursor_update(screen_x, screen_y);
 }
 
+int32_t
+display_s(int8_t* s)
+{
+	register int32_t index = 0;
+	while(s[index] != '\0') {
+		display_c(s[index]);
+		index++;
+	}
+
+	return index;
+}
+
 void delete()
 {
 	screen_x--;	
