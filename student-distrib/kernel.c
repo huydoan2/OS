@@ -13,6 +13,7 @@
 #include "rtc.h"
 #include "Paging.h"
 #include "file.h"
+#include "file_desc.h"
 /* Macros. */
 /* Check if the bit BIT in FLAGS is set. */
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
@@ -29,10 +30,13 @@ entry (unsigned long magic, unsigned long addr)
 	multiboot_info_t *mbi;
 	
 	/*file system test variables*/
+
 	uint32_t fileSys_startAddr;
 	dentry_t dentry;
 	uint32_t index;
 	uint8_t buffer[6000] = {0};
+
+	uint32_t offset;
 
 	/*paging test variables*/
 	uint32_t test_phys_addr;
@@ -49,6 +53,10 @@ entry (unsigned long magic, unsigned long addr)
 	int num_byte = size_of_keys;
 	int32_t * buf;
 	int32_t num_bytes;
+
+	int32_t fd_rtc;
+	int32_t fd_file;
+	int32_t fd_dir;
 
 	/* Clear the screen. */
 	clear();
@@ -185,7 +193,8 @@ entry (unsigned long magic, unsigned long addr)
 	/* Initialize devices, memory, filesystem, enable device interrupts on the
 	 * PIC, any other initialization stuff... */
 	keyboard_open();
-	rtc_open(buf, num_bytes);
+	//rtc_open(buf, num_bytes);
+	
 	paging_init();
 
 	/*test the memory accessing by paging */
@@ -205,18 +214,43 @@ entry (unsigned long magic, unsigned long addr)
 
 	clear(); //need to clear screen in terminal driver init
 	parsing_fileSystem(fileSys_startAddr); //initialize file system
+	init_PCB();
+
+
+	/*open rtc*/
+	fd_rtc = open((uint8_t*)"rtc");
+	printf(" rtc fd Num: %d\n",fd_rtc );
 	sti();
 	/* Execute the first program (`shell') ... */
 	
 	/********TESTING FILE SYSTEM*******/
-	index = 2;
-	read_dentry_by_index(index, &dentry);
-	read_data(dentry.inode_num, 4103,  buffer, 25);
-	//print out the file selected 
+	fd_dir = open((uint8_t*)".");
+	while(read(fd_dir, buffer, 4))
+	{
+		display_printf("%s\n",(int8_t*)buffer);
+	}
+	
+	fd_file = open((uint8_t*)"verylargetxtwithverylongname.txt");
+	read(fd_file, buffer, 32);
 	printf("TEXT READ:\n ");
-	display_s((int8_t *)buffer);
+	display_printf("%s\n",(int8_t *)buffer);	
+	read(fd_file, buffer, 32);
+	printf("TEXT READ:\n ");
+	display_printf("%s\n",(int8_t *)buffer);	
+
+
+	//index = 2;
+	//read_dentry_by_index(index, &dentry);
+	//read_data(dentry.inode_num, 4103,  buffer, 25);
+	//print out the file selected 
+	// printf("TEXT READ:\n ");
+	// display_s((int8_t *)buffer);
 	printf("\n");
 
+
+
+
+	
 	/********TESTING READ AND WRITE for Terminal and RTC*******/
 	while(1)
 	{
@@ -230,8 +264,9 @@ entry (unsigned long magic, unsigned long addr)
 			i--;
 		}
 		//rtc read write test
-		rtc_write(rtc_buff+rtc_index,rtc_num_byte);
-		rtc_read(rtc_buff+rtc_index,rtc_num_byte);
+		write(fd_rtc,rtc_buff+rtc_index, rtc_num_byte);
+		read(fd_rtc, rtc_buff+rtc_index, rtc_num_byte);
+		
 		rtc_index = (rtc_index+1)%rtc_buff_size;
 
 	}

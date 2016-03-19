@@ -273,7 +273,7 @@ void reset_linebuffer()
  *   SIDE EFFECTS: all the flags and PIC are initialized 
  *
  */
-int keyboard_open()
+int32_t keyboard_open()
 {
 	shift_flag = 0;					/*initialize the shift flag to zero*/
 	caps_lock_flag = 0;				/*initialize the caps lock flag to zero*/
@@ -295,7 +295,7 @@ int keyboard_open()
  *   SIDE EFFECTS: does nothing
  *
  */
-int keyboard_close()
+int32_t keyboard_close()
 {
 	return 0;
 }
@@ -315,7 +315,7 @@ int keyboard_close()
  *			- the line buffer and its index variable are cleared 
  *
  */
-int keyboard_read(char * buff, int num_bytes)
+int32_t keyboard_read(char * buff, int num_bytes)
 {
 	int i = 0;
 	//check if the input is valid
@@ -347,7 +347,7 @@ int keyboard_read(char * buff, int num_bytes)
  *			- characters passed in by the buffer are displayed on the screen
  *
  */
-int keyboard_write(char * buff, int num_bytes)
+int32_t keyboard_write(char * buff, int num_bytes)
 {
 	int i =0;
 	//Check if the inputs are valid

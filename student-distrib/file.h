@@ -17,28 +17,28 @@
 
 
 //open file driver
-extern int32_t dir_open(int32_t* buff, int32_t num_bytes);
+extern int32_t dir_open();
 
 //close file driver
-extern int32_t dir_close(int32_t* buff, int32_t num_bytes);
+extern int32_t dir_close();
 
 //read function for file
-extern int32_t dir_read(int32_t* buff, int32_t num_bytes);
+extern int32_t dir_read(int32_t* buff, uint32_t offset,int32_t num_bytes);
 
 //write function for file
-extern int32_t dir_write(int32_t* buff, int32_t num_bytes);
+extern int32_t dir_write(int32_t* buff,  int32_t num_bytes);
 
 //handler for file
 extern void file_handler(void);
 
 //open file driver
-extern int32_t file_open(int32_t* buff, int32_t num_bytes);
+extern int32_t file_open();
 
 //close file driver
-extern int32_t file_close(int32_t* buff, int32_t num_bytes);
+extern int32_t file_close();
 
 //read function for file
-extern int32_t file_read(int32_t* buff, int32_t num_bytes);
+extern int32_t file_read(int32_t* buff, uint32_t offset, int32_t num_bytes);
 
 //write function for file
 extern int32_t file_write(int32_t* buff, int32_t num_bytes);

@@ -1,6 +1,5 @@
 #include "types.h"
-#include "file.h"
-#include "rtc.h"
+
 
 #define PCB_SIZE 8
 #define NUM_OP 4
@@ -10,11 +9,21 @@
 #define CLOSE 3
 
 /*function pointer type for system calls*/
-typedef int32_t (*systemcallFunc_ptr)(int32_t*, int32_t);
+typedef int32_t (*openFunc_ptr)();
+typedef int32_t (*readFunc_ptr)(int32_t*, uint32_t, int32_t);
+typedef int32_t (*writeFunc_ptr)(int32_t*, int32_t);
+typedef int32_t (*closeFunc_ptr)();
 
+
+typedef struct fop{
+	openFunc_ptr open_ptr;
+	readFunc_ptr read_ptr;
+	writeFunc_ptr write_ptr;
+	closeFunc_ptr close_ptr;
+} fop_t;
 /*sturcure for one PCB*/
 typedef struct file_desc{
-	systemcallFunc_ptr fops[NUM_OP];
+	fop_t fops;
 	uint32_t inode;
 	uint32_t file_pos;
 	uint32_t flags;
