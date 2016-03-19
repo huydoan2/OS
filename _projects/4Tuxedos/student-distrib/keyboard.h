@@ -34,16 +34,16 @@ extern char getchar();
 extern void reset_linebuffer();
 
 //open keyboard driver
-extern int keyboard_open();
+extern int32_t keyboard_open();
 
 //close keyboard driver
-extern int keyboard_close();
+extern int32_t keyboard_close();
 
 //read function for keyboard
-extern int keyboard_read(char * buff, int num_bytes);
+extern int32_t keyboard_read(char * buff, int num_bytes);
 
 //write function for keyboard
-extern int keyboard_write(char * buff, int num_bytes);
+extern int32_t keyboard_write(char * buff, int num_bytes);
 
 #endif
 

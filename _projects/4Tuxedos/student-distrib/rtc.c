@@ -144,7 +144,7 @@ void rtc_set_rate()
  *   SIDE EFFECTS: 
  *
  */
-int rtc_open(int * buff, int num_bytes)
+int32_t rtc_open()
 {
 	interrupt_flag = 0;
 	rtc_init();
@@ -162,7 +162,7 @@ int rtc_open(int * buff, int num_bytes)
  *   SIDE EFFECTS: 
  *
  */
-int rtc_close(int * buff, int num_bytes)
+int32_t rtc_close()
 {
 	disable_irq(RTC_IRQ_8);
 	return 0;
@@ -180,7 +180,7 @@ int rtc_close(int * buff, int num_bytes)
  *   SIDE EFFECTS: 
  *
  */
-int rtc_read(int * buff, int num_bytes)
+int32_t rtc_read(int32_t * buff, uint32_t offset,int32_t num_bytes)
 {	
 	while(!interrupt_flag);
 	interrupt_flag = 0;
@@ -199,8 +199,11 @@ int rtc_read(int * buff, int num_bytes)
  *   SIDE EFFECTS: 
  *
  */
-int rtc_write(int * buff, int num_bytes)
+int32_t rtc_write(int32_t * buff, int32_t num_bytes)
 {
+	
+    printf("buffer value: %d \n", *buff);
+
 	if((num_bytes != rtc_num_byte) || buff == NULL)
 		return -1;
 

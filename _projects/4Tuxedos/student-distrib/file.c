@@ -11,6 +11,7 @@
 #define BLOCK_SIZE    4096
 #define ADDRPERBLOCK  1024
 #define SKIPENTRY     16
+#define NAME_MAX_LEN 31		//one character left for '\0'
 
  uint8_t * get_block_addr(int32_t block_num);		//get the starting address of the given block number
 
@@ -86,19 +87,26 @@ void parsing_fileSystem(uint32_t * startAddr){
 }
 
 //open file driver
-int32_t dir_open(int32_t* buff, int32_t num_bytes){
+int32_t dir_open(){	
  	return 0;
 }
 
 //close file driver
-int32_t dir_close(int32_t* buff, int32_t num_bytes){
+int32_t dir_close(){
 	return 0;
 }
 
 //read function for file
-int32_t dir_read(int32_t* buff, int32_t num_bytes){
+int32_t dir_read(int32_t* buff, uint32_t offset, int32_t num_bytes){
+//
+	dentry_t dentry;
+	if(offset >= bootblock.num_dentries)
+		return 0;
 
-	return 0;
+	read_dentry_by_index(offset, &dentry);
+	strcpy((int8_t*)buff,dentry.filename);
+
+	return 1;
 }
 
 //write function for file
@@ -107,12 +115,12 @@ int32_t dir_write(int32_t* buff, int32_t num_bytes){
 }
 
 
-int32_t file_open(int32_t* buff, int32_t num_bytes)
+int32_t file_open()
 {
 	return 0;
 }
 
-int32_t file_close(int32_t* buff, int32_t num_bytes)
+int32_t file_close()
 {
 	return 0;
 }
@@ -123,10 +131,12 @@ void file_handler(void)
 }
 
 
-int32_t file_read(int32_t * buff, int32_t num_bytes)
+int32_t file_read(int32_t * buff, uint32_t offset,int32_t num_bytes)
 {
+	uint32_t inode = *buff;
+
+	return read_data(inode, offset, (uint8_t*)buff, num_bytes);
 	
-	return 0;
 }
 
 int32_t file_write(int32_t * buff, int32_t num_bytes)
@@ -149,12 +159,15 @@ int32_t file_write(int32_t * buff, int32_t num_bytes)
  */
 int32_t read_dentry_by_name(const uint8_t* fname, struct dentry_t* dentry)
 {
-	int i;
+	int i, len= strlen((int8_t *)fname);
+
+	if(len > NAME_MAX_LEN)
+		len = NAME_MAX_LEN;
 
 	for(i = 0; i < bootblock.num_dentries; i++)
 	{
 
-		if(strncmp((int8_t *)bootblock.directory_entry[i].filename, (int8_t *)fname, strlen((int8_t *)fname)))
+		if(strncmp((int8_t *)bootblock.directory_entry[i].filename, (int8_t *)fname, len ) == 0)
 		{
 			strcpy((int8_t *)dentry->filename, (int8_t *)bootblock.directory_entry[i].filename);
 			dentry->file_type = bootblock.directory_entry[i].file_type;
