@@ -239,13 +239,13 @@ entry (unsigned long magic, unsigned long addr)
 	}
 	close(fd_dir);
 
-	// fd_file = open((uint8_t*)"verylargetxtwithverylongname.txt");
-	// read(fd_file, buffer_1, 32);
-	// display_printf("TEXT READ:\n ");
-	// display_printf("%s\n",(int8_t *)buffer_1);	
-	// read(fd_file, buffer_1, 32);
-	// display_printf("TEXT READ:\n ");
-	// display_printf("%s\n",(int8_t *)buffer_1);	
+	fd_file = open((uint8_t*)"verylargetxtwithverylongname.txt");
+	read(fd_file, buffer_1, 6000);
+	display_printf("TEXT READ:\n ");
+	display_printf("%s\n",(int8_t *)buffer_1);	
+	read(fd_file, buffer_1, 32);
+	display_printf("TEXT READ:\n ");
+	display_printf("%s\n",(int8_t *)buffer_1);	
 
 	// display_printf("\n");
 	
