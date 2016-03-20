@@ -757,14 +757,14 @@ display_c(uint8_t c)
 	    screen_x++;
 	    screen_y = (screen_y + (screen_x / NUM_COLS));
 	    screen_x %= NUM_COLS;
-
-	    //if the screen_y goes over the max y, scroll the screen
-	 	if (screen_y > NUM_ROWS - 1)
-		{
-			scroll_screen();
-			--screen_y;
-		}
 	}
+    //if the screen_y goes over the max y, scroll the screen
+ 	if (screen_y > NUM_ROWS - 1)
+	{
+		scroll_screen();
+		--screen_y;
+	}
+
 	//update the cursor location
     cursor_update(screen_x, screen_y);
 }
