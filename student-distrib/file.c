@@ -7,11 +7,11 @@
 
 
 
-#define max_dentries 63
+#define max_dentries  63
 #define BLOCK_SIZE    4096
 #define ADDRPERBLOCK  1024
 #define SKIPENTRY     16
-#define NAME_MAX_LEN 31		//one character left for '\0'
+#define NAME_MAX_LEN  32		//one character left for '\0'
 
  uint8_t * get_block_addr(int32_t block_num);		//get the starting address of the given block number
 
@@ -192,14 +192,14 @@ int32_t read_dentry_by_name(const uint8_t* fname, struct dentry_t* dentry)
 	/*traverse the directory entries to match with input filename*/
 	for(i = 0; i < bootblock.num_dentries; i++)
 	{
-
+		if( len != strlen((int8_t *)bootblock.directory_entry[i].filename))
+			continue;
 		if(strncmp((int8_t *)bootblock.directory_entry[i].filename, (int8_t *)fname, len ) == 0)
 		{
 			/*if match has been found, then copy the directory entry*/
 			strcpy((int8_t *)dentry->filename, (int8_t *)bootblock.directory_entry[i].filename);
 			dentry->file_type = bootblock.directory_entry[i].file_type;
 			dentry->inode_num = bootblock.directory_entry[i].inode_num;
-
 			return 0;
 		}
 	}

@@ -171,7 +171,6 @@ int32_t write(int32_t fd, const void * buf, int32_t nbytes)
 {
 	file_decs_t cur_fd = PCB[fd];
 
-	printf("fd from write func: %d \n", fd);
 	return cur_fd.fops.write_ptr((int32_t*)buf, nbytes);
 
 	

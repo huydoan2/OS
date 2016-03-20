@@ -45,7 +45,8 @@ extern int32_t file_write(int32_t* buff, int32_t num_bytes);
 
 //bootblock starting address
 /*
-
+|| Joel's note on the BOOTBLOCK:
+===============================================
 file syststem is contiguous
 
 Confirmed mod->mod_start is starting address of bootblock

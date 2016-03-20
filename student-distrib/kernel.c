@@ -36,6 +36,10 @@ entry (unsigned long magic, unsigned long addr)
 	uint32_t index;
 	uint8_t buffer_0[6000] = {0};
 	uint8_t buffer_1[6000] = {0};
+	uint8_t testchar[2] = {0};
+	testchar[0] = 'a';
+	testchar[1] = 's';
+	testchar[2] = 'd';
 
 	uint32_t offset;
 
@@ -225,13 +229,7 @@ entry (unsigned long magic, unsigned long addr)
 	/* Execute the first program (`shell') ... */
 	
 	/********TESTING FILE SYSTEM*******/
-	fd_dir = open((uint8_t*)".");
-	while(read(fd_dir, buffer_0, 4))
-	{
-		display_printf("%s\n",(int8_t*)buffer_0);
-	}
-	close(fd_dir);
-	fd_dir = 0;
+	/*open a directory file*/
 	fd_dir = open((uint8_t*)".");
 	while(read(fd_dir, buffer_0, 4))
 	{
@@ -239,15 +237,34 @@ entry (unsigned long magic, unsigned long addr)
 	}
 	close(fd_dir);
 
-	fd_file = open((uint8_t*)"verylargetxtwithverylongname.txt");
-	read(fd_file, buffer_1, 6000);
-	display_printf("TEXT READ:\n ");
-	display_printf("%s\n",(int8_t *)buffer_1);	
-	read(fd_file, buffer_1, 32);
-	display_printf("TEXT READ:\n ");
-	display_printf("%s\n",(int8_t *)buffer_1);	
+	fd_dir = open((uint8_t*)".");
+	while(read(fd_dir, buffer_0, 4))
+	{
+		display_printf("%s\n",(int8_t*)buffer_0);
+	}
+	close(fd_dir);
 
-	// display_printf("\n");
+	/*open a regular file*/
+	 fd_file = open((uint8_t*)"verylargetxtwithverylongname.tx");
+
+
+	if(read(fd_file, buffer_1, 32) != -1){
+		display_printf("TEXT READ:\n ");
+		display_printf("%s\n",(int8_t *)buffer_1);	
+	}
+	else {
+		display_printf("The end of the file has been reached!!\n");
+	}
+ 	offset = 0;
+	if((offset = read(fd_file, buffer_1, 90)) != -1){
+		display_printf("TEXT READ:\n ");
+		display_printf("%s\n",(int8_t *)buffer_1);	
+		display_printf("number of Bytes read: %d \n",offset);
+	}
+	else {
+		display_printf("The end of the file has been reached!!\n");
+	}
+
 	
 	/********TESTING READ AND WRITE for Terminal and RTC*******/
 	while(1)

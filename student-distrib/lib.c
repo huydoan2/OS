@@ -293,7 +293,6 @@ format_char_switch:
 		}
 		buf++;
 	}
-
 	return (buf - format);
 }
 
