@@ -248,7 +248,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 	if(inode >= bootblock.num_inodes)	
 		return -1;
 	//bad offset
-	if(offset > inode_array[inode].length_in_B || offset < 0)
+	if(offset >= inode_array[inode].length_in_B || offset < 0)
 		return -1;
 
 	/*calculate block offset adn block entry offset*/
