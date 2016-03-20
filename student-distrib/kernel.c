@@ -34,7 +34,8 @@ entry (unsigned long magic, unsigned long addr)
 	uint32_t fileSys_startAddr;
 	dentry_t dentry;
 	uint32_t index;
-	uint8_t buffer[6000] = {0};
+	uint8_t buffer_0[6000] = {0};
+	uint8_t buffer_1[6000] = {0};
 
 	uint32_t offset;
 
@@ -219,25 +220,34 @@ entry (unsigned long magic, unsigned long addr)
 
 	/*open rtc*/
 	fd_rtc = open((uint8_t*)"rtc");
-	printf(" rtc fd Num: %d\n",fd_rtc );
+	//display_printf(" rtc fd Num: %d\n",fd_rtc );
 	sti();
 	/* Execute the first program (`shell') ... */
 	
 	/********TESTING FILE SYSTEM*******/
 	fd_dir = open((uint8_t*)".");
-	while(read(fd_dir, buffer, 4))
+	while(read(fd_dir, buffer_0, 4))
 	{
-		display_printf("%s\n",(int8_t*)buffer);
+		display_printf("%s\n",(int8_t*)buffer_0);
 	}
-	fd_file = open((uint8_t*)"verylargetxtwithverylongname.txt");
-	read(fd_file, buffer, 32);
-	printf("TEXT READ:\n ");
-	display_printf("%s\n",(int8_t *)buffer);	
-	read(fd_file, buffer, 32);
-	printf("TEXT READ:\n ");
-	display_printf("%s\n",(int8_t *)buffer);	
+	close(fd_dir);
+	fd_dir = 0;
+	fd_dir = open((uint8_t*)".");
+	while(read(fd_dir, buffer_0, 4))
+	{
+		display_printf("%s\n",(int8_t*)buffer_0);
+	}
+	close(fd_dir);
 
-	printf("\n");
+	// fd_file = open((uint8_t*)"verylargetxtwithverylongname.txt");
+	// read(fd_file, buffer_1, 32);
+	// display_printf("TEXT READ:\n ");
+	// display_printf("%s\n",(int8_t *)buffer_1);	
+	// read(fd_file, buffer_1, 32);
+	// display_printf("TEXT READ:\n ");
+	// display_printf("%s\n",(int8_t *)buffer_1);	
+
+	// display_printf("\n");
 	
 	/********TESTING READ AND WRITE for Terminal and RTC*******/
 	while(1)
