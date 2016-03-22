@@ -67,7 +67,7 @@ int check_avail(){
  *   SIDE EFFECTS: none
  *
  */
-int32_t open(const uint8_t* filename)
+int32_t open_fd(const uint8_t* filename)
 {
 	dentry_t dentry;
 	file_decs_t fd;
@@ -140,7 +140,7 @@ int32_t open(const uint8_t* filename)
  *   SIDE EFFECTS: none
  *
  */
-int32_t read(int32_t fd, void * buf, int32_t nbytes)
+int32_t read_fd(int32_t fd, void * buf, int32_t nbytes)
 {
 	uint32_t offset = 0;
 	int ret_val;
@@ -167,7 +167,7 @@ int32_t read(int32_t fd, void * buf, int32_t nbytes)
  *
  */
 
-int32_t write(int32_t fd, const void * buf, int32_t nbytes)
+int32_t write_fd(int32_t fd, const void * buf, int32_t nbytes)
 {
 	file_decs_t cur_fd = PCB[fd];
 
@@ -190,7 +190,7 @@ int32_t write(int32_t fd, const void * buf, int32_t nbytes)
  *
  */
 
-int32_t close(int32_t fd)
+int32_t close_fd(int32_t fd)
 {
 	file_decs_t cur_fd = PCB[fd];
 	PCB[fd].flags = NOTUSE;
