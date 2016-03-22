@@ -51,6 +51,7 @@ entry (unsigned long magic, unsigned long addr)
 	/*RTC test variables*/
 	int rtc_buff[rtc_buff_size] = {2,4,8,16,32};
 	int rtc_index = 0;
+	int rtc_read_buf[rtc_buff_size] = {2,4,8,16,32};
 
 	/*keyboard and terminal test variables*/
 	int i;
@@ -58,6 +59,7 @@ entry (unsigned long magic, unsigned long addr)
 	int num_byte = size_of_keys;
 	int32_t * buf;
 	int32_t num_bytes;
+
    /*file descriptor variables*/
 	int32_t fd_rtc;
 	int32_t fd_file;
@@ -238,7 +240,7 @@ entry (unsigned long magic, unsigned long addr)
 	close(fd_dir);
 
 	fd_dir = open((uint8_t*)".");
-	while(read(fd_dir, buffer_0, 4))
+	while(read(fd_dir, buffer_0, 32))
 	{
 		display_printf("%s\n",(int8_t*)buffer_0);
 	}
@@ -280,9 +282,12 @@ entry (unsigned long magic, unsigned long addr)
 		}
 		//rtc read write test
 		write(fd_rtc,rtc_buff+rtc_index, rtc_num_byte);
-		read(fd_rtc, rtc_buff+rtc_index, rtc_num_byte);
-		
-		rtc_index = (rtc_index+1)%rtc_buff_size;
+		read(fd_rtc, rtc_read_buf, rtc_num_byte);
+		printf("rtc index: %d \n", rtc_index);
+		//rtc_index = (rtc_index+1)%rtc_buff_size;
+		rtc_index++;
+		if(rtc_index == 5)
+			rtc_index = 0;
 
 	}
 	
