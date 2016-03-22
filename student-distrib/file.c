@@ -118,7 +118,7 @@ int32_t dir_read(int32_t* buff, uint32_t offset, int32_t num_bytes){
 	//obtain the directory entry
 	read_dentry_by_index(offset, &dentry);
 	//obtian the file name of that entry 
-	strcpy((int8_t*)buff,dentry.filename);
+	strncpy((int8_t*)buff,dentry.filename, num_bytes);
 
 	return 1;
 }
