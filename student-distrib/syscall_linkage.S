@@ -23,7 +23,7 @@ syscalls:
 syscalls_default:
         /* return -1 */
         movl $FAIL_VALUE, %eax
-        ret     
+        iret     
 
 jumb_table:
         .long halt, execute, read, write, open,
