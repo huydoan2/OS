@@ -5,8 +5,9 @@ file_desc.o: file_desc.c file_desc.h types.h file.h rtc.h i8259.h lib.h
 i8259.o: i8259.c i8259.h types.h lib.h
 IDT.o: IDT.c IDT.h lib.h types.h x86_desc.h keyboard.h i8259.h rtc.h
 kernel.o: kernel.c multiboot.h types.h x86_desc.h lib.h i8259.h debug.h \
-  keyboard.h IDT.h rtc.h Paging.h file.h file_desc.h
+  keyboard.h IDT.h rtc.h Paging.h file.h file_desc.h systemCalls.h
 keyboard.o: keyboard.c keyboard.h i8259.h types.h lib.h
 lib.o: lib.c lib.h types.h
 Paging.o: Paging.c Paging.h types.h lib.h
 rtc.o: rtc.c rtc.h i8259.h types.h lib.h
+systemCalls.o: systemCalls.c systemCalls.h types.h file_desc.h

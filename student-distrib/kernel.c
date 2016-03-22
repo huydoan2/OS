@@ -14,6 +14,8 @@
 #include "Paging.h"
 #include "file.h"
 #include "file_desc.h"
+#include "systemCalls.h"
+
 /* Macros. */
 /* Check if the bit BIT in FLAGS is set. */
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
