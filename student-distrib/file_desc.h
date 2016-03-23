@@ -1,3 +1,4 @@
+
 #include "types.h"
 
 
@@ -8,6 +9,7 @@
 #define WRITE 2
 #define CLOSE 3
 
+#ifndef ASM
 /*function pointer type for system calls*/
 typedef int32_t (*openFunc_ptr)();
 typedef int32_t (*readFunc_ptr)(int32_t*, uint32_t, int32_t);
@@ -41,4 +43,4 @@ extern int32_t read_fd(int32_t fd, void * buf, int32_t nbytes);
 extern int32_t write_fd(int32_t fd, const void * buf, int32_t nbytes);
 extern int32_t close_fd(int32_t fd);
 
-
+#endif
