@@ -226,7 +226,7 @@ entry (unsigned long magic, unsigned long addr)
 	/*open rtc*/
 	fd_rtc = open((uint8_t*)"rtc");
 	sti();
-	
+
 	/* Execute the first program (`shell') ... */
 	
 	/********TESTING FILE SYSTEM*******/
@@ -270,6 +270,15 @@ entry (unsigned long magic, unsigned long addr)
 		display_printf("The end of the file has been reached!!\n");
 	}
 
+	if((offset = read(fd_file, buffer_1, file_buff_size)) != -1){
+		buffer_1[file_buff_size] = '\0';
+		display_printf("TEXT READ:\n");
+		display_printf("%s\n",(int8_t *)buffer_1);	
+		display_printf("number of Bytes read: %d \n",offset);
+	}
+	else {
+		display_printf("The end of the file has been reached!!\n");
+	}
 	
 	/********TESTING READ AND WRITE for Terminal and RTC*******/
 	while(1)
