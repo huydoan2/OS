@@ -26,6 +26,29 @@
 #define column_offset_3 3
 #define rtc_num_byte	4
 #define rtc_freq 32768
+
+#define rate_0 15
+#define rate_1 14
+#define rate_2 13
+#define rate_3 12
+#define rate_4 11
+#define rate_5 10
+#define rate_6 9
+#define rate_7 8
+#define rate_8 7
+#define rate_9 6
+
+#define freq_0 2
+#define freq_1 4
+#define freq_2 8
+#define freq_3 16
+#define freq_4 32
+#define freq_5 64
+#define freq_6 128
+#define freq_7 256
+#define freq_8 512
+#define freq_9 1024
+
 static char* video_mem = (char *)VIDEO;
 void rtc_set_rate();
 
@@ -201,53 +224,47 @@ int32_t rtc_read(int32_t * buff, uint32_t offset,int32_t num_bytes)
  */
 int32_t rtc_write(int32_t * buff, int32_t num_bytes)
 {
-	
-    printf("buffer value: %d \n", *buff);
-
 	if((num_bytes != rtc_num_byte) || buff == NULL)
 		return -1;
 
 	switch(*buff)
 	{
-		case 2:
-			rate = 15;
+		case freq_0:
+			rate = rate_0;
 			break;
-		case 4:
-			rate = 14;
+		case freq_1:
+			rate = rate_1;
 			break;
-		case 8:
-			rate = 13;
+		case freq_2:
+			rate = rate_2;
 			break;
-		case 16:
-			rate = 12;
+		case freq_3:
+			rate = rate_3;
 			break;
-		case 32:
-			rate = 11;
+		case freq_4:
+			rate = rate_4;
 			break;
-		case 64:
-			rate = 10;
+		case freq_5:
+			rate = rate_5;
 			break;
-		case 128:
-			rate = 9;
+		case freq_6:
+			rate = rate_6;
 			break;
-		case 256:
-			rate = 8;
+		case freq_7:
+			rate = rate_7;
 			break;
-		case 512:
-			rate = 7;
+		case freq_8:
+			rate = rate_8;
 			break;
-		case 1024:
-			rate = 6;
+		case freq_9:
+			rate = rate_9;
 			break;
 		default:
 			rate = rate;
 			return -1;
 	}
 	rtc_set_rate();
+	printf("rtc rate: %d \n", rate);
 	return 0;
 }
 
-
-/*Bootblock + 4096* Num of iNodes +1 gets you to data blocks*/
-
-/*file system close wont do anything*/
