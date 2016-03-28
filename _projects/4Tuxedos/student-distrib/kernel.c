@@ -231,14 +231,14 @@ entry (unsigned long magic, unsigned long addr)
 	
 	/********TESTING FILE SYSTEM*******/
 	/*open a directory file*/
-	/*
-	fd_dir = open((uint8_t*)".");
-	while(read(fd_dir, buffer_0, 4))
-	{
-		display_printf("%s\n",(int8_t*)buffer_0);
-	}
-	close(fd_dir);
-	*/
+	
+	// fd_dir = open((uint8_t*)".");
+	// while(read(fd_dir, buffer_0, 4))
+	// {
+	// 	display_printf("%s\n",(int8_t*)buffer_0);
+	// }
+	// close(fd_dir);
+	
 
 	fd_dir = open((uint8_t*)".");
 	while(read(fd_dir, buffer_0, file_name_max_size))
@@ -270,15 +270,16 @@ entry (unsigned long magic, unsigned long addr)
 		display_printf("The end of the file has been reached!!\n");
 	}
 
-	if((offset = read(fd_file, buffer_1, file_buff_size)) != -1){
-		buffer_1[file_buff_size] = '\0';
-		display_printf("TEXT READ:\n");
-		display_printf("%s\n",(int8_t *)buffer_1);	
-		display_printf("number of Bytes read: %d \n",offset);
-	}
-	else {
-		display_printf("The end of the file has been reached!!\n");
-	}
+	/*print end of file reached statement*/
+	// if((offset = read(fd_file, buffer_1, file_buff_size)) != -1){
+	// 	buffer_1[file_buff_size] = '\0';
+	// 	display_printf("TEXT READ:\n");
+	// 	display_printf("%s\n",(int8_t *)buffer_1);	
+	// 	display_printf("number of Bytes read: %d \n",offset);
+	// }
+	// else {
+	// 	display_printf("The end of the file has been reached!!\n");
+	// }
 	
 	/********TESTING READ AND WRITE for Terminal and RTC*******/
 	while(1)
