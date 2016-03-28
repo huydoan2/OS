@@ -43,14 +43,14 @@ name:   PUSHL	%EBX          ;\
 	RET
 
 /* the system call library wrappers */
-DO_CALL(halt,SYS_HALT)
-DO_CALL(execute,SYS_EXECUTE)
-DO_CALL(read,SYS_READ)
-DO_CALL(write,SYS_WRITE)
-DO_CALL(open,SYS_OPEN)
-DO_CALL(close,SYS_CLOSE)
-DO_CALL(getargs,SYS_GETARGS)
-DO_CALL(vidmap,SYS_VIDMAP)
-DO_CALL(set_handler,SYS_SET_HANDLER)
-DO_CALL(sigreturn,SYS_SIGRETURN)
+# DO_CALL(halt,SYS_HALT)
+# DO_CALL(execute,SYS_EXECUTE)
+# DO_CALL(read,SYS_READ)
+# DO_CALL(write,SYS_WRITE)
+# DO_CALL(open,SYS_OPEN)
+# DO_CALL(close,SYS_CLOSE)
+# DO_CALL(getargs,SYS_GETARGS)
+# DO_CALL(vidmap,SYS_VIDMAP)
+# DO_CALL(set_handler,SYS_SET_HANDLER)
+# DO_CALL(sigreturn,SYS_SIGRETURN)
 

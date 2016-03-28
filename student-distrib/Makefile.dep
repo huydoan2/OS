@@ -12,4 +12,4 @@ keyboard.o: keyboard.c keyboard.h i8259.h types.h lib.h
 lib.o: lib.c lib.h types.h
 Paging.o: Paging.c Paging.h types.h lib.h
 rtc.o: rtc.c rtc.h i8259.h types.h lib.h
-systemCalls.o: systemCalls.c
+systemCalls.o: systemCalls.c systemCalls.h types.h file_desc.h
