@@ -23,6 +23,9 @@
 #define size_of_keys 128
 #define rtc_num_byte 4
 #define rtc_buff_size 5
+#define file_name_max_size 32
+#define test_virt 0x00005111
+#define file_buff_size 6000
 
 /* Check if MAGIC is valid and print the Multiboot information structure
    pointed by ADDR. */
@@ -34,18 +37,14 @@ entry (unsigned long magic, unsigned long addr)
 	/*file system test variables*/
 
 	uint32_t fileSys_startAddr;
-	uint8_t buffer_0[6000] = {0};
-	uint8_t buffer_1[6000] = {0};
-	uint8_t testchar[2] = {0};
-	testchar[0] = 'a';
-	testchar[1] = 's';
-	testchar[2] = 'd';
+	uint8_t buffer_0[file_buff_size] = {0};
+	uint8_t buffer_1[file_buff_size] = {0};
 
 	uint32_t offset;
 
 	/*paging test variables*/
 	uint32_t test_phys_addr;
-	uint32_t test_virt_addr = 0x00005111;
+	uint32_t test_virt_addr = test_virt;
 	uint32_t test_val;
 	
 	/*RTC test variables*/
@@ -226,21 +225,23 @@ entry (unsigned long magic, unsigned long addr)
 
 	/*open rtc*/
 	fd_rtc = open((uint8_t*)"rtc");
-	//display_printf(" rtc fd Num: %d\n",fd_rtc );
 	sti();
+	
 	/* Execute the first program (`shell') ... */
 	
 	/********TESTING FILE SYSTEM*******/
 	/*open a directory file*/
+	/*
 	fd_dir = open((uint8_t*)".");
 	while(read(fd_dir, buffer_0, 4))
 	{
 		display_printf("%s\n",(int8_t*)buffer_0);
 	}
 	close(fd_dir);
+	*/
 
 	fd_dir = open((uint8_t*)".");
-	while(read(fd_dir, buffer_0, 32))
+	while(read(fd_dir, buffer_0, file_name_max_size))
 	{
 		display_printf("%s\n",(int8_t*)buffer_0);
 	}
@@ -249,17 +250,19 @@ entry (unsigned long magic, unsigned long addr)
 	/*open a regular file*/
 	 fd_file = open((uint8_t*)"verylargetxtwithverylongname.tx");
 
-
-	if(read(fd_file, buffer_1, 32) != -1){
-		display_printf("TEXT READ:\n ");
+	 //33 is temporary testing. chagne it to some other number to test
+	if(read(fd_file, buffer_1, 33) != -1){
+		buffer_1[33] = '\0';
+		display_printf("TEXT READ:\n");
 		display_printf("%s\n",(int8_t *)buffer_1);	
 	}
 	else {
 		display_printf("The end of the file has been reached!!\n");
 	}
  	offset = 0;
-	if((offset = read(fd_file, buffer_1, 90)) != -1){
-		display_printf("TEXT READ:\n ");
+	if((offset = read(fd_file, buffer_1, file_buff_size)) != -1){
+		buffer_1[file_buff_size] = '\0';
+		display_printf("TEXT READ:\n");
 		display_printf("%s\n",(int8_t *)buffer_1);	
 		display_printf("number of Bytes read: %d \n",offset);
 	}
@@ -283,12 +286,9 @@ entry (unsigned long magic, unsigned long addr)
 		//rtc read write test
 		write(fd_rtc,rtc_buff+rtc_index, rtc_num_byte);
 		read(fd_rtc, rtc_read_buf, rtc_num_byte);
-		printf("rtc index: %d \n", rtc_index);
-		//rtc_index = (rtc_index+1)%rtc_buff_size;
 		rtc_index++;
-		if(rtc_index == 5)
+		if(rtc_index == rtc_buff_size)
 			rtc_index = 0;
-
 	}
 	
 
