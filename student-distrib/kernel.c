@@ -34,8 +34,6 @@ entry (unsigned long magic, unsigned long addr)
 	/*file system test variables*/
 
 	uint32_t fileSys_startAddr;
-	dentry_t dentry;
-	uint32_t index;
 	uint8_t buffer_0[6000] = {0};
 	uint8_t buffer_1[6000] = {0};
 	uint8_t testchar[2] = {0};
