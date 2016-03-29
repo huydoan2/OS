@@ -276,7 +276,7 @@ entry (unsigned long magic, unsigned long addr)
 	file_size = get_fileSize((uint8_t*)"frame0.txt");
 	if(file_size != -1){
 		display_printf("file name: %s\n", "frame0.txt");
-		display_printf("file size: %d\n", file_size);
+		display_printf("file size: %d Bytes\n", file_size);
 	}
 	/*print end of file reached statement*/
 	// if((offset = read(fd_file, buffer_1, file_buff_size)) != -1){
