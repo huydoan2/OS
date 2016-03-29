@@ -64,6 +64,8 @@ entry (unsigned long magic, unsigned long addr)
 	int32_t fd_file;
 	int32_t fd_dir;
 
+	int32_t file_size;
+
 	/* Clear the screen. */
 	clear();
 
@@ -270,6 +272,12 @@ entry (unsigned long magic, unsigned long addr)
 		display_printf("The end of the file has been reached!!\n");
 	}
 
+	/*obtain the size of a given file*/
+	file_size = get_fileSize((uint8_t*)"frame0.txt");
+	if(file_size != -1){
+		display_printf("file name: %s\n", "frame0.txt");
+		display_printf("file size: %d\n", file_size);
+	}
 	/*print end of file reached statement*/
 	// if((offset = read(fd_file, buffer_1, file_buff_size)) != -1){
 	// 	buffer_1[file_buff_size] = '\0';

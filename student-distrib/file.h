@@ -43,6 +43,9 @@ extern int32_t file_read(int32_t* buff, uint32_t offset, int32_t num_bytes);
 //write function for file
 extern int32_t file_write(int32_t* buff, int32_t num_bytes);
 
+/*helper function to the size of the file*/
+extern int32_t get_fileSize(const uint8_t* filename);
+
 //bootblock starting address
 /*
 || Joel's note on the BOOTBLOCK:
