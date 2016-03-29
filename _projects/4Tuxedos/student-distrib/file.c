@@ -355,4 +355,26 @@ uint8_t * get_block_addr(int32_t block_num)
 	return (uint8_t *)(datablock_startAddr + (BLOCK_SIZE/4) * block_num);
 }
 
+/* 
+ * get_fileSize
+ *   DESCRIPTION: obtain the size of the file given the file name 
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: - filename: the name of the file 
 
+ *   OUTPUTS: none
+ *   RETURN VALUE:the size of the file with the given filename
+ *   - if there is no match, the return value is -1
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: none
+ */int32_t get_fileSize(const uint8_t* filename){
+	dentry_t dentry;
+	int32_t inode_num;
+	
+	/*obtain the directory entry by filename*/
+	if (read_dentry_by_name(filename, &dentry) == -1)
+		return -1;
+	//obtain the inode number
+	inode_num = dentry.inode_num;
+	return inode_array[inode_num].length_in_B;
+
+}
