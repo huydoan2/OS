@@ -235,6 +235,21 @@ int32_t read_dentry_by_index(uint32_t index, struct dentry_t* dentry)
 	return 0;
 }
 
+
+/* 
+ * read_data
+ *   DESCRIPTION: read data of given inode within valid range
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: - inode: location of data to be read
+ 			 - offset: offset of where to start reading
+ 			 - buf: stores data being read
+ 			 -length: length of how many bytes to read
+ *   OUTPUTS: - buf: data read from inode
+ *   RETURN VALUE: -1: failed 
+ 					success: number of bytes read
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: - store target directory entry into dentry
+ */
 int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length)
 {
 	
