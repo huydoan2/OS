@@ -250,7 +250,7 @@ entry (unsigned long magic, unsigned long addr)
 	close(fd_dir);
 
 	/*open a regular file*/
-	 fd_file = open((uint8_t*)"verylargetxtwithverylongname.tx");
+	 fd_file = open((uint8_t*)"frame0.txt");
 
 	 //33 is temporary testing. chagne it to some other number to test
 	if(read(fd_file, buffer_1, 33) != -1){
