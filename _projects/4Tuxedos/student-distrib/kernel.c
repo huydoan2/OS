@@ -232,12 +232,12 @@ entry (unsigned long magic, unsigned long addr)
 	/********TESTING FILE SYSTEM*******/
 	/*open a directory file*/
 	
-	// fd_dir = open((uint8_t*)".");
-	// while(read(fd_dir, buffer_0, 4))
-	// {
-	// 	display_printf("%s\n",(int8_t*)buffer_0);
-	// }
-	// close(fd_dir);
+	fd_dir = open((uint8_t*)".");
+	while(read(fd_dir, buffer_0, 4))
+	{
+		display_printf("%s\n",(int8_t*)buffer_0);
+	}
+	close(fd_dir);
 	
 
 	fd_dir = open((uint8_t*)".");

@@ -17,7 +17,7 @@ syscalls:
         pushl %ecx			#for c calling convention
         pushl %ebx
         leal jumb_table(,%eax,4), %eax        #push the address of the function to eax
-        call %eax			#call the appropriate function
+        call %eax			#call the appropriate function, it should be a memory indirect call which executes the function located at address pointed by %eax
         /*tear off the KERNEL STACK*/
         popl %ebx
         popl %ecx
