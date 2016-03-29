@@ -16,9 +16,9 @@ typedef int32_t (*readFunc_ptr)(int32_t*, uint32_t, int32_t);
 typedef int32_t (*writeFunc_ptr)(int32_t*, int32_t);
 typedef int32_t (*closeFunc_ptr)();
 
-
+/*function operation structure */
 typedef struct fop{
-	openFunc_ptr open_ptr;
+	openFunc_ptr open_ptr; 
 	readFunc_ptr read_ptr;
 	writeFunc_ptr write_ptr;
 	closeFunc_ptr close_ptr;
