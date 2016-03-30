@@ -220,7 +220,6 @@ void keyboard_handler()
 	    lb_index++;
 		line_buffer[lb_index] = c;
 		enter_flag = 1;
-		reset_linebuffer();	//reset line buffer by reset the index
 		newline();
 	}
 	//handle the backspace input
@@ -259,7 +258,12 @@ void keyboard_handler()
  */
 void reset_linebuffer()
 {	
-	lb_index = -1;	
+	int i;
+	for (i = 0; i < lb_index; ++i)
+	{
+		line_buffer[i] = 0;
+	}
+	lb_index = -1;
 }
 
 /* 
@@ -326,11 +330,13 @@ int32_t keyboard_read(char * buff, int num_bytes)
 	while(enter_flag == 0);
  	enter_flag = 0;
  	//copy the characters in the line buffer
- 	while(line_buffer[i] != '\n' && i < num_bytes )
+ 	while(line_buffer[i] != '\n' && i < num_bytes)
  	{
  		buff[i] = line_buffer[i];
  		i++;
  	}
+ 	reset_linebuffer();	//reset line buffer by reset the index
+		
  	return i;
 }
 
@@ -354,11 +360,12 @@ int32_t keyboard_write(char * buff, int num_bytes)
 	if(buff == NULL || num_bytes < 0)
 		return -1;
 	//write character to the screen
-	while(buff[i] != '\0' && i < num_bytes)
+	while(i < num_bytes)
 	{
 		display_c(buff[i]);
 		i++;
 	}
+	printf("\n");	
 	return i;
 }
 

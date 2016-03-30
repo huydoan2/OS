@@ -783,7 +783,6 @@ display_s(int8_t* s)
 		display_c(s[index]);
 		index++;
 	}
-
 	return index;
 }
 
