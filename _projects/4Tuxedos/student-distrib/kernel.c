@@ -232,15 +232,12 @@ entry (unsigned long magic, unsigned long addr)
 	
 	/********TESTING FILE SYSTEM*******/
 	/*open a directory file*/
-	
 	fd_dir = open((uint8_t*)".");
 	while(read(fd_dir, buffer_0, 4))
 	{
 		printf("%s\n",buffer_0);
 	}
 	close(fd_dir);
-	
-
 	fd_dir = open((uint8_t*)".");
 	while(read(fd_dir, buffer_0, file_name_max_size))
 	{
@@ -248,31 +245,33 @@ entry (unsigned long magic, unsigned long addr)
 	}
 	close(fd_dir);
 
-	/*open a regular file*/
+	/*open a regular file and read*/
 	 fd_file = open((uint8_t*)"frame0.txt");
-
-	 //33 is temporary testing. chagne it to some other number to test
-	if((offset = read(fd_file, buffer_1, 33)) != 0){
+	if((offset = read(fd_file, buffer_1, 33)) != 0)
+	{
 		printf("TEXT READ:\n");
 		keyboard_write((int8_t *)buffer_1,offset);
 		printf("number of Bytes read: %d \n",offset);
 	}
-	else {
+	else 
+	{
 		printf("The end of the file has been reached!!\n");
 	}
-	offset = 0;
-	if((offset = read(fd_file, buffer_1, file_buff_size)) != 0){
+	if((offset = read(fd_file, buffer_1, file_buff_size)) != 0)
+	{
 		printf("TEXT READ:\n");
 		keyboard_write((int8_t *)buffer_1,offset);
 		printf("number of Bytes read: %d \n",offset);
 	}
-	else {
+	else 
+	{
 		printf("The end of the file has been reached!!\n");
 	}
 
 	/*obtain the size of a given file*/
 	file_size = get_fileSize((uint8_t*)"frame0.txt");
-	if(file_size != -1){
+	if(file_size != -1)
+	{
 		printf("file name: %s\n", "frame0.txt");
 		printf("file size: %d Bytes\n", file_size);
 	}
