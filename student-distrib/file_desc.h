@@ -2,7 +2,7 @@
 #include "types.h"
 
 
-#define PCB_SIZE 8
+#define FD_SIZE 8
 #define NUM_OP 4
 #define OPEN 0
 #define READ 1
@@ -23,7 +23,7 @@ typedef struct fop{
 	writeFunc_ptr write_ptr;
 	closeFunc_ptr close_ptr;
 } fop_t;
-/*sturcure for one PCB*/
+/*sturcure for one FD*/
 typedef struct file_desc{
 	fop_t fops;
 	uint32_t inode;
@@ -32,9 +32,9 @@ typedef struct file_desc{
 }file_decs_t;
 
 /*initialize the file descriptor array*/
-extern void init_PCB();
+extern void init_FD();
 
-/*check if the PCB array has vacancy*/
+/*check if the FD array has vacancy*/
 int check_avail();
 
 /*common system calls*/

@@ -221,7 +221,7 @@ entry (unsigned long magic, unsigned long addr)
 
 	clear(); //need to clear screen in terminal driver init
 	parsing_fileSystem(fileSys_startAddr); //initialize file system
-	init_PCB();
+	init_FD();
 
 
 	/*open rtc*/
