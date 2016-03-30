@@ -25,7 +25,7 @@
 #define rtc_buff_size 5
 #define file_name_max_size 32
 #define test_virt 0x00005111
-#define file_buff_size 6000
+#define file_buff_size 6200
 
 /* Check if MAGIC is valid and print the Multiboot information structure
    pointed by ADDR. */
@@ -53,7 +53,7 @@ entry (unsigned long magic, unsigned long addr)
 	int rtc_read_buf[rtc_buff_size] = {2,4,8,16,32};
 
 	/*keyboard and terminal test variables*/
-	int i;
+	int keyboard_write_index;
 	char buff[size_of_keys];
 	int num_byte = size_of_keys;
 	int32_t * buf;
@@ -197,12 +197,11 @@ entry (unsigned long magic, unsigned long addr)
 
 	/* Init the PIC */
 	i8259_init();
-
+	rtc_init();
 	/* Initialize devices, memory, filesystem, enable device interrupts on the
 	 * PIC, any other initialization stuff... */
 	keyboard_open();
 	//rtc_open(buf, num_bytes);
-	
 	paging_init();
 
 	/*test the memory accessing by paging */
@@ -237,7 +236,7 @@ entry (unsigned long magic, unsigned long addr)
 	fd_dir = open((uint8_t*)".");
 	while(read(fd_dir, buffer_0, 4))
 	{
-		display_printf("%s\n",(int8_t*)buffer_0);
+		printf("%s\n",buffer_0);
 	}
 	close(fd_dir);
 	
@@ -245,7 +244,7 @@ entry (unsigned long magic, unsigned long addr)
 	fd_dir = open((uint8_t*)".");
 	while(read(fd_dir, buffer_0, file_name_max_size))
 	{
-		display_printf("%s\n",(int8_t*)buffer_0);
+		printf("%s\n",buffer_0);
 	}
 	close(fd_dir);
 
@@ -253,53 +252,43 @@ entry (unsigned long magic, unsigned long addr)
 	 fd_file = open((uint8_t*)"frame0.txt");
 
 	 //33 is temporary testing. chagne it to some other number to test
-	if(read(fd_file, buffer_1, 33) != -1){
-		buffer_1[33] = '\0';
-		display_printf("TEXT READ:\n");
-		display_printf("%s\n",(int8_t *)buffer_1);	
+	if((offset = read(fd_file, buffer_1, 33)) != 0){
+		printf("TEXT READ:\n");
+		keyboard_write((int8_t *)buffer_1,offset);
+		printf("number of Bytes read: %d \n",offset);
 	}
 	else {
-		display_printf("The end of the file has been reached!!\n");
+		printf("The end of the file has been reached!!\n");
 	}
- 	offset = 0;
-	if((offset = read(fd_file, buffer_1, file_buff_size)) != -1){
-		buffer_1[file_buff_size] = '\0';
-		display_printf("TEXT READ:\n");
-		display_printf("%s\n",(int8_t *)buffer_1);	
-		display_printf("number of Bytes read: %d \n",offset);
+	offset = 0;
+	if((offset = read(fd_file, buffer_1, file_buff_size)) != 0){
+		printf("TEXT READ:\n");
+		keyboard_write((int8_t *)buffer_1,offset);
+		printf("number of Bytes read: %d \n",offset);
 	}
 	else {
-		display_printf("The end of the file has been reached!!\n");
+		printf("The end of the file has been reached!!\n");
 	}
 
 	/*obtain the size of a given file*/
 	file_size = get_fileSize((uint8_t*)"frame0.txt");
 	if(file_size != -1){
-		display_printf("file name: %s\n", "frame0.txt");
-		display_printf("file size: %d Bytes\n", file_size);
+		printf("file name: %s\n", "frame0.txt");
+		printf("file size: %d Bytes\n", file_size);
 	}
-	/*print end of file reached statement*/
-	// if((offset = read(fd_file, buffer_1, file_buff_size)) != -1){
-	// 	buffer_1[file_buff_size] = '\0';
-	// 	display_printf("TEXT READ:\n");
-	// 	display_printf("%s\n",(int8_t *)buffer_1);	
-	// 	display_printf("number of Bytes read: %d \n",offset);
-	// }
-	// else {
-	// 	display_printf("The end of the file has been reached!!\n");
-	// }
+	
 	
 	/********TESTING READ AND WRITE for Terminal and RTC*******/
 	while(1)
 	{
 		//keyboard read write test
-		i = keyboard_read(buff, num_byte);
-		keyboard_write(buff, num_byte);
-		printf("\nbytes written = %d\n",i);
-		while(i>=0)
+		keyboard_write_index = keyboard_read(buff, num_byte);
+		keyboard_write(buff, keyboard_write_index);
+		printf("bytes written = %d\n",keyboard_write_index);
+		while(keyboard_write_index>=0)
 		{		
-			buff[i] = 0;
-			i--;
+			buff[keyboard_write_index] = 0;
+			keyboard_write_index--;
 		}
 		//rtc read write test
 		write(fd_rtc,rtc_buff+rtc_index, rtc_num_byte);

@@ -170,7 +170,6 @@ void rtc_set_rate()
 int32_t rtc_open()
 {
 	interrupt_flag = 0;
-	rtc_init();
 	return 0;
 }
 
@@ -187,7 +186,6 @@ int32_t rtc_open()
  */
 int32_t rtc_close()
 {
-	disable_irq(RTC_IRQ_8);
 	return 0;
 }
 
