@@ -9,46 +9,46 @@
 #define NOTUSE 0
 
 
-/*PCB array*/
-file_decs_t PCB[PCB_SIZE];
+/*FD array*/
+file_decs_t FD[FD_SIZE];
 /* 
- * init_PCB
- *   DESCRIPTION: initialize the array of the PCBs
+ * init_FD
+ *   DESCRIPTION: initialize the array of the FDs
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
  *   OUTPUTS: none
  *   RETURN VALUE: none
  *-----------------------------------------------------------------------------------
- *   SIDE EFFECTS: every PCB now has the flag indicates not in use
+ *   SIDE EFFECTS: every FD now has the flag indicates not in use
  *
  */
-void init_PCB(){
+void init_FD(){
 	int i;
 	/*initialize file position and flag*/
-	for (i = 0; i < PCB_SIZE; ++i){
-		PCB[i].file_pos = 0;
-	    PCB[i].flags = NOTUSE;
+	for (i = 0; i < FD_SIZE; ++i){
+		FD[i].file_pos = 0;
+	    FD[i].flags = NOTUSE;
 	}
 }
 
 /* 
  * check_avail
- *   DESCRIPTION: find the first availible PCB block in the array 
+ *   DESCRIPTION: find the first availible FD block in the array 
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
  *   OUTPUTS: none
- *   RETURN VALUE: the index of the first availible PCB block
+ *   RETURN VALUE: the index of the first availible FD block
  *-----------------------------------------------------------------------------------
  *   SIDE EFFECTS: none
  *
  */
 int check_avail(){
 	int i;
-	/*traverse through the PCB size and for the first empty*/
+	/*traverse through the FD size and for the first empty*/
 	//start from 2 to leave space for stdin and stdout
-	for (i = 2; i < PCB_SIZE; ++i){
+	for (i = 2; i < FD_SIZE; ++i){
 		
-	    if (PCB[i].flags == NOTUSE){
+	    if (FD[i].flags == NOTUSE){
 	    	return i;
 	    }
 	}
@@ -59,11 +59,11 @@ int check_avail(){
 
 /* 
  * open
- *   DESCRIPTION: create a new PCB, call the specific open function
+ *   DESCRIPTION: create a new FD, call the specific open function
  *-----------------------------------------------------------------------------------
  *   INPUTS: - filename: the name of the file to be opened
  *   OUTPUTS: none
- *   RETURN VALUE: the index of PCB block that stores the newly opened fd (fd value)
+ *   RETURN VALUE: the index of FD block that stores the newly opened fd (fd value)
  *-----------------------------------------------------------------------------------
  *   SIDE EFFECTS: none
  *
@@ -72,9 +72,9 @@ int32_t open_fd(const uint8_t* filename)
 {
 	dentry_t dentry;
 	file_decs_t fd;
-	int PCB_idx;
-	/*check if the PCB array has empty spaces*/
-	if ((PCB_idx = check_avail()) == -1){
+	int FD_idx;
+	/*check if the FD array has empty spaces*/
+	if ((FD_idx = check_avail()) == -1){
 		return -1;
 	} 
 	/*obtain the directory entry by filename*/
@@ -120,12 +120,12 @@ int32_t open_fd(const uint8_t* filename)
 	fd.flags = INUSE;
 
 	//put the file descriptor to the fd array
-	PCB[PCB_idx] = fd;
+	FD[FD_idx] = fd;
 
 	//return the index of the fd
 	fd.fops.open_ptr();
 
-	return PCB_idx;
+	return FD_idx;
 
 	
 }
@@ -145,12 +145,12 @@ int32_t read_fd(int32_t fd, void * buf, int32_t nbytes)
 {
 	uint32_t offset = 0;
 	int ret_val;
-	file_decs_t cur_fd = PCB[fd];
+	file_decs_t cur_fd = FD[fd];
 	*(int32_t*)buf = cur_fd.inode;
 	offset = cur_fd.file_pos;
 
 	ret_val = cur_fd.fops.read_ptr((int32_t*)buf, offset,nbytes);
-	PCB[fd].file_pos += ret_val;
+	FD[fd].file_pos += ret_val;
 
 	return ret_val;
 }
@@ -158,7 +158,7 @@ int32_t read_fd(int32_t fd, void * buf, int32_t nbytes)
  * write
  *   DESCRIPTION: call the write function associated with the give fd
  *-----------------------------------------------------------------------------------
- *   INPUTS: - fd: index of the PCB array
+ *   INPUTS: - fd: index of the FD array
  *			 - nbytes: number of bytes to read from the file
  *			 - buf: extra parameter, may be unused, depending on the type of the file
  *   OUTPUTS: 
@@ -170,7 +170,7 @@ int32_t read_fd(int32_t fd, void * buf, int32_t nbytes)
 
 int32_t write_fd(int32_t fd, const void * buf, int32_t nbytes)
 {
-	file_decs_t cur_fd = PCB[fd];
+	file_decs_t cur_fd = FD[fd];
 
 	return cur_fd.fops.write_ptr((int32_t*)buf, nbytes);
 
@@ -180,21 +180,21 @@ int32_t write_fd(int32_t fd, const void * buf, int32_t nbytes)
 
 /* 
  * close
- *   DESCRIPTION: close a file, remove the PCB from the array (by changing the flag)
+ *   DESCRIPTION: close a file, remove the FD from the array (by changing the flag)
  *-----------------------------------------------------------------------------------
- *   INPUTS: - fd: index of the PCB array
+ *   INPUTS: - fd: index of the FD array
 
  *   OUTPUTS: 
  *   RETURN VALUE: 0 for successed and -1 for failed
  *-----------------------------------------------------------------------------------
- *   SIDE EFFECTS: the PCB with the index 'fd' is unoccupied now
+ *   SIDE EFFECTS: the FD with the index 'fd' is unoccupied now
  *
  */
 
 int32_t close_fd(int32_t fd)
 {
-	file_decs_t cur_fd = PCB[fd];
-	PCB[fd].flags = NOTUSE;
+	file_decs_t cur_fd = FD[fd];
+	FD[fd].flags = NOTUSE;
 	return cur_fd.fops.close_ptr();	
 }
 
