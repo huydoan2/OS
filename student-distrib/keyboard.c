@@ -362,7 +362,7 @@ int32_t keyboard_write(char * buff, int num_bytes)
 	//write character to the screen
 	while(i < num_bytes)
 	{
-		display_c(buff[i]);
+		putc(buff[i]);
 		i++;
 	}
 	printf("\n");	
