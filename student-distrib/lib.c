@@ -329,12 +329,13 @@ putc(uint8_t c)
     if(c == '\n' || c == '\r') {
         screen_y++;
         screen_x=0;
-    } else {
+    } 
+    else {
         *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = c;
         *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1) + 1) = ATTRIB;
         screen_x++;
-        screen_x %= NUM_COLS;
-        screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
+	    screen_y = (screen_y + (screen_x / NUM_COLS));
+	    screen_x %= NUM_COLS;
     }
     if (screen_y > NUM_ROWS - 1)
 	{
@@ -343,7 +344,6 @@ putc(uint8_t c)
 	}
     cursor_update(screen_x, screen_y);
 }
-
 /*
 * int8_t* itoa(uint32_t value, int8_t* buf, int32_t radix);
 *   Inputs: uint32_t value = number to convert
