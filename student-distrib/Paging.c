@@ -12,6 +12,8 @@
 #define  PD_ENTRY_EMP_VAL 0x00000002
 #define  PD_ENTRY_INIT_VAL_0 0x00000103
 #define  PD_ENTRY_INIT_VAL_1 0x00000183
+#define  PD_ENTRY_INIT_VAL_2 0x00000083
+
 /*entry value for page table*/
 #define  PT_ENTRY_EMP_VAL 0x00000002
 #define  PT_ENTRY_INIT_VAL_0 0x00000103
@@ -26,6 +28,9 @@
 #define PHYS_ADDR_OFFSET_MASK_0 0x00000FFF//the mask for 4kB page
 #define PHYS_ADDR_OFFSET_MASK_1 0x003FFFFF//the mask for 4MB page
 #define PAGE_SIZE_MASK 0x0000080 //mask to extract the page size bit from the pd 
+
+#define FIRST_PROG 0x00800000 //8MB
+#define PROG_VIRTADDR 0x08000000
 
 
 /* 
@@ -54,17 +59,17 @@ void paging_init()
 	  	physAddr = PT_INCREMENT*i;
 		page_directory[i] = PD_ENTRY_EMP_VAL;
 		if (i == 0){
-			first_page_table[i] = (physAddr | PT_ENTRY_EMP_VAL);	//reserve the first entry in pt as NULL
+			page_table[i] = (physAddr | PT_ENTRY_EMP_VAL);	//reserve the first entry in pt as NULL
 		}
 		else
-			first_page_table[i] = (physAddr | PT_ENTRY_INIT_VAL_0);
+			page_table[i] = (physAddr | PT_ENTRY_INIT_VAL_0);
 
 	}
 
 
 	/*assign the first and second entry of the page directory*/
 	//set the first two enties of the PD
-	 page_directory[0] = ((unsigned int)first_page_table) | PD_ENTRY_INIT_VAL_0;
+	 page_directory[0] = ((unsigned int)page_table) | PD_ENTRY_INIT_VAL_0;
 	 //increment the physical address to the next segement 
 	 physAddr += PT_INCREMENT;
 	 page_directory[1] = ((physAddr )| PD_ENTRY_INIT_VAL_1);
@@ -177,10 +182,31 @@ uint32_t get_physAddr(uint32_t virtAddr){
 
 }
 
-/*
-void mapping_virt2Phys_Addr(uint32_t* physAddr, uint32_t* virtAddr, uint32_t val){
 
-    first_pt[index] = val;
+void mapping_virt2Phys_Addr(uint32_t physAddr, uint32_t virtAddr){
+
+
+    unsigned long pdindex = (unsigned long)virtAddr >> 22;
+    uint32_t CR3 = 0;    
+
+
+    // Create a large page 
+    page_directory[pdindex] = ((physAddr )| PD_ENTRY_INIT_VAL_2);
+
+    // Now you need to flush the entry in the TLB
+
+    asm volatile("mov %%CR3, %0":"=c"(CR3));
+	CR3 = (unsigned int)page_directory;
+	asm volatile("mov %0, %%CR3"::"c"(CR3));  	
+
+	
 }
 
-*/
+
+void map_page(uint32_t pid){
+	uint32_t prog_startAddr = FIRST_PROG * (pid+1);
+
+	mapping_virt2Phys_Addr(prog_startAddr, PROG_VIRTADDR);
+}
+
+
