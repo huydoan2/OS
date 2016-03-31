@@ -20,7 +20,7 @@
 
 /*declare the page directory and the first page table*/
 uint32_t page_directory[MAX_SIZE]   __attribute__((aligned( MAX_SIZE*4)));
-uint32_t first_page_table[MAX_SIZE] __attribute__((aligned( MAX_SIZE*4)));
+uint32_t page_table[MAX_SIZE] __attribute__((aligned( MAX_SIZE*4)));
 
 /*function that initializes the page dir, page table and enable paging*/
 void paging_init();
@@ -33,9 +33,9 @@ void fill_pt_entry(uint32_t * pt, int index, uint32_t val);
 /*functions that might be useful in the future for manipulating the paging*/
 uint32_t get_physAddr(uint32_t  virtAddr);
 
-//void mapping_virt2Phys_Addr(uint32_t* physAddr, uint32_t* virtAddr, uint32_t val);
+void mapping_virt2Phys_Addr(uint32_t physAddr, uint32_t virtAddr);
 
-
+void map_page(uint32_t pid);
 
 
 

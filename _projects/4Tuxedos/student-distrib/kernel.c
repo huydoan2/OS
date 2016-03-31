@@ -24,7 +24,11 @@
 #define rtc_num_byte 4
 #define rtc_buff_size 5
 #define file_name_max_size 32
-#define test_virt 0x00005111
+#define test_virt_1 0x00800000
+#define test_virt 0x00400000
+
+
+#define test_phys 0x0000FFFF
 #define file_buff_size 6200
 
 /* Check if MAGIC is valid and print the Multiboot information structure
@@ -204,11 +208,23 @@ entry (unsigned long magic, unsigned long addr)
 	//rtc_open(buf, num_bytes);
 	paging_init();
 
-	/*test the memory accessing by paging */
-	test_phys_addr = get_physAddr(test_virt_addr);
+	/* test the memory accessing by paging */
+	test_phys_addr = get_physAddr(0x00400000+8);
 	test_val = *((uint32_t *)test_phys_addr);
 	printf("memory: %x\n", test_val);
-	
+
+
+	printf("reach here ! \n");
+	uint32_t virtual_addr = 0x08000000;
+	mapping_virt2Phys_Addr(0x00800000, 0x08000000);
+	test_phys_addr = get_physAddr(0x08000000);
+
+	printf("memory: %x\n", test_phys_addr);
+
+	test_val = *((uint32_t *)virtual_addr);
+
+
+
 	/*Set up IDT to handle system calls*/
 
 
@@ -218,8 +234,7 @@ entry (unsigned long magic, unsigned long addr)
 	 * without showing you any output */
 	printf("Enabling Interrupts\n");
 
-
-	clear(); //need to clear screen in terminal driver init
+	//clear(); //need to clear screen in terminal driver init
 	parsing_fileSystem(fileSys_startAddr); //initialize file system
 	init_FD();
 
@@ -232,49 +247,49 @@ entry (unsigned long magic, unsigned long addr)
 	
 	/********TESTING FILE SYSTEM*******/
 	/*open a directory file*/
-	fd_dir = open((uint8_t*)".");
-	while(read(fd_dir, buffer_0, 4))
-	{
-		printf("%s\n",buffer_0);
-	}
-	close(fd_dir);
-	fd_dir = open((uint8_t*)".");
-	while(read(fd_dir, buffer_0, file_name_max_size))
-	{
-		printf("%s\n",buffer_0);
-	}
-	close(fd_dir);
+	// fd_dir = open((uint8_t*)".");
+	// while(read(fd_dir, buffer_0, 4))
+	// {
+	// 	printf("%s\n",buffer_0);
+	// }
+	// close(fd_dir);
+	// fd_dir = open((uint8_t*)".");
+	// while(read(fd_dir, buffer_0, file_name_max_size))
+	// {
+	// 	printf("%s\n",buffer_0);
+	// }
+	// close(fd_dir);
 
-	/*open a regular file and read*/
-	 fd_file = open((uint8_t*)"frame0.txt");
-	if((offset = read(fd_file, buffer_1, 33)) != 0)
-	{
-		printf("TEXT READ:\n");
-		keyboard_write((int8_t *)buffer_1,offset);
-		printf("number of Bytes read: %d \n",offset);
-	}
-	else 
-	{
-		printf("The end of the file has been reached!!\n");
-	}
-	if((offset = read(fd_file, buffer_1, file_buff_size)) != 0)
-	{
-		printf("TEXT READ:\n");
-		keyboard_write((int8_t *)buffer_1,offset);
-		printf("number of Bytes read: %d \n",offset);
-	}
-	else 
-	{
-		printf("The end of the file has been reached!!\n");
-	}
+	// /*open a regular file and read*/
+	//  fd_file = open((uint8_t*)"frame0.txt");
+	// if((offset = read(fd_file, buffer_1, 33)) != 0)
+	// {
+	// 	printf("TEXT READ:\n");
+	// 	keyboard_write((int8_t *)buffer_1,offset);
+	// 	printf("number of Bytes read: %d \n",offset);
+	// }
+	// else 
+	// {
+	// 	printf("The end of the file has been reached!!\n");
+	// }
+	// if((offset = read(fd_file, buffer_1, file_buff_size)) != 0)
+	// {
+	// 	printf("TEXT READ:\n");
+	// 	keyboard_write((int8_t *)buffer_1,offset);
+	// 	printf("number of Bytes read: %d \n",offset);
+	// }
+	// else 
+	// {
+	// 	printf("The end of the file has been reached!!\n");
+	// }
 
-	/*obtain the size of a given file*/
-	file_size = get_fileSize((uint8_t*)"frame0.txt");
-	if(file_size != -1)
-	{
-		printf("file name: %s\n", "frame0.txt");
-		printf("file size: %d Bytes\n", file_size);
-	}
+	// /*obtain the size of a given file*/
+	// file_size = get_fileSize((uint8_t*)"frame0.txt");
+	// if(file_size != -1)
+	// {
+	// 	printf("file name: %s\n", "frame0.txt");
+	// 	printf("file size: %d Bytes\n", file_size);
+	// }
 	
 	
 	/********TESTING READ AND WRITE for Terminal and RTC*******/
