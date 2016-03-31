@@ -2,26 +2,29 @@
 #define ASM 1
 #include "../syscalls/ece391sysnum.h"
 #include "file_desc.h"
+#include "syscall_linkage.h"
 
 
 .data
 	TABLE_SIZE = 10
 	FAIL_VALUE = -1
+.section .text
 
-.text
-.globl syscalls
+.globl syscalls     
+.type syscalls, @function
 syscalls:        
         cmpl $TABLE_SIZE, %eax
         ja syscalls_default        
         pushl %edx			#push all 3 argument to KERNEL STACK
         pushl %ecx			#for c calling convention
         pushl %ebx
-        leal jumb_table(,%eax,4), %eax        #push the address of the function to eax
+        dec %eax
+        movl jumb_table(,%eax,4), %eax        #push the address of the function to eax
         call *%eax			#call the appropriate function
         /*tear off the KERNEL STACK*/
         popl %ebx
         popl %ecx
-        popl %edx
+        popl %edx        
         iret		#return from interrupt
 syscalls_default:
         /* return -1 */
@@ -43,14 +46,13 @@ name:   PUSHL	%EBX          ;\
 	RET
 
 /* the system call library wrappers */
-# DO_CALL(halt,SYS_HALT)
-# DO_CALL(execute,SYS_EXECUTE)
-# DO_CALL(read,SYS_READ)
-# DO_CALL(write,SYS_WRITE)
-# DO_CALL(open,SYS_OPEN)
-# DO_CALL(close,SYS_CLOSE)
-# DO_CALL(getargs,SYS_GETARGS)
-# DO_CALL(vidmap,SYS_VIDMAP)
-# DO_CALL(set_handler,SYS_SET_HANDLER)
-# DO_CALL(sigreturn,SYS_SIGRETURN)
-
+DO_CALL(halt,SYS_HALT)
+DO_CALL(execute,SYS_EXECUTE)
+DO_CALL(read,SYS_READ)
+DO_CALL(write,SYS_WRITE)
+DO_CALL(open,SYS_OPEN)
+DO_CALL(close,SYS_CLOSE)
+DO_CALL(getargs,SYS_GETARGS)
+DO_CALL(vidmap,SYS_VIDMAP)
+DO_CALL(set_handler,SYS_SET_HANDLER)
+DO_CALL(sigreturn,SYS_SIGRETURN)
