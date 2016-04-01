@@ -1,4 +1,4 @@
-/* keyboard.c
+    /* keyboard.c
  * - scancode lookup array
  * - key stroke output functions
  * - keyboard initialization functions
@@ -319,11 +319,16 @@ int32_t keyboard_close()
  *			- the line buffer and its index variable are cleared 
  *
  */
-int32_t keyboard_read(char * buff, int num_bytes)
+
+
+
+int32_t keyboard_read(int32_t * buff, uint32_t offset, int32_t num_bytes)
 {
+	
 	int i = 0;
+	char* read_buff = (char*)buff;
 	//check if the input is valid
-	if(buff == NULL)
+	if(read_buff  == NULL)
 		return -1;
 
 	//wait for the user to finish typing (hit enter)
@@ -332,9 +337,10 @@ int32_t keyboard_read(char * buff, int num_bytes)
  	//copy the characters in the line buffer
  	while(line_buffer[i] != '\n' && i < num_bytes)
  	{
- 		buff[i] = line_buffer[i];
+ 		read_buff [i] = line_buffer[i];
  		i++;
  	}
+ 	buff = (int32_t*)read_buff;
  	reset_linebuffer();	//reset line buffer by reset the index
 		
  	return i;
@@ -353,16 +359,17 @@ int32_t keyboard_read(char * buff, int num_bytes)
  *			- characters passed in by the buffer are displayed on the screen
  *
  */
-int32_t keyboard_write(char * buff, int num_bytes)
+int32_t keyboard_write(int32_t * buff, int32_t num_bytes)
 {
 	int i =0;
+	char*write_buff = (char*)buff;
 	//Check if the inputs are valid
 	if(buff == NULL || num_bytes < 0)
 		return -1;
 	//write character to the screen
 	while(i < num_bytes)
 	{
-		putc(buff[i]);
+		putc(write_buff[i]);
 		i++;
 	}
 	printf("\n");	

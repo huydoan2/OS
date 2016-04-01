@@ -1,6 +1,7 @@
 #include "file_desc.h"
 #include "file.h"
 #include "rtc.h"
+#include "keyboard.h"
 
 #define RTC 0
 #define DIR	1
@@ -22,6 +23,8 @@ file_decs_t FD[FD_SIZE];
  *   SIDE EFFECTS: every FD now has the flag indicates not in use
  *
  */
+
+
 void init_FD(){
 	int i;
 	/*initialize file position and flag*/
@@ -29,6 +32,24 @@ void init_FD(){
 		FD[i].file_pos = 0;
 	    FD[i].flags = NOTUSE;
 	}
+	//initialize the stdin and stdout
+	FD[0].fops.open_ptr = &keyboard_open;
+	FD[0].fops.close_ptr = &keyboard_close;
+	FD[0].fops.read_ptr = &keyboard_read;
+	FD[0].fops.write_ptr = &keyboard_write;
+	FD[0].inode = -1;
+	FD[0].file_pos = 0;
+	FD[0].flags = INUSE;
+
+	FD[1].fops.open_ptr = &keyboard_open;
+	FD[1].fops.close_ptr = &keyboard_close;
+	FD[1].fops.read_ptr = &keyboard_read;
+	FD[1].fops.write_ptr = &keyboard_write;
+	FD[1].inode = -1;
+	FD[1].file_pos = 0;
+	FD[1].flags = INUSE;
+
+
 }
 
 /* 

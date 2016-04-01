@@ -102,5 +102,7 @@ int32_t read_dentry_by_index(uint32_t index, struct dentry_t* dentry);
 /*function that reads data from the data block*/
 int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length);
 
+/*load a program image into the virtual address*/
+void prog_loader(const uint8_t* filename, uint32_t * virtAddr);
 #endif 
 

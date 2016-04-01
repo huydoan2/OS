@@ -366,7 +366,8 @@ uint8_t * get_block_addr(int32_t block_num)
  *   - if there is no match, the return value is -1
  *-----------------------------------------------------------------------------------
  *   SIDE EFFECTS: none
- */int32_t get_fileSize(const uint8_t* filename){
+ */
+ int32_t get_fileSize(const uint8_t* filename){
 	dentry_t dentry;
 	int32_t inode_num;
 	
@@ -378,3 +379,54 @@ uint8_t * get_block_addr(int32_t block_num)
 	return inode_array[inode_num].length_in_B;
 
 }
+
+/*load a program image into the virtual memory*/
+
+void prog_loader(const uint8_t* filename, uint32_t * virtAddr){
+
+	//get the data blocks for the program file 
+	dentry_t dentry;
+	int32_t inode_num;
+	uint8_t* vitr_startAddr = (uint8_t*) virtAddr;
+	uint8_t * datablk_startAddr;	
+	int32_t file_length = 0;
+	uint32_t i = 0;
+	uint32_t j;
+	uint32_t data_blk_idx = 0;
+
+	read_dentry_by_name(filename, &dentry);
+	inode_num = dentry.inode_num;
+	file_length = inode_array[inode_num].length_in_B;
+
+
+	//copy data from the data blocks
+    while(file_length > 0){
+    	
+    	datablk_startAddr = get_block_addr(inode_array[inode_num].data_block[data_blk_idx]);
+
+
+    	if(file_length < BLOCK_SIZE){
+		
+		 	for(j = 0; j < file_length; ++j)	//read the size of the length
+			{
+				vitr_startAddr[i] = (datablk_startAddr[j]);
+				i++;	
+			}
+			file_length = 0;		//finish reading, length is 0
+		}
+		else{ //if the length is larger thanthe lenght of a block
+			for(j = 0; j < BLOCK_SIZE; j++)
+			{
+				vitr_startAddr[i] = (datablk_startAddr[j]);
+				i++;
+			
+			}
+			file_length -= BLOCK_SIZE;	//decrement the length 
+		}
+       data_blk_idx++;
+
+
+    }
+
+}
+

@@ -3,7 +3,8 @@ syscall_linkage.o: syscall_linkage.S ../syscalls/ece391sysnum.h \
   file_desc.h types.h syscall_linkage.h
 x86_desc.o: x86_desc.S x86_desc.h types.h
 file.o: file.c file.h types.h lib.h
-file_desc.o: file_desc.c file_desc.h types.h file.h rtc.h i8259.h lib.h
+file_desc.o: file_desc.c file_desc.h types.h file.h rtc.h i8259.h lib.h \
+  keyboard.h
 i8259.o: i8259.c i8259.h types.h lib.h
 IDT.o: IDT.c IDT.h lib.h types.h x86_desc.h keyboard.h i8259.h rtc.h \
   syscall_linkage.h

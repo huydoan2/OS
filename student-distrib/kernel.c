@@ -216,7 +216,7 @@ entry (unsigned long magic, unsigned long addr)
 
 	printf("reach here ! \n");
 	uint32_t virtual_addr = 0x08000000;
-	mapping_virt2Phys_Addr(0x00800000, 0x08000000);
+	map_page(0);
 	test_phys_addr = get_physAddr(0x08000000);
 
 	printf("memory: %x\n", test_phys_addr);
@@ -290,14 +290,22 @@ entry (unsigned long magic, unsigned long addr)
 	// 	printf("file name: %s\n", "frame0.txt");
 	// 	printf("file size: %d Bytes\n", file_size);
 	// }
+	virtual_addr = 0x08048000;
+	prog_loader((uint8_t*)"frame0.txt", (uint32_t*)virtual_addr);
+	virtual_addr = 0x08048000;
+
 	
+	write(1, (int32_t*)virtual_addr,187);
+
+	
+
 	
 	/********TESTING READ AND WRITE for Terminal and RTC*******/
 	while(1)
 	{
 		//keyboard read write test
-		keyboard_write_index = keyboard_read(buff, num_byte);
-		keyboard_write(buff, keyboard_write_index);
+		keyboard_write_index = read(0,(int32_t*)buff, num_byte);
+		write(1, (int32_t*)buff, keyboard_write_index);
 		printf("bytes written = %d\n",keyboard_write_index);
 		while(keyboard_write_index>=0)
 		{		
