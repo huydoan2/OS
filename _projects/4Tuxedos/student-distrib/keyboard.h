@@ -40,10 +40,12 @@ extern int32_t keyboard_open();
 extern int32_t keyboard_close();
 
 //read function for keyboard
-extern int32_t keyboard_read(char * buff, int num_bytes);
+extern int32_t keyboard_read(int32_t*buff, uint32_t offset, int32_t num_bytes);
 
 //write function for keyboard
-extern int32_t keyboard_write(char * buff, int num_bytes);
+extern int32_t keyboard_write(int32_t*buff, int32_t num_bytes);
+
+
 
 #endif
 
