@@ -9,7 +9,7 @@
 
 typedef struct parent_info{
 	uint32_t pid;
-	uint32_t file_desc_t* fd_array;
+	/*uint32_t*/ file_decs_t* fd_array;
 } parent_info_t;
 
 typedef struct pcb_struct{
@@ -17,8 +17,8 @@ typedef struct pcb_struct{
 	uint32_t esp;
 	uint32_t ebp;
 	uint32_t eip;
-	file_desc_t* fd_array;
-	parent_info parent;
+	file_decs_t* fd_array;
+	parent_info_t parent;
 }pcb_struct_t;
 
 
