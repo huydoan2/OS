@@ -8,6 +8,7 @@
 #define mask 0xff
 #define EIGHT 8
 #define SEVEN 7
+#define TWO 2
 /* Interrupt masks to determine which interrupts
  * are enabled and disabled */
 uint8_t master_mask; /* IRQs 0-7 */
@@ -92,7 +93,9 @@ send_eoi(uint32_t irq_num)
 {
 	//if the interrupt request line's on the slave PIC
 	if(irq_num >= EIGHT)
+		outb(EOI | TWO, MASTER_COMMAND);
 		outb(EOI | (irq_num & SEVEN), SLAVE_COMMAND);
+
 	//if the interrupt request line's on the master PIC
 	else
 		outb(EOI | irq_num, MASTER_COMMAND);
