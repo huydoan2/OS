@@ -104,8 +104,7 @@ rtc_handler(void)
 	for (i=NUM_ROWS*NUM_COLS-2; i < NUM_ROWS*NUM_COLS; i++) {
 		video_mem[i<<1]++;
 	}
-
-	send_eoi(RTC_IRQ_2);
+	
 	send_eoi(RTC_IRQ_8);
 
 	outb(REGISTER_C , RTC_PORT);	// select register C
