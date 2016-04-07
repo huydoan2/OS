@@ -92,9 +92,10 @@ void
 send_eoi(uint32_t irq_num)
 {
 	//if the interrupt request line's on the slave PIC
-	if(irq_num >= EIGHT)
+	if(irq_num >= EIGHT){
 		outb(EOI | TWO, MASTER_COMMAND);
 		outb(EOI | (irq_num & SEVEN), SLAVE_COMMAND);
+	}
 
 	//if the interrupt request line's on the master PIC
 	else

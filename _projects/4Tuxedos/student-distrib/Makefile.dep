@@ -1,6 +1,6 @@
 boot.o: boot.S multiboot.h x86_desc.h types.h
 syscall_linkage.o: syscall_linkage.S ../syscalls/ece391sysnum.h \
-  file_desc.h types.h syscall_linkage.h
+  syscall_linkage.h types.h systemCalls.h
 x86_desc.o: x86_desc.S x86_desc.h types.h
 file.o: file.c file.h types.h lib.h
 file_desc.o: file_desc.c file_desc.h types.h file.h rtc.h i8259.h lib.h \
@@ -15,4 +15,4 @@ lib.o: lib.c lib.h types.h
 Paging.o: Paging.c Paging.h types.h lib.h
 PCB.o: PCB.c PCB.h types.h file_desc.h
 rtc.o: rtc.c rtc.h i8259.h types.h lib.h
-systemCalls.o: systemCalls.c
+systemCalls.o: systemCalls.c systemCalls.h types.h file_desc.h
