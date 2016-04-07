@@ -19,6 +19,7 @@ typedef struct pcb_struct{
 	uint32_t eip;
 	file_decs_t* fd_array;
 	parent_info_t parent;
+	uint8_t* arg_buf;
 }pcb_struct_t;
 
 
