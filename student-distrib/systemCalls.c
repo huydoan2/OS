@@ -2,19 +2,17 @@
  * - definition of system call functions 
  */
 #include "systemCalls.h"
-#include "file_desc.h" //file that have sys
 #include "file.h"
 #include "lib.h"
 #include "Paging.h"
-#include "PCB.h"
 #include "x86_desc.h"
 
 #define FILENAME_MAXLEN   32
 #define EIGHT_KB       0x2000
 #define EIGHT_MB	   0x800000
 
-
-
+uint32_t current_pid = 0;
+int32_t add_process(pcb_struct_t** pcb, uint32_t pid, uint32_t eip, const parent_info_t parent);
  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
  /*  helper functions for system calls  */
 
@@ -74,6 +72,7 @@ void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename
  	uint32_t par_ebp = 0;
  	uint32_t cur_eip = 0;
   uint32_t * virtAddr;
+  uint32_t eflags;
   virtAddr = (uint32_t *)0x08048000;
 	
  	dentry_t dentry;
@@ -113,32 +112,42 @@ void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename
     cur_eip = ((uint32_t)read_buf[1] << 16) | cur_eip;
     cur_eip = ((uint32_t)read_buf[0] << 24) | cur_eip;
 
-    init_PCB(current_PCB, current_pid, cur_eip, parent);
+    
     
     /*Context switching*/
     if(current_pid != 0){
 	    //assign current eip, esp, ebp parent_PCB 
 	    asm volatile("mov %%esp, %0":"=c"(par_esp));
-		  asm volatile("mov %%ebp, %0":"=c"(par_ebp));
-		  parent_PCB->esp = par_esp;
-		  parent_PCB->ebp = par_esp;
+		asm volatile("mov %%ebp, %0":"=c"(par_ebp));
+
+		// parent_PCB->esp = par_esp;
+		// parent_PCB->ebp = par_ebp;
 	}
 
+	parent.esp = par_esp;
+    parent.ebp = par_ebp;
+    add_process(&current_PCB, current_pid, cur_eip, parent);
     
+    // current_PCB->esp = par_esp;
+    // current_PCB->ebp = par_ebp;
 
     //updating TSS
     tss.ss0 = USER_DS;
-	  tss.esp0 = EIGHT_MB - current_pid*EIGHT_KB;
-	  ltr(KERNEL_TSS);
+	tss.esp0 = EIGHT_MB - current_pid*EIGHT_KB;
+	
+	ltr(KERNEL_TSS);
    
+   uint32_t user_cs = USER_CS;
    //create artificial IRET 
-   
+   asm volatile("pushf");
+   asm volatile("pushl %0":"=c"(user_cs));
+   asm volatile("pushl %0":"=c"(cur_eip));
 
-   /*update pid information*/
-	current_pid++;
+   
    /*IRET*/
    asm volatile("IRET");
-   asm volatile("halt_ret_label:");
+  halt_ret_label:
+  // asm volatile("halt_ret_label:");
   // asm volatile("RET");
    return 0;
 
@@ -146,23 +155,23 @@ void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename
 
   /*system call 3: read function*/
  int32_t syscall_read(int32_t fd, void* buf, int32_t nbytes){
- 	return read_fd(fd, buf, nbytes);
+ 	return read_fd(PCB_array[current_pid].fd_array, fd, buf, nbytes);
 
  }
 
   /*system call 4: write function*/
  int32_t syscall_write(int32_t fd, const void* buf, int32_t nbytes){
- 	return write_fd(fd, buf, nbytes);
+ 	return write_fd(PCB_array[current_pid].fd_array, fd, buf, nbytes);
  }
 
   /*system call 5: open function*/
  int32_t syscall_open(const uint8_t* filename){
- 	return open_fd(filename);
+ 	return open_fd(PCB_array[current_pid].fd_array, filename);
  }
 
   /*system call 6: close*/
  int32_t syscall_close(int32_t fd){
- 	return close_fd(fd);
+ 	return close_fd(PCB_array[current_pid].fd_array, fd);
 
  }
 
@@ -189,3 +198,16 @@ void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename
  	return 0;
 
  }
+
+
+int32_t add_process(pcb_struct_t** pcb, uint32_t pid, uint32_t eip, const parent_info_t parent)
+{
+	if(current_pid >= MAX_NUM_PCB - 1)
+		return -1;
+
+	++current_pid;
+	*pcb = (pcb_struct_t*)(PCB_array + current_pid);
+	init_PCB(*pcb, pid, eip, parent);
+	return 0;
+}
+

@@ -1,8 +1,6 @@
 #include "file_desc.h"
 #include "file.h"
 #include "rtc.h"
-#include "keyboard.h"
-#include "PCB.h"
 
 #define RTC 0
 #define DIR	1
@@ -12,7 +10,7 @@
 
 
 /*FD array*/
-//file_decs_t FD[FD_SIZE];
+//file_desc_t FD[FD_SIZE];
 /* 
  * init_FD
  *   DESCRIPTION: initialize the array of the FDs
@@ -24,33 +22,13 @@
  *   SIDE EFFECTS: every FD now has the flag indicates not in use
  *
  */
-
-
-void init_FD(file_decs_t* FD){
+void init_FD(file_desc_t* FD){
 	int i;
 	/*initialize file position and flag*/
 	for (i = 0; i < FD_SIZE; ++i){
 		FD[i].file_pos = 0;
 	    FD[i].flags = NOTUSE;
 	}
-	//initialize the stdin and stdout
-	FD[0].fops.open_ptr = &keyboard_open;
-	FD[0].fops.close_ptr = &keyboard_close;
-	FD[0].fops.read_ptr = &keyboard_read;
-	FD[0].fops.write_ptr = &keyboard_write;
-	FD[0].inode = -1;
-	FD[0].file_pos = 0;
-	FD[0].flags = INUSE;
-
-	FD[1].fops.open_ptr = &keyboard_open;
-	FD[1].fops.close_ptr = &keyboard_close;
-	FD[1].fops.read_ptr = &keyboard_read;
-	FD[1].fops.write_ptr = &keyboard_write;
-	FD[1].inode = -1;
-	FD[1].file_pos = 0;
-	FD[1].flags = INUSE;
-
-
 }
 
 /* 
@@ -64,7 +42,7 @@ void init_FD(file_decs_t* FD){
  *   SIDE EFFECTS: none
  *
  */
-int check_avail(file_decs_t* FD){
+int check_avail(file_desc_t* FD){
 	int i;
 	/*traverse through the FD size and for the first empty*/
 	//start from 2 to leave space for stdin and stdout
@@ -90,12 +68,10 @@ int check_avail(file_decs_t* FD){
  *   SIDE EFFECTS: none
  *
  */
-int32_t open_fd(const uint8_t* filename)
+int32_t open_fd(file_desc_t* FD, const uint8_t* filename)
 {
-
-	file_decs_t* FD = find_PCB(current_pid-1)->fd_array;
 	dentry_t dentry;
-	file_decs_t fd;
+	file_desc_t fd;
 	int FD_idx;
 	/*check if the FD array has empty spaces*/
 	if ((FD_idx = check_avail(FD)) == -1){
@@ -165,12 +141,11 @@ int32_t open_fd(const uint8_t* filename)
  *   SIDE EFFECTS: none
  *
  */
-int32_t read_fd(int32_t fd, void * buf, int32_t nbytes)
+int32_t read_fd(file_desc_t* FD, int32_t fd, void * buf, int32_t nbytes)
 {
-	file_decs_t* FD = find_PCB(current_pid-1)->fd_array;
 	uint32_t offset = 0;
 	int ret_val;
-	file_decs_t cur_fd = FD[fd];
+	file_desc_t cur_fd = FD[fd];
 	*(int32_t*)buf = cur_fd.inode;
 	offset = cur_fd.file_pos;
 
@@ -193,10 +168,9 @@ int32_t read_fd(int32_t fd, void * buf, int32_t nbytes)
  *
  */
 
-int32_t write_fd(int32_t fd, const void * buf, int32_t nbytes)
+int32_t write_fd(file_desc_t* FD, int32_t fd, const void * buf, int32_t nbytes)
 {
-	file_decs_t* FD = find_PCB(current_pid-1)->fd_array;
-	file_decs_t cur_fd = FD[fd];
+	file_desc_t cur_fd = FD[fd];
 
 	return cur_fd.fops.write_ptr((int32_t*)buf, nbytes);
 
@@ -217,10 +191,9 @@ int32_t write_fd(int32_t fd, const void * buf, int32_t nbytes)
  *
  */
 
-int32_t close_fd(int32_t fd)
+int32_t close_fd(file_desc_t* FD, int32_t fd)
 {
-	file_decs_t* FD = find_PCB(current_pid-1)->fd_array;
-	file_decs_t cur_fd = FD[fd];
+	file_desc_t cur_fd = FD[fd];
 	FD[fd].flags = NOTUSE;
 	return cur_fd.fops.close_ptr();	
 }

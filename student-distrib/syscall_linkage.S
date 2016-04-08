@@ -1,30 +1,36 @@
 
 #define ASM 1
 #include "../syscalls/ece391sysnum.h"
+#include "file_desc.h"
 #include "syscall_linkage.h"
-#include "systemCalls.h"
 
 
 .data
 	TABLE_SIZE = 10
 	FAIL_VALUE = -1
+        RETURN_VALUE: .long
 .section .text
 
 .globl syscalls     
 .type syscalls, @function
 syscalls:        
         cmpl $TABLE_SIZE, %eax
-        ja syscalls_default        
+        ja syscalls_default
+        pusha                           #save all registers
         pushl %edx			#push all 3 argument to KERNEL STACK
         pushl %ecx			#for c calling convention
         pushl %ebx
         dec %eax
         movl jumb_table(,%eax,4), %eax        #push the address of the function to eax
         call *%eax			#call the appropriate function
+        movl %eax, RETURN_VALUE         #save return value
         /*tear off the KERNEL STACK*/
         popl %ebx
         popl %ecx
         popl %edx        
+        popa                            #restore all registers
+        movl $RETURN_VALUE, %eax        #put return value back to EAX 
+
         iret		#return from interrupt
 syscalls_default:
         /* return -1 */
@@ -32,7 +38,7 @@ syscalls_default:
         iret     
 
 jumb_table:
-        .long syscall_halt, syscall_execute, syscall_read, syscall_write, syscall_open, syscall_close, syscall_getargs, syscall_vidmap, syscall_set_handler, syscall_sigreturn
+        .long halt, execute, read_fd, write_fd, open_fd, close_fd, getargs, vidmap, set_handler, sigreturn
 
 #define DO_CALL(name,number)   \
 .GLOBL name                   ;\

@@ -1,10 +1,18 @@
 /* systemCalls.h
  * - declaration of the function prototype for all system calls
  */
-#include "types.h"
 
+#ifndef SYSTEMCALLS_H
+#define SYSTEMCALLS_H 
+#include "types.h"
+#include "PCB.h"
+
+#define MAX_NUM_PCB 6
 #ifndef ASM
 
+
+
+pcb_struct_t PCB_array[MAX_NUM_PCB];
 
   /*system call 1: halt function*/
 extern int32_t syscall_halt(uint8_t status);
@@ -37,4 +45,4 @@ extern int32_t syscall_set_handler(int32_t signum, void* handler_address);
 extern int32_t syscall_sigreturn();
 
 #endif /* ASM */
-
+#endif

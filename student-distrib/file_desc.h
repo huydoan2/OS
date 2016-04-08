@@ -16,7 +16,7 @@
 
 #ifndef ASM
 
-uint32_t current_pid = 0;
+
 /*function pointer type for system calls*/
 typedef int32_t (*openFunc_ptr)();
 typedef int32_t (*readFunc_ptr)(int32_t*, uint32_t, int32_t);
@@ -36,20 +36,19 @@ typedef struct file_desc{
 	uint32_t inode;
 	uint32_t file_pos;
 	uint32_t flags;
-}file_decs_t;
+}file_desc_t;
 
 /*initialize the file descriptor array*/
-extern void init_FD(file_decs_t* FD);
+extern void init_FD(file_desc_t* FD);
 
 /*check if the FD array has vacancy*/
-int check_avail(file_decs_t* FD);
+int check_avail(file_desc_t* FD);
 
 /*common system calls*/
-extern int32_t open_fd(const uint8_t* filename);
-extern int32_t read_fd(int32_t fd, void * buf, int32_t nbytes);
-extern int32_t write_fd(int32_t fd, const void * buf, int32_t nbytes);
-extern int32_t close_fd(int32_t fd);
-
+int32_t open_fd(file_desc_t* FD, const uint8_t* filename);
+int32_t read_fd(file_desc_t* FD, int32_t fd, void * buf, int32_t nbytes);
+int32_t write_fd(file_desc_t* FD, int32_t fd, const void * buf, int32_t nbytes);
+int32_t close_fd(file_desc_t* FD, int32_t fd);
 
 
 #endif
