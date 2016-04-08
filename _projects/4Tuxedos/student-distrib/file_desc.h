@@ -1,4 +1,9 @@
 
+
+
+#ifndef FILE_DESC_H
+#define FILE_DESC_H
+
 #include "types.h"
 
 
@@ -10,6 +15,8 @@
 #define CLOSE 3
 
 #ifndef ASM
+
+uint32_t current_pid = 0;
 /*function pointer type for system calls*/
 typedef int32_t (*openFunc_ptr)();
 typedef int32_t (*readFunc_ptr)(int32_t*, uint32_t, int32_t);
@@ -32,10 +39,10 @@ typedef struct file_desc{
 }file_decs_t;
 
 /*initialize the file descriptor array*/
-extern void init_FD();
+extern void init_FD(file_decs_t* FD);
 
 /*check if the FD array has vacancy*/
-int check_avail();
+int check_avail(file_decs_t* FD);
 
 /*common system calls*/
 extern int32_t open_fd(const uint8_t* filename);
@@ -44,5 +51,7 @@ extern int32_t write_fd(int32_t fd, const void * buf, int32_t nbytes);
 extern int32_t close_fd(int32_t fd);
 
 
+
+#endif
 
 #endif

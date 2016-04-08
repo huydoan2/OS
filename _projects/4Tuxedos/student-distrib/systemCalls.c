@@ -5,11 +5,55 @@
 #include "file_desc.h" //file that have sys
 #include "file.h"
 #include "lib.h"
-#include "paging.h"
+#include "Paging.h"
 #include "PCB.h"
+#include "x86_desc.h"
 
 #define FILENAME_MAXLEN   32
+#define EIGHT_KB       0x2000
+#define EIGHT_MB	   0x800000
 
+
+
+ ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+ /*  helper functions for system calls  */
+
+/* systcall_exec_parse: parse input for execute call
+ *reutrn the filename and store the command parameters in the buffer
+ */
+void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename){
+
+  uint32_t idx = 0;
+
+  //get the first char of the filename
+  while (*command == ' ') {
+      command++; 
+    }
+
+    /*get the filename*/
+    while( *command != '\0' && *command != ' '&& *command != '\n' ){\
+      filename[idx] = *command;
+      idx++;
+      command++;
+    }
+
+    //get the first char of the arguments
+   while (*command == ' ') {//get the first char 
+         command++; 
+     }
+    /*assign arguments to the buffer*/
+    idx = 0;
+    while(*command != '\0'){
+      buf[idx] = *command;
+      idx++;
+      command++;
+    }
+
+  return;
+
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   /*system call 1: halt function*/
  int32_t syscall_halt(uint8_t status){
@@ -19,24 +63,32 @@
   /*system call 2: execute function*/
  int32_t syscall_execute(const uint8_t* command){
  	/*local variable declaration*/
- 	uint32_t idx = 0;
+ 	uint32_t parent_pid = current_pid - 1;
+ 	pcb_struct_t* parent_PCB;
+ 	pcb_struct_t* current_PCB;
  	uint8_t filename[FILENAME_MAXLEN];
  	uint8_t* arg_buf;
  	uint8_t  read_buf[4];
  	uint8_t  ELF[4];
+ 	uint32_t par_esp = 0;
+ 	uint32_t par_ebp = 0;
+ 	uint32_t cur_eip = 0;
+  uint32_t * virtAddr;
+  virtAddr = (uint32_t *)0x08048000;
+	
  	dentry_t dentry;
 
  	/*parse the input string*/
- 	filename = systcall_exec_parse(command, arg_buf);
+ systcall_exec_parse(command, arg_buf, filename);
 
  	/*check the file type*/
- 	EFL[0] = 0x46;
- 	EFL[1] = 0x4C;
- 	EFL[2] = 0x45;
- 	EFL[3] = 0x7F;
+ 	ELF[0] = 0x46;
+ 	ELF[1] = 0x4C;
+ 	ELF[2] = 0x45;
+ 	ELF[3] = 0x7F;
     read_dentry_by_name(filename, &dentry);
     read_data(dentry.inode_num, 0, read_buf, 4);
-    if(strncmp(ELF, read_buf, 4) != 0){
+    if(strncmp((int8_t*)ELF, (int8_t*)read_buf, 4) != 0){
     	return -1;//not an executable
     } 
 
@@ -44,15 +96,51 @@
     map_page(current_pid);
      
     /*Load the progrma file*/
-    prog_loader(filename, 0x08048000);
+    prog_loader(filename, virtAddr);
 
     /*Create PCB*/
+    parent_info_t parent;
+    parent.pid = parent_pid;
+    if(current_pid != 0){//if NOT shell
+    	parent_PCB = find_PCB(parent_pid);
+    	parent.fd_array = parent_PCB->fd_array; 
+    }
+
+   //get the eip
+    read_data(dentry.inode_num, 24, read_buf, 4);
+    cur_eip = read_buf[3];
+    cur_eip = ((uint32_t)read_buf[2] << 8)  | cur_eip;
+    cur_eip = ((uint32_t)read_buf[1] << 16) | cur_eip;
+    cur_eip = ((uint32_t)read_buf[0] << 24) | cur_eip;
+
+    init_PCB(current_PCB, current_pid, cur_eip, parent);
+    
+    /*Context switching*/
+    if(current_pid != 0){
+	    //assign current eip, esp, ebp parent_PCB 
+	    asm volatile("mov %%esp, %0":"=c"(par_esp));
+		  asm volatile("mov %%ebp, %0":"=c"(par_ebp));
+		  parent_PCB->esp = par_esp;
+		  parent_PCB->ebp = par_esp;
+	}
+
     
 
-    /*Context switching*/
+    //updating TSS
+    tss.ss0 = USER_DS;
+	  tss.esp0 = EIGHT_MB - current_pid*EIGHT_KB;
+	  ltr(KERNEL_TSS);
+   
+   //create artificial IRET 
+   
 
-    /*IRET*/
- 	return 0;
+   /*update pid information*/
+	current_pid++;
+   /*IRET*/
+   asm volatile("IRET");
+   asm volatile("halt_ret_label:");
+  // asm volatile("RET");
+   return 0;
 
  }
 
@@ -101,54 +189,3 @@
  	return 0;
 
  }
- ///////////////////////////////////////////////////////////////////////////////////////////////////////////
- /*  helper functions for system calls  */
-
-/* systcall_exec_parse: parse input for execute call
- *reutrn the filename and store the command parameters in the buffer
- */
-uint8_t* systcall_exec_parse(const uint8_t* command, uint8_t* buf){
-
-	uint32_t idx = 0;
-	uint8_t filename[FILENAME_MAXLEN];
-
-	//get the first char of the filename
-	while (*command == ' ') {
-    	command++; 
-    }
-
-    /*get the filename*/
-    while( *command != '\0' && *command != ' '&& *command != '\n' ){\
-    	filename[idx] = *command;
-    	idx++;
-    	command++;
-    }
-
-    //get the first char of the arguments
-   while (*command == ' ') {//get the first char 
-      	 command++; 
-     }
-    /*assign arguments to the buffer*/
-    idx = 0;
-    while(*command != '\0'){
-    	buf[idx] = *command;
-    	idx++;
-    	command++;
-    }
-
-	return filename;
-
-
-
-}
-
-while (*line != '\0') {       /* if not the end of line ....... */ 
-          while (*line == ' ' || *line == '\t' || *line == '\n')
-               *line++ = '\0';     /* replace white spaces with 0    */
-          *argv++ = line;          /* save the argument position     */
-          while (*line != '\0' && *line != ' ' && 
-                 *line != '\t' && *line != '\n') 
-               line++;             /* skip the argument until ...    */
-     }
-     *argv = '\0';                 /* mark the end of argument list  */
-}

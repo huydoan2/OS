@@ -4,6 +4,8 @@
 #include "types.h"
 
 #ifndef ASM
+
+
   /*system call 1: halt function*/
 extern int32_t syscall_halt(uint8_t status);
 

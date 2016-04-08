@@ -2,6 +2,7 @@
 #include "file.h"
 #include "rtc.h"
 #include "keyboard.h"
+#include "PCB.h"
 
 #define RTC 0
 #define DIR	1
@@ -11,7 +12,7 @@
 
 
 /*FD array*/
-file_decs_t FD[FD_SIZE];
+//file_decs_t FD[FD_SIZE];
 /* 
  * init_FD
  *   DESCRIPTION: initialize the array of the FDs
@@ -25,7 +26,7 @@ file_decs_t FD[FD_SIZE];
  */
 
 
-void init_FD(){
+void init_FD(file_decs_t* FD){
 	int i;
 	/*initialize file position and flag*/
 	for (i = 0; i < FD_SIZE; ++i){
@@ -63,7 +64,7 @@ void init_FD(){
  *   SIDE EFFECTS: none
  *
  */
-int check_avail(){
+int check_avail(file_decs_t* FD){
 	int i;
 	/*traverse through the FD size and for the first empty*/
 	//start from 2 to leave space for stdin and stdout
@@ -91,11 +92,13 @@ int check_avail(){
  */
 int32_t open_fd(const uint8_t* filename)
 {
+
+	file_decs_t* FD = find_PCB(current_pid-1)->fd_array;
 	dentry_t dentry;
 	file_decs_t fd;
 	int FD_idx;
 	/*check if the FD array has empty spaces*/
-	if ((FD_idx = check_avail()) == -1){
+	if ((FD_idx = check_avail(FD)) == -1){
 		return -1;
 	} 
 	/*obtain the directory entry by filename*/
@@ -164,6 +167,7 @@ int32_t open_fd(const uint8_t* filename)
  */
 int32_t read_fd(int32_t fd, void * buf, int32_t nbytes)
 {
+	file_decs_t* FD = find_PCB(current_pid-1)->fd_array;
 	uint32_t offset = 0;
 	int ret_val;
 	file_decs_t cur_fd = FD[fd];
@@ -191,6 +195,7 @@ int32_t read_fd(int32_t fd, void * buf, int32_t nbytes)
 
 int32_t write_fd(int32_t fd, const void * buf, int32_t nbytes)
 {
+	file_decs_t* FD = find_PCB(current_pid-1)->fd_array;
 	file_decs_t cur_fd = FD[fd];
 
 	return cur_fd.fops.write_ptr((int32_t*)buf, nbytes);
@@ -214,6 +219,7 @@ int32_t write_fd(int32_t fd, const void * buf, int32_t nbytes)
 
 int32_t close_fd(int32_t fd)
 {
+	file_decs_t* FD = find_PCB(current_pid-1)->fd_array;
 	file_decs_t cur_fd = FD[fd];
 	FD[fd].flags = NOTUSE;
 	return cur_fd.fops.close_ptr();	
