@@ -12,8 +12,6 @@
 #include "IDT.h"
 #include "rtc.h"
 #include "Paging.h"
-#include "file.h"
-#include "file_desc.h"
 #include "systemCalls.h"
 
 /* Macros. */

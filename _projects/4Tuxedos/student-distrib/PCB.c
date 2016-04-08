@@ -4,14 +4,15 @@
 #define EIGHT_KB       0x2000
 
 
-void init_PCB(pcb_struct_t* pcb, uint32_t pid,uint32_t eip, const parent_info_t parent )
+void init_PCB(pcb_struct_t* pcb, uint32_t pid, uint32_t eip, const parent_info_t parent )
 {
 	pcb->pid = pid;
-
 	pcb->eip = eip;
-	pcb->fd_array = FIRST_PCB_ADDR - pid*EIGHT_KB;	//fd_array address = stack - 8KB
+	//pcb->fd_array = (file_desc_t*)(esp - PCB_OFFSET);	//fd_array address = stack - 8KB
 	init_FD(pcb->fd_array);
 	pcb->parent.pid = parent.pid;
+	pcb->parent.esp = parent.esp;
+	pcb->parent.ebp = parent.ebp;
 	pcb->parent.fd_array = parent.fd_array;
 }
 
@@ -19,8 +20,7 @@ void init_PCB(pcb_struct_t* pcb, uint32_t pid,uint32_t eip, const parent_info_t 
 /*return the pointer of PCB block, given a pid*/
 pcb_struct_t* find_PCB(uint32_t pid){
 
-	pcb_struct_t* PCB =(pcb_struct_t*)(FIRST_PCB_ADDR - pid*EIGHT_KB);
+	pcb_struct_t* PCB =(pcb_struct_t*)(FIRST_PCB_ADDR - (pid-1)*EIGHT_KB - PCB_OFFSET);
 
 	return PCB;
 }
-
