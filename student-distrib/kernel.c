@@ -208,20 +208,20 @@ entry (unsigned long magic, unsigned long addr)
 	//rtc_open(buf, num_bytes);
 	paging_init();
 
-	/* test the memory accessing by paging */
-	test_phys_addr = get_physAddr(0x00400000+8);
-	test_val = *((uint32_t *)test_phys_addr);
-	printf("memory: %x\n", test_val);
+	// /* test the memory accessing by paging */
+	// test_phys_addr = get_physAddr(0x00400000+8);
+	// test_val = *((uint32_t *)test_phys_addr);
+	// printf("memory: %x\n", test_val);
 
 
-	printf("reach here ! \n");
-	uint32_t virtual_addr = 0x08000000;
-	map_page(0);
-	test_phys_addr = get_physAddr(0x08000000);
+	// printf("reach here ! \n");
+	// uint32_t virtual_addr = 0x08000000;
+	// map_page(0);
+	// test_phys_addr = get_physAddr(0x08000000);
 
-	printf("memory: %x\n", test_phys_addr);
+	// printf("memory: %x\n", test_phys_addr);
 
-	test_val = *((uint32_t *)virtual_addr);
+	// test_val = *((uint32_t *)virtual_addr);
 
 
 
@@ -236,11 +236,11 @@ entry (unsigned long magic, unsigned long addr)
 
 	//clear(); //need to clear screen in terminal driver init
 	parsing_fileSystem(fileSys_startAddr); //initialize file system
-	init_FD();
+	// init_FD();
 
 
 	/*open rtc*/
-	fd_rtc = open((uint8_t*)"rtc");
+	// fd_rtc = open((uint8_t*)"rtc");
 	sti();
 
 	/* Execute the first program (`shell') ... */
@@ -290,12 +290,12 @@ entry (unsigned long magic, unsigned long addr)
 	// 	printf("file name: %s\n", "frame0.txt");
 	// 	printf("file size: %d Bytes\n", file_size);
 	// }
-	virtual_addr = 0x08048000;
-	prog_loader((uint8_t*)"frame0.txt", (uint32_t*)virtual_addr);
-	virtual_addr = 0x08048000;
+	// virtual_addr = 0x08048000;
+	// prog_loader((uint8_t*)"frame0.txt", (uint32_t*)virtual_addr);
+	// virtual_addr = 0x08048000;
 
 	
-	write(1, (int32_t*)virtual_addr,187);
+	// write(1, (int32_t*)virtual_addr,187);
 
 	
 
@@ -304,8 +304,8 @@ entry (unsigned long magic, unsigned long addr)
 	while(1)
 	{
 		//keyboard read write test
-		keyboard_write_index = read(0,(int32_t*)buff, num_byte);
-		write(1, (int32_t*)buff, keyboard_write_index);
+		keyboard_write_index = keyboard_read((int32_t*)buff, 0,num_byte);
+		keyboard_write((int32_t*)buff, keyboard_write_index);
 		printf("bytes written = %d\n",keyboard_write_index);
 		while(keyboard_write_index>=0)
 		{		
@@ -313,11 +313,11 @@ entry (unsigned long magic, unsigned long addr)
 			keyboard_write_index--;
 		}
 		//rtc read write test
-		write(fd_rtc,rtc_buff+rtc_index, rtc_num_byte);
-		read(fd_rtc, rtc_read_buf, rtc_num_byte);
-		rtc_index++;
-		if(rtc_index == rtc_buff_size)
-			rtc_index = 0;
+		// write(fd_rtc,rtc_buff+rtc_index, rtc_num_byte);
+		// read(fd_rtc, rtc_read_buf, rtc_num_byte);
+		// rtc_index++;
+		// if(rtc_index == rtc_buff_size)
+		// 	rtc_index = 0;
 	}
 	
 
