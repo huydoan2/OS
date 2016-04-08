@@ -212,13 +212,11 @@ entry (unsigned long magic, unsigned long addr)
 	// printf("memory: %x\n", test_val);
 
 
-	// printf("reach here ! \n");
+	// /* test the virt to phys mapping */
 	// uint32_t virtual_addr = 0x08000000;
 	// map_page(0);
 	// test_phys_addr = get_physAddr(0x08000000);
-
 	// printf("memory: %x\n", test_phys_addr);
-
 	// test_val = *((uint32_t *)virtual_addr);
 
 
@@ -244,7 +242,7 @@ entry (unsigned long magic, unsigned long addr)
 	/* Execute the first program (`shell') ... */
 	
 	/********TESTING FILE SYSTEM*******/
-	/*open a directory file*/
+	// /*OPEN A DIRECTORY FILE*/
 	// fd_dir = open((uint8_t*)".");
 	// while(read(fd_dir, buffer_0, 4))
 	// {
@@ -258,7 +256,7 @@ entry (unsigned long magic, unsigned long addr)
 	// }
 	// close(fd_dir);
 
-	// /*open a regular file and read*/
+	// /*OPEN A REGULAR FILE AND READ*/
 	//  fd_file = open((uint8_t*)"frame0.txt");
 	// if((offset = read(fd_file, buffer_1, 33)) != 0)
 	// {
@@ -281,7 +279,8 @@ entry (unsigned long magic, unsigned long addr)
 	// 	printf("The end of the file has been reached!!\n");
 	// }
 
-	// /*obtain the size of a given file*/
+
+	// /*OBTAIN THE SIZE OF A GIVEN FILE*/
 	// file_size = get_fileSize((uint8_t*)"frame0.txt");
 	// if(file_size != -1)
 	// {
@@ -291,13 +290,10 @@ entry (unsigned long magic, unsigned long addr)
 	// virtual_addr = 0x08048000;
 	// prog_loader((uint8_t*)"frame0.txt", (uint32_t*)virtual_addr);
 	// virtual_addr = 0x08048000;
-
-	
 	// write(1, (int32_t*)virtual_addr,187);
 
 	
-
-	
+	printf("%d\n",syscall_execute("shell"));
 	/********TESTING READ AND WRITE for Terminal and RTC*******/
 	while(1)
 	{
