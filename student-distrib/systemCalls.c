@@ -57,13 +57,50 @@ void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename
 
 /*system call 1: halt function*/
 int32_t syscall_halt(uint8_t status){
+   pcb_struct_t* cur_PCB;
+  uint32_t par_esp = 0;
+  uint32_t par_ebp = 0;
+  uint32_t * virtAddr;
+  virtAddr = (uint32_t *)0x08048000;
+
+
+  /*remap the parent code to the virtual memory*/
+  //Set up paging
+  --current_pid;
+  map_page(current_pid-1);
+
+  /*get parent PCB and information of the parent*/
+
+  cur_PCB =find_PCB(current_pid);
+  par_esp = cur_PCB->parent.esp;
+  par_ebp = cur_PCB->parent.ebp;
+
+   tss.ss0 = KERNEL_DS;
+
+  tss.esp0 = EIGHT_MB - 4 - EIGHT_KB * (current_pid-1);
+
+   asm volatile("movl %0, %%esp"
+                     :
+                     :"c"(par_esp)
+                     :"%esp"
+                     );
+   asm volatile("movl %0, %%ebp" 
+                     :
+                     :"c"(par_ebp)
+                     :"%ebp"
+                     );
+
+
+  /*jump back to the execute*/
+asm volatile("jmp halt_ret_label;");
+
   return 0;
 }
 
 /*system call 2: execute function*/
 int32_t syscall_execute(const uint8_t* command){
  	/*local variable declaration*/
- 	uint32_t parent_pid = current_pid - 1;
+ 	uint32_t parent_pid = current_pid ;
  	pcb_struct_t* parent_PCB;
  	pcb_struct_t* current_PCB;
  	uint8_t filename[FILENAME_MAXLEN]={0};
@@ -98,16 +135,11 @@ int32_t syscall_execute(const uint8_t* command){
   map_page(current_pid);
   /*Load the progrma file*/
   prog_loader(filename, virtAddr);
-  //keyboard_write((int32_t*)virtAddr,744);
   /*Create PCB*/
   parent_info_t parent;
   parent.pid = parent_pid;
 
-  if(current_pid != 0){//if NOT shell
-    printf("not shell\n");
-  	parent_PCB = find_PCB(parent_pid);
-  	parent.fd_array = parent_PCB->fd_array; 
-  }
+
 
   //get the eip
   read_data(dentry.inode_num, 24, read_buf, 4);
@@ -115,27 +147,19 @@ int32_t syscall_execute(const uint8_t* command){
   cur_eip = ((uint32_t)read_buf[1] << 8)  | cur_eip;
   cur_eip = ((uint32_t)read_buf[2] << 16) | cur_eip;
   cur_eip = ((uint32_t)read_buf[3] << 24) | cur_eip;
-  printf("cur_eip: %x\n",cur_eip);
 
   /*Context switching*/
-  //assign values to the parent 
-  // if(current_pid != 0){  
-    //assign current eip, esp, ebp parent_PCB 
-  //asm volatile("mov %%esp, %0" :"=c"(par_esp));
-  //asm volatile("mov %%ebp, %0" :"=c"(par_ebp));
-  	// parent_PCB->esp = par_esp;
-  	// parent_PCB->ebp = par_ebp;
-	//}
-    // printf("par_esp: %x\n",par_esp);
-  // printf("par_ebp: %x\n",par_ebp);
+  
+  asm volatile("mov %%esp, %0" :"=c"(par_esp));
+  asm volatile("mov %%ebp, %0" :"=c"(par_ebp));
+
 
 	parent.esp = par_esp;
   parent.ebp = par_ebp;
 
-  add_process(&current_PCB, current_pid, cur_eip, parent);
+ add_process(&current_PCB, current_pid, cur_eip, parent);
     
-  // current_PCB->esp = par_esp;
-  // current_PCB->ebp = par_ebp;
+
  
   //updating TSS
   tss.ss0 = KERNEL_DS;
@@ -200,29 +224,34 @@ int32_t syscall_execute(const uint8_t* command){
   asm volatile("IRET");
   
   asm volatile("halt_ret_label:");
-  // asm volatile("RET");
+
+
   return 0;
 }
 
 /*system call 3: read function*/
 int32_t syscall_read(int32_t fd, void* buf, int32_t nbytes){
-	return read_fd(PCB_array[current_pid].fd_array, fd, buf, nbytes);
+  pcb_struct_t * pcb = find_PCB(current_pid-1);
+	return read_fd(pcb->fd_array, fd, buf, nbytes);
 
 }
 
 /*system call 4: write function*/
 int32_t syscall_write(int32_t fd, const void* buf, int32_t nbytes){
-	return write_fd(PCB_array[current_pid].fd_array, fd, buf, nbytes);
+  pcb_struct_t * pcb = find_PCB(current_pid-1);\
+	return write_fd(pcb->fd_array, fd, buf, nbytes);
 }
 
 /*system call 5: open function*/
 int32_t syscall_open(const uint8_t* filename){
-	return open_fd(PCB_array[current_pid].fd_array, filename);
+  pcb_struct_t * pcb = find_PCB(current_pid-1);
+	return open_fd(pcb->fd_array, filename);
 }
 
 /*system call 6: close*/
 int32_t syscall_close(int32_t fd){
-	return close_fd(PCB_array[current_pid].fd_array, fd);
+  pcb_struct_t * pcb = find_PCB(current_pid-1);
+	return close_fd(pcb->fd_array, fd);
 
 }
 
@@ -257,7 +286,7 @@ int32_t add_process(pcb_struct_t** pcb, uint32_t pid, uint32_t eip, const parent
 		return -1;
 
 	++current_pid;
-	*pcb = (pcb_struct_t*)(PCB_array + current_pid);
+	*pcb = find_PCB(pid);
 	init_PCB(*pcb, pid, eip, parent);
 	return 0;
 }

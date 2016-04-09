@@ -20,7 +20,7 @@ void init_PCB(pcb_struct_t* pcb, uint32_t pid, uint32_t eip, const parent_info_t
 /*return the pointer of PCB block, given a pid*/
 pcb_struct_t* find_PCB(uint32_t pid){
 
-	pcb_struct_t* PCB =(pcb_struct_t*)(FIRST_PCB_ADDR - (pid-1)*EIGHT_KB - PCB_OFFSET);
+	pcb_struct_t* PCB =(pcb_struct_t*)(FIRST_PCB_ADDR - (pid)*EIGHT_KB );
 
 	return PCB;
 }
