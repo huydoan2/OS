@@ -120,7 +120,7 @@ int32_t dir_read(int32_t* buff, uint32_t offset, int32_t num_bytes){
 	//obtian the file name of that entry 
 	strncpy((int8_t*)buff,dentry.filename, num_bytes);
 
-	return 1;
+	return strlen(dentry.filename);
 }
 
 //write function for file
