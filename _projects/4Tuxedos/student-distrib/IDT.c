@@ -173,7 +173,7 @@ void Exception_Handler_5(){
 void Exception_Handler_6(){
 
 	//print out the error message
-    clear();
+    //clear();
 	printf("Exception: Invalid Opcode. \n");
 
 	//stop the execution 

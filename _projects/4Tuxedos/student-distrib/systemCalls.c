@@ -12,7 +12,7 @@
 #define FOUR_KB       0x1000
 #define EIGHT_KB       0x2000
 #define EIGHT_MB	   0x800000
-#define PROG_EIP     0x83FFFFC
+#define PROG_ESP     0x83FFFFC
 
 uint32_t current_pid = 0;
 int32_t add_process(pcb_struct_t** pcb, uint32_t pid, uint32_t eip, const parent_info_t parent);
@@ -76,7 +76,7 @@ int32_t syscall_execute(const uint8_t* command){
   uint32_t * virtAddr;
   uint32_t user_ds = USER_DS;
   uint32_t user_cs = USER_CS;
-  uint32_t next_eip = PROG_EIP;
+  uint32_t user_esp = PROG_ESP;
   virtAddr = (uint32_t *)0x08048000;
  	dentry_t dentry;
 
@@ -93,14 +93,12 @@ int32_t syscall_execute(const uint8_t* command){
   if(strncmp((int8_t*)ELF, (int8_t*)read_buf, 4) != 0){
   	return -1;//not an executable
   } 
-
+  
   /*Set up paging*/
   map_page(current_pid);
   /*Load the progrma file*/
   prog_loader(filename, virtAddr);
-  
-  //keyboard_write((int32_t*)virtAddr,187);
-
+  //keyboard_write((int32_t*)virtAddr,744);
   /*Create PCB*/
   parent_info_t parent;
   parent.pid = parent_pid;
@@ -113,19 +111,18 @@ int32_t syscall_execute(const uint8_t* command){
 
   //get the eip
   read_data(dentry.inode_num, 24, read_buf, 4);
-  cur_eip = read_buf[3];
-  cur_eip = ((uint32_t)read_buf[2] << 8)  | cur_eip;
-  cur_eip = ((uint32_t)read_buf[1] << 16) | cur_eip;
-  cur_eip = ((uint32_t)read_buf[0] << 24) | cur_eip;
+  cur_eip = ((uint32_t)read_buf[0] << 0)  | cur_eip;
+  cur_eip = ((uint32_t)read_buf[1] << 8)  | cur_eip;
+  cur_eip = ((uint32_t)read_buf[2] << 16) | cur_eip;
+  cur_eip = ((uint32_t)read_buf[3] << 24) | cur_eip;
   printf("cur_eip: %x\n",cur_eip);
-      
-    
+
   /*Context switching*/
   //assign values to the parent 
- // if(current_pid != 0){  
+  // if(current_pid != 0){  
     //assign current eip, esp, ebp parent_PCB 
-    asm volatile("mov %%esp, %0" :"=c"(par_esp));
-	  asm volatile("mov %%ebp, %0" :"=c"(par_ebp));
+  //asm volatile("mov %%esp, %0" :"=c"(par_esp));
+  //asm volatile("mov %%ebp, %0" :"=c"(par_ebp));
   	// parent_PCB->esp = par_esp;
   	// parent_PCB->ebp = par_ebp;
 	//}
@@ -143,59 +140,63 @@ int32_t syscall_execute(const uint8_t* command){
   //updating TSS
   tss.ss0 = KERNEL_DS;
 
-  tss.esp0 = EIGHT_MB - 4 - EIGHT_KB*(current_pid-1);
-
+  tss.esp0 = EIGHT_MB - 4 - EIGHT_KB * (current_pid-1);
+  
   /*create artificial IRET*/ 
-
   cli();
-  asm volatile ("        \n\
-       mov $0x23, %%ax   \n\    
-       mov %%ax, %%ds    \n\    
-       mov %%ax, %%es    \n\
-       mov %%ax, %%fs    \n\
-       mov %%ax, %%gs    \n\
-       "
-       :
-       :
-       :"%ax"
-  );
-   asm volatile("mov %%esp, %0":"=c"(par_esp));
-   //push user ds
+  asm volatile ("mov $0x2B, %%ax   \n\
+                 mov %%ax, %%ds    \n\
+                 mov %%ax, %%es    \n\
+                 mov %%ax, %%fs    \n\
+                 mov %%ax, %%gs    \n\
+                 "
+                 :
+                 :
+                 :"%ax"
+                );
+
+   asm volatile("movl %%esp, %0":"=c"(par_esp));
+   asm volatile("movl %%ebp, %0" :"=c"(par_ebp));
+   
+
+   //push user ss
    asm volatile("movl %0, %%eax;\n"
-       "pushl %%eax;"
-       :                       /* output */
-       : "r" (user_ds)         /* input */
-       :"%eax"    /* clobbered register */
-       );
+                "pushl %%eax;"
+               :                       /* output */
+               : "r" (user_ds)         /* input */
+               :"%eax"    /* clobbered register */
+               );
    //push esp
    asm volatile("movl %0, %%eax;\n"
-     "pushl %%eax;"
-     :       /* output */
-     : "r" (par_esp)         /* input */
-     :"%eax"    /* clobbered register */
-     );
-  
+                "pushl %%eax;"
+                :                        /* output */
+                : "r" (user_esp)         /* input */
+                :"%eax"    /* clobbered register */
+                );
+
   asm volatile("pushf"); //push the EFLAGS
   
   //re-enable interrupt after IRET is called
-  asm volatile ("         \n\
-      popl %%eax          \n\
-      orl  $0x200,%%eax   \n\
-      pushl %%eax         \n\
-      " 
-      :
-      :
-      :"%eax"
-      );
+  asm volatile ("popl %%eax          \n\
+                 orl  $0x200,%%eax   \n\
+                 pushl %%eax         \n\
+                 " 
+                 :
+                 :
+                 :"%eax"
+                 );
 
   asm volatile("pushl %0"
                 :
                 :"c"(user_cs)); //push CS to change to 
+
   asm volatile("pushl %0"
                 :
-                :"c"(next_eip)); //push currnet EIP
+                :"c"(cur_eip)); //push currnet EIP
+
+
+
   /*IRET*/
-//printf("reached here\n");
   asm volatile("IRET");
   
   asm volatile("halt_ret_label:");

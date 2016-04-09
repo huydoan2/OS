@@ -372,7 +372,7 @@ int32_t keyboard_write(int32_t * buff, int32_t num_bytes)
 		putc(write_buff[i]);
 		i++;
 	}
-	printf("\n");	
+	//printf("\n");	
 	return i;
 }
 
