@@ -300,7 +300,7 @@ entry (unsigned long magic, unsigned long addr)
 		//keyboard read write test
 		keyboard_write_index = keyboard_read((int32_t*)buff, 0,num_byte);
 		keyboard_write((int32_t*)buff, keyboard_write_index);
-		printf("bytes written = %d\n",keyboard_write_index);
+		printf("\nbytes written = %d\n",keyboard_write_index);
 		while(keyboard_write_index>=0)
 		{		
 			buff[keyboard_write_index] = 0;

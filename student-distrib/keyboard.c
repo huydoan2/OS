@@ -28,7 +28,8 @@
 //scancode array for keyboard
 //0 = no output
 //size of the scancode is 88
-char scancode [size_of_keys] = {
+char garbage [size_of_keys] = 
+{
 	'\0','1','2','3','4','5','6','7','8','9','0','-','=','\b',0,//backspace and tab
 	'q','w','e','r','t','y','u','i','o','p','[',']','\n',0,//Control
 	'a','s','d','f','g','h','j','k','l',';','\'','`',0,//Left shift
@@ -36,7 +37,15 @@ char scancode [size_of_keys] = {
   	'*',0,' ',0,0,0,0,0,0,0,0,0,0,0,0,0,
   	'7',0,'9','-',0,'5',0,'+','1',0,'3','0','.',0,0,0,0,0,0, /* All Release keys are undefined */
 };
-
+char scancode [size_of_keys] = 
+{
+	'\0','1','2','3','4','5','6','7','8','9','0','-','=','\b',0,//backspace and tab
+	'q','w','e','r','t','y','u','i','o','p','[',']','\n',0,//Control
+	'a','s','d','f','g','h','j','k','l',';','\'','`',0,//Left shift
+  	'\\','z','x','c','v','b','n','m',',','.','/',0,
+  	'*',0,' ',0,0,0,0,0,0,0,0,0,0,0,0,0,
+  	'7',0,'9','-',0,'5',0,'+','1',0,'3','0','.',0,0,0,0,0,0, /* All Release keys are undefined */
+};
 
 char shift_scancode[size_of_keys] =
 {
@@ -144,20 +153,21 @@ char getchar()
 	if((caps_lock_flag % 2) ==0)
 	{
 		/*caps lock off and shift on*/
-		if(shift_flag == 1)
+		if(shift_flag == 0)
 		{
-	    	if(c < end_of_press)
-	      		return shift_scancode[c-1];
+	    	if(c < end_of_press){
+	      		return scancode[c-1];
+	      	}
 	    	else
-	      		return shift_scancode[0];
+	      		return scancode[87];
 		}
 		/*caps lock off and shift off*/
 		else
 		{
 			if(c < end_of_press)
-	      		return scancode[c-1];
+	      		return shift_scancode[c-1];
 	    	else
-	      		return scancode[0];
+	      		return shift_scancode[87];
 		}
 	}
 
@@ -170,7 +180,7 @@ char getchar()
 	    	if(c < end_of_press)
 	      		return caps_shift_scancode[c-1];
 	    	else
-	      		return caps_shift_scancode[0];
+	      		return caps_shift_scancode[87];
 		}
 		/*caps lock on and shift off*/
 		else
@@ -178,7 +188,7 @@ char getchar()
 			if(c < end_of_press)
 	      		return caps_scancode[c-1];
 	    	else
-	      		return caps_scancode[0];
+	      		return caps_scancode[87];
 		}
 	}
 }
