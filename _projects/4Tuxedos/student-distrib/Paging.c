@@ -12,7 +12,7 @@
 #define  PD_ENTRY_EMP_VAL 0x00000002
 #define  PD_ENTRY_INIT_VAL_0 0x00000103
 #define  PD_ENTRY_INIT_VAL_1 0x00000183
-#define  PD_ENTRY_INIT_VAL_2 0x00000083
+#define  PD_ENTRY_INIT_VAL_2 0x00000087
 
 /*entry value for page table*/
 #define  PT_ENTRY_EMP_VAL 0x00000002
