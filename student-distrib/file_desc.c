@@ -169,7 +169,11 @@ int32_t read_fd(file_desc_t* FD, int32_t fd, void * buf, int32_t nbytes)
 	offset = cur_fd.file_pos;
 
 	ret_val = cur_fd.fops.read_ptr((int32_t*)buf, offset,nbytes);
-	FD[fd].file_pos += ret_val;
+	if(FD[fd].inode == 0)
+		FD[fd].file_pos += 1;
+
+	else
+		FD[fd].file_pos += ret_val;
 
 	return ret_val;
 }
