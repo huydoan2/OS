@@ -29,7 +29,7 @@ syscalls:
         popl %ecx
         popl %edx        
         popa                            #restore all registers
-        movl $RETURN_VALUE, %eax        #put return value back to EAX 
+        movl RETURN_VALUE, %eax        #put return value back to EAX 
 
         iret		#return from interrupt
 syscalls_default:
@@ -38,7 +38,7 @@ syscalls_default:
         iret     
 
 jumb_table:
-        .long halt, execute, read_fd, write_fd, open_fd, close_fd, getargs, vidmap, set_handler, sigreturn
+        .long syscall_halt, syscall_execute, syscall_read, syscall_write, syscall_open, syscall_close, syscall_getargs, syscall_vidmap, syscall_set_handler, syscall_sigreturn
 
 #define DO_CALL(name,number)   \
 .GLOBL name                   ;\

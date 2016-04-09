@@ -31,6 +31,7 @@
 
 #define FIRST_PROG 0x00800000 //8MB
 #define PROG_VIRTADDR 0x08000000
+#define FOUR_MB 0x0400000
 
 
 /* 
@@ -204,7 +205,7 @@ void mapping_virt2Phys_Addr(uint32_t physAddr, uint32_t virtAddr){
 
 
 void map_page(uint32_t pid){
-	uint32_t prog_startAddr = FIRST_PROG * (pid+1);
+	uint32_t prog_startAddr = FIRST_PROG + FOUR_MB* (pid);
 
 	mapping_virt2Phys_Addr(prog_startAddr, PROG_VIRTADDR);
 }

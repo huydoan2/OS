@@ -1,6 +1,7 @@
 #include "file_desc.h"
 #include "file.h"
 #include "rtc.h"
+#include "keyboard.h"
 
 #define RTC 0
 #define DIR	1
@@ -24,11 +25,29 @@
  */
 void init_FD(file_desc_t* FD){
 	int i;
-	/*initialize file position and flag*/
-	for (i = 0; i < FD_SIZE; ++i){
+	/*init in and out*/
+	/*stdin*/
+	FD[0].file_pos = 0;
+    FD[0].flags = INUSE;
+	FD[0].fops.open_ptr = &keyboard_open;
+	FD[0].fops.close_ptr = &keyboard_close;
+	FD[0].fops.read_ptr = &keyboard_read;
+	FD[0].fops.write_ptr = &keyboard_write;
+
+	/*stdout*/
+    FD[1].file_pos = 0;
+    FD[1].flags = INUSE;
+	FD[1].fops.open_ptr = &keyboard_open;
+	FD[1].fops.close_ptr = &keyboard_close;
+	FD[1].fops.read_ptr = &keyboard_read;
+	FD[1].fops.write_ptr = &keyboard_write;
+
+	/*initialize the rest of the blocks*/
+	for (i = 2; i < FD_SIZE; ++i){
 		FD[i].file_pos = 0;
 	    FD[i].flags = NOTUSE;
 	}
+
 }
 
 /* 
