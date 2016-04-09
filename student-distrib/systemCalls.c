@@ -74,8 +74,8 @@ int32_t syscall_execute(const uint8_t* command){
  	uint32_t par_ebp = 0;
  	uint32_t cur_eip = 0;
   uint32_t * virtAddr;
-  uint32_t user_ds = USER_DS|0x3;
-  uint32_t user_cs = USER_CS|0x3;
+  uint32_t user_ds = USER_DS;
+  uint32_t user_cs = USER_CS;
   uint32_t next_eip = PROG_EIP;
   virtAddr = (uint32_t *)0x08048000;
  	dentry_t dentry;
@@ -124,8 +124,8 @@ int32_t syscall_execute(const uint8_t* command){
   //assign values to the parent 
  // if(current_pid != 0){  
     //assign current eip, esp, ebp parent_PCB 
-    asm volatile("mov %%esp, %0":"=c"(par_esp));
-	  asm volatile("mov %%ebp, %0":"=c"(par_ebp));
+    asm volatile("mov %%esp, %0" :"=c"(par_esp));
+	  asm volatile("mov %%ebp, %0" :"=c"(par_ebp));
   	// parent_PCB->esp = par_esp;
   	// parent_PCB->ebp = par_ebp;
 	//}
@@ -148,11 +148,22 @@ int32_t syscall_execute(const uint8_t* command){
   /*create artificial IRET*/ 
 
   cli();
+  asm volatile ("        \n\
+       mov $0x23, %%ax   \n\    
+       mov %%ax, %%ds    \n\    
+       mov %%ax, %%es    \n\
+       mov %%ax, %%fs    \n\
+       mov %%ax, %%gs    \n\
+       "
+       :
+       :
+       :"%ax"
+  );
    asm volatile("mov %%esp, %0":"=c"(par_esp));
    //push user ds
    asm volatile("movl %0, %%eax;\n"
        "pushl %%eax;"
-       :       /* output */
+       :                       /* output */
        : "r" (user_ds)         /* input */
        :"%eax"    /* clobbered register */
        );
@@ -177,13 +188,16 @@ int32_t syscall_execute(const uint8_t* command){
       :"%eax"
       );
 
-
-  asm volatile("pushl %0":"=c"(user_cs)); //push CS to change to 
-  asm volatile("pushl %0":"=c"(next_eip)); //push currnet EIP
+  asm volatile("pushl %0"
+                :
+                :"c"(user_cs)); //push CS to change to 
+  asm volatile("pushl %0"
+                :
+                :"c"(next_eip)); //push currnet EIP
   /*IRET*/
+//printf("reached here\n");
   asm volatile("IRET");
-  printf("reached here\n");
-  //halt_ret_label:
+  
   asm volatile("halt_ret_label:");
   // asm volatile("RET");
   return 0;
