@@ -194,106 +194,25 @@ entry (unsigned long magic, unsigned long addr)
 		ltr(KERNEL_TSS);
 	}
 
-	/* Init the IDT */
+	/* Initialize the IDT */
 	fill_interrupt_descriptor_table();
-
-	/* Init the PIC */
+	/* Initialize the PIC */
 	i8259_init();
+	/* Initialize the Real-time Clock */
 	rtc_init();
-	/* Initialize devices, memory, filesystem, enable device interrupts on the
-	 * PIC, any other initialization stuff... */
+	/* Initialize the terminal I/O */
 	keyboard_open();
-	//rtc_open(buf, num_bytes);
+	/* initialize Paging*/
 	paging_init();
-
-	// /* test the memory accessing by paging */
-	// test_phys_addr = get_physAddr(0x00400000+8);
-	// test_val = *((uint32_t *)test_phys_addr);
-	// printf("memory: %x\n", test_val);
-
-
-	// /* test the virt to phys mapping */
-	// uint32_t virtual_addr = 0x08000000;
-	// map_page(0);
-	// test_phys_addr = get_physAddr(0x08000000);
-	// printf("memory: %x\n", test_phys_addr);
-	// test_val = *((uint32_t *)virtual_addr);
-
-
-
-	/*Set up IDT to handle system calls*/
-
-
+	/* Initialize the filesystem*/
+    parsing_fileSystem(fileSys_startAddr); //initialize file system
 	/* Enable interrupts */
-	/* Do not enable the following until after you have set up your
-	 * IDT correctly otherwise QEMU will triple fault and simple close
-	 * without showing you any output */
-	printf("Enabling Interrupts\n");
-
-	//clear(); //need to clear screen in terminal driver init
-	parsing_fileSystem(fileSys_startAddr); //initialize file system
-	// init_FD();
-
-
-	/*open rtc*/
-	// fd_rtc = open((uint8_t*)"rtc");
 	sti();
-
+    printf("Enabling Interrupts\n");
+	clear(); //need to clear screen in terminal driver init
 	/* Execute the first program (`shell') ... */
-	
-	/********TESTING FILE SYSTEM*******/
-	// /*OPEN A DIRECTORY FILE*/
-	// fd_dir = open((uint8_t*)".");
-	// while(read(fd_dir, buffer_0, 4))
-	// {
-	// 	printf("%s\n",buffer_0);
-	// }
-	// close(fd_dir);
-	// fd_dir = open((uint8_t*)".");
-	// while(read(fd_dir, buffer_0, file_name_max_size))
-	// {
-	// 	printf("%s\n",buffer_0);
-	// }
-	// close(fd_dir);
-
-	// /*OPEN A REGULAR FILE AND READ*/
-	//  fd_file = open((uint8_t*)"frame0.txt");
-	// if((offset = read(fd_file, buffer_1, 33)) != 0)
-	// {
-	// 	printf("TEXT READ:\n");
-	// 	keyboard_write((int8_t *)buffer_1,offset);
-	// 	printf("number of Bytes read: %d \n",offset);
-	// }
-	// else 
-	// {
-	// 	printf("The end of the file has been reached!!\n");
-	// }
-	// if((offset = read(fd_file, buffer_1, file_buff_size)) != 0)
-	// {
-	// 	printf("TEXT READ:\n");
-	// 	keyboard_write((int8_t *)buffer_1,offset);
-	// 	printf("number of Bytes read: %d \n",offset);
-	// }
-	// else 
-	// {
-	// 	printf("The end of the file has been reached!!\n");
-	// }
-
-
-	// /*OBTAIN THE SIZE OF A GIVEN FILE*/
-	// file_size = get_fileSize((uint8_t*)"frame0.txt");
-	// if(file_size != -1)
-	// {
-	// 	printf("file name: %s\n", "frame0.txt");
-	// 	printf("file size: %d Bytes\n", file_size);
-	// }
-	// virtual_addr = 0x08048000;
-	// prog_loader((uint8_t*)"frame0.txt", (uint32_t*)virtual_addr);
-	// virtual_addr = 0x08048000;
-	// write(1, (int32_t*)virtual_addr,187);
-
-	
 	printf("%d\n",syscall_execute("shell"));
+	
 	/********TESTING READ AND WRITE for Terminal and RTC*******/
 	while(1)
 	{

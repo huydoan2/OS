@@ -1,3 +1,7 @@
+/*PCB.h
+ * - structures and functions for process control blocks 
+ */
+
 #ifndef PCB_H
 #define PCH_H
 
@@ -6,7 +10,7 @@
 
 #define PCB_OFFSET 0x1FFF
 
-
+/*structure for the parent process information */
 typedef struct {
 	uint32_t pid;	
 	uint32_t esp;
@@ -14,6 +18,7 @@ typedef struct {
     file_desc_t* fd_array;
 } parent_info_t;
 
+/*structure for PCB*/
 typedef struct {
 	uint32_t pid;	
 	uint32_t eip;
@@ -22,9 +27,9 @@ typedef struct {
 	uint8_t* arg_buf;
 }pcb_struct_t;
 
-
+/*function that initializes a PCB for the new process */
 void init_PCB(pcb_struct_t* pcb, uint32_t pid, uint32_t eip, const parent_info_t parent );
-
+/*function that finds the corresponding PCB given a pid*/
 pcb_struct_t* find_PCB(uint32_t pid);
 
 #endif
