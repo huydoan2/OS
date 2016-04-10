@@ -10,7 +10,8 @@ IDT.o: IDT.c IDT.h lib.h types.h x86_desc.h keyboard.h i8259.h rtc.h \
   syscall_linkage.h
 kernel.o: kernel.c multiboot.h types.h x86_desc.h lib.h i8259.h debug.h \
   keyboard.h IDT.h rtc.h Paging.h systemCalls.h PCB.h file_desc.h
-keyboard.o: keyboard.c keyboard.h i8259.h types.h lib.h
+keyboard.o: keyboard.c keyboard.h i8259.h types.h lib.h systemCalls.h \
+  PCB.h file_desc.h
 lib.o: lib.c lib.h types.h
 Paging.o: Paging.c Paging.h types.h lib.h
 PCB.o: PCB.c PCB.h types.h file_desc.h

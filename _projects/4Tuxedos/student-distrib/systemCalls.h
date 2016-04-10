@@ -11,7 +11,7 @@
 #ifndef ASM
 
 
-
+extern uint32_t current_pid;
 //pcb_struct_t PCB_array[MAX_NUM_PCB];
 
   /*system call 1: halt function*/
