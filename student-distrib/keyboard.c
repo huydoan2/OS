@@ -6,6 +6,7 @@
  */
 
 #include "keyboard.h"
+#include "systemCalls.h"
 #define keyboard_irq_num 1
 #define left_shift_on 0x2A
 #define left_shift_off 0xAA
@@ -22,6 +23,7 @@
 #define max_keys 126
 #define max_flag	8
 #define L_pressed 0x26
+#define C_pressed 0x2E
 
 
 
@@ -147,6 +149,17 @@ char getchar()
 		clear();
 		reset_linebuffer();
 		return 0;
+	}
+
+	if(control_flag && c == C_pressed)
+	{
+		if(current_pid!=1)
+		{
+			display_c('\n');
+			syscall_halt(0);
+			reset_linebuffer();
+			return 0;
+		}
 	}
 
 	/*caps lock off case, checking if it's even or odd*/
@@ -346,13 +359,15 @@ int32_t keyboard_read(int32_t * buff, uint32_t offset, int32_t num_bytes)
  	enter_flag = 0;
  	//copy the characters in the line buffer
  	while(line_buffer[i] != '\n' && i < num_bytes)
+ 	//while(i < num_bytes)
  	{
  		read_buff [i] = line_buffer[i];
  		i++;
  	}
+ 	read_buff [i] = '\n';
+ 	i++;
  	buff = (int32_t*)read_buff;
  	reset_linebuffer();	//reset line buffer by reset the index
-		
  	return i;
 }
 
@@ -376,13 +391,12 @@ int32_t keyboard_write(int32_t * buff, int32_t num_bytes)
 	//Check if the inputs are valid
 	if(buff == NULL || num_bytes < 0)
 		return -1;
-	//write character to the screen
+	//write character to the screen]
 	while(i < num_bytes)
 	{
 		putc(write_buff[i]);
 		i++;
 	}
-	//printf("\n");	
 	return i;
 }
 
