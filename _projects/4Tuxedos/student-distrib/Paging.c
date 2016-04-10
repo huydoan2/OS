@@ -205,7 +205,7 @@ void mapping_virt2Phys_Addr(uint32_t physAddr, uint32_t virtAddr){
 
 
 void map_page(uint32_t pid){
-	uint32_t prog_startAddr = FIRST_PROG + FOUR_MB* (pid);
+	uint32_t prog_startAddr = FIRST_PROG + FOUR_MB* (pid -1);
 
 	mapping_virt2Phys_Addr(prog_startAddr, PROG_VIRTADDR);
 }

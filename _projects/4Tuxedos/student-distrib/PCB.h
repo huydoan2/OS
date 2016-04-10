@@ -14,6 +14,8 @@
 typedef struct {
 	uint32_t pid;	
 	uint32_t esp;
+	uint32_t esp0;
+	uint32_t ss0;
 	uint32_t ebp;
     file_desc_t* fd_array;
 } parent_info_t;

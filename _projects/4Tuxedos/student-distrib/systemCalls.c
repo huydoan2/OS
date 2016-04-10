@@ -15,7 +15,7 @@
 #define PROG_ESP     0x83FFFFC
 
 uint32_t current_pid = 0;
-int32_t add_process(pcb_struct_t** pcb, uint32_t pid, uint32_t eip, const parent_info_t parent);
+int32_t add_process(pcb_struct_t** pcb, uint32_t eip, const parent_info_t parent);
  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
  /*  helper functions for system calls  */
 
@@ -64,20 +64,21 @@ int32_t syscall_halt(uint8_t status){
   virtAddr = (uint32_t *)0x08048000;
 
 
-  /*remap the parent code to the virtual memory*/
-  //Set up paging
-  --current_pid;
-  map_page(current_pid-1);
-
   /*get parent PCB and information of the parent*/
 
   cur_PCB =find_PCB(current_pid);
   par_esp = cur_PCB->parent.esp;
   par_ebp = cur_PCB->parent.ebp;
 
+  /*remap the parent code to the virtual memory*/
+  //Set up paging
+  --current_pid;
+  map_page(current_pid);
+
   /*set tss registers*/
-   tss.ss0 = KERNEL_DS;
-   tss.esp0 = EIGHT_MB - 4 - EIGHT_KB * (current_pid-1);
+   tss.ss0 = cur_PCB->parent.ss0;
+   tss.esp0 = cur_PCB->parent.esp0;
+
 
    /*set esp and ebp to the parent stack*/
    asm volatile("movl %0, %%esp"
@@ -132,10 +133,6 @@ int32_t syscall_execute(const uint8_t* command){
   	return -1;//not an executable
   } 
   
-  /*Set up paging*/
-  map_page(current_pid);
-  /*Load the progrma file*/
-  prog_loader(filename, virtAddr);
 
 
   /*Get the eip from the executable file*/
@@ -145,23 +142,31 @@ int32_t syscall_execute(const uint8_t* command){
   cur_eip = ((uint32_t)read_buf[2] << 16) | cur_eip;
   cur_eip = ((uint32_t)read_buf[3] << 24) | cur_eip;
 
-  /*Context switching*/
-    /*Create PCB*/
+
+  
+  /*Create PCB*/
   parent_info_t parent;
-  parent.pid = parent_pid;
+  parent.pid = current_pid;
   asm volatile("mov %%esp, %0" :"=c"(par_esp));
   asm volatile("mov %%ebp, %0" :"=c"(par_ebp));
-	parent.esp = par_esp;
+  parent.esp = par_esp;
   parent.ebp = par_ebp;
-  //add a new PCB
-  add_process(&current_PCB, current_pid, cur_eip, parent);
-    
+  parent.esp0 = tss.esp0;
+  parent.ss0 = tss.ss0;
 
- 
   //updating TSS
   tss.ss0 = KERNEL_DS;
+  tss.esp0 = EIGHT_MB - 4 - EIGHT_KB * (current_pid);
+  
+  //add a new PCB
+  add_process(&current_PCB, cur_eip, parent);
+    
+  /*Set up paging*/
+  map_page(current_pid);
+  /*Load the progrma file*/
+  prog_loader(filename, virtAddr);
 
-  tss.esp0 = EIGHT_MB - 4 - EIGHT_KB * (current_pid-1);
+ 
   
   /*create artificial IRET*/ 
   cli();
@@ -228,26 +233,26 @@ int32_t syscall_execute(const uint8_t* command){
 
 /*system call 3: read function*/
 int32_t syscall_read(int32_t fd, void* buf, int32_t nbytes){
-  pcb_struct_t * pcb = find_PCB(current_pid-1);
+  pcb_struct_t * pcb = find_PCB(current_pid);
 	return read_fd(pcb->fd_array, fd, buf, nbytes);
 
 }
 
 /*system call 4: write function*/
 int32_t syscall_write(int32_t fd, const void* buf, int32_t nbytes){
-  pcb_struct_t * pcb = find_PCB(current_pid-1);
+  pcb_struct_t * pcb = find_PCB(current_pid);
 	return write_fd(pcb->fd_array, fd, buf, nbytes);
 }
 
 /*system call 5: open function*/
 int32_t syscall_open(const uint8_t* filename){
-  pcb_struct_t * pcb = find_PCB(current_pid-1);
+  pcb_struct_t * pcb = find_PCB(current_pid);
 	return open_fd(pcb->fd_array, filename);
 }
 
 /*system call 6: close*/
 int32_t syscall_close(int32_t fd){
-  pcb_struct_t * pcb = find_PCB(current_pid-1);
+  pcb_struct_t * pcb = find_PCB(current_pid);
 	return close_fd(pcb->fd_array, fd);
 
 }
@@ -277,14 +282,14 @@ int32_t syscall_sigreturn(){
 }
 
 /*function that updates the pid and PCB for next process*/
-int32_t add_process(pcb_struct_t** pcb, uint32_t pid, uint32_t eip, const parent_info_t parent)
+int32_t add_process(pcb_struct_t** pcb, uint32_t eip, const parent_info_t parent)
 {
 	if(current_pid >= MAX_NUM_PCB - 1)
 		return -1;
 
 	++current_pid;
-	*pcb = find_PCB(pid);
-	init_PCB(*pcb, pid, eip, parent);
+	*pcb = find_PCB(current_pid);
+	init_PCB(*pcb, current_pid, eip, parent);
 	return 0;
 }
 
