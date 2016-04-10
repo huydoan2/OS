@@ -164,6 +164,10 @@ int32_t read_fd(file_desc_t* FD, int32_t fd, void * buf, int32_t nbytes)
 {
 	uint32_t offset = 0;
 	int ret_val;
+	if(fd < 0 || fd > 7 || fd == 1)
+		return -1;
+	if(	FD[fd].flags == NOTUSE)
+		return -1;
 	file_desc_t cur_fd = FD[fd];
 	*(int32_t*)buf = cur_fd.inode;
 	offset = cur_fd.file_pos;
@@ -193,11 +197,12 @@ int32_t read_fd(file_desc_t* FD, int32_t fd, void * buf, int32_t nbytes)
 
 int32_t write_fd(file_desc_t* FD, int32_t fd, const void * buf, int32_t nbytes)
 {
+	if(fd <= 0 || fd > 7)
+		return -1;
+	if(	FD[fd].flags == NOTUSE)
+		return -1;
 	file_desc_t cur_fd = FD[fd];
-
 	return cur_fd.fops.write_ptr((int32_t*)buf, nbytes);
-
-	
 
 }
 
@@ -216,6 +221,10 @@ int32_t write_fd(file_desc_t* FD, int32_t fd, const void * buf, int32_t nbytes)
 
 int32_t close_fd(file_desc_t* FD, int32_t fd)
 {
+	if(fd < 2 || fd > 7)
+		return -1;
+	if(	FD[fd].flags == NOTUSE)
+		return -1;
 	file_desc_t cur_fd = FD[fd];
 	FD[fd].flags = NOTUSE;
 	return cur_fd.fops.close_ptr();	

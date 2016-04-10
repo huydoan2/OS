@@ -265,7 +265,10 @@ int32_t syscall_getargs(uint8_t* buf, int32_t nbytes){
 
 /*system call 8: vidmap function*/
 int32_t syscall_vidmap(uint8_t** screen_start){
-	return 0;
+	if(screen_start == NULL || *screen_start == NULL ||screen_start >= (uint8_t**)0x400000)
+    return -1;
+
+  return 0;
 
 }
 
