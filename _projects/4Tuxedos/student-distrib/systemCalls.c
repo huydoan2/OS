@@ -8,13 +8,16 @@
 #include "x86_desc.h"
 #include "keyboard.h" // remove later
 
-#define FILENAME_MAXLEN   128
+#define FILENAME_MAXLEN   32
 #define FOUR_KB       0x1000
 #define EIGHT_KB       0x2000
 #define EIGHT_MB	   0x800000
 #define PROG_ESP     0x83FFFFC
 
 uint32_t current_pid = 0;
+uint8_t arg_buf[128]={0};	//buffer for arguments
+int32_t buf_length = -1;
+
 int32_t add_process(pcb_struct_t** pcb, uint32_t eip, const parent_info_t parent);
  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
  /*  helper functions for system calls  */
@@ -25,29 +28,36 @@ int32_t add_process(pcb_struct_t** pcb, uint32_t eip, const parent_info_t parent
 void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename){
 
   uint32_t idx = 0;
+  buf_length = -1;		//reset the buffer
+
   //get the first char of the filename
   while (*command == ' ') {
-    command++; 
-  }
+      command++; 
+    }
 
-  /*get the filename*/
-  while( *command != '\0' && *command != ' '&& *command != '\n' ){\
-    filename[idx] = *command;
-    idx++;
-    command++;
-  }
-  //get the first char of the arguments
- while (*command == ' ') {//get the first char 
-       command++; 
-   }
-  /*assign arguments to the buffer*/
-  idx = 0;
-  while(*command != '\0'){
-    buf[idx] = *command;
-    idx++;
-    command++;
-  }
-
+    /*get the filename*/
+    while( *command != '\0' && *command != ' '&& *command != '\n' ){\
+      filename[idx] = *command;
+      idx++;
+      command++;
+    }
+    //get the first char of the arguments
+   while (*command == ' ') {//get the first char 
+         command++; 
+     }
+    /*assign arguments to the buffer*/
+    idx = 0;
+    while(*command != '\0' && idx < 127){
+      buf[idx] = *command;
+      idx++;
+      command++;
+    }
+    if(idx == 127){
+    	buf_length = -1;
+    	return;
+    }
+    buf[idx] = '\0';
+    buf_length = idx;
   return;
 
 }
@@ -93,7 +103,8 @@ int32_t syscall_halt(uint8_t status){
 
 
   /*jump back to the execute*/
-  asm volatile("jmp halt_ret_label;");
+asm volatile("jmp halt_ret_label;");
+
   return 0;
 }
 
@@ -103,8 +114,7 @@ int32_t syscall_execute(const uint8_t* command){
  	uint32_t parent_pid = current_pid ;
  	pcb_struct_t* parent_PCB;
  	pcb_struct_t* current_PCB;
- 	uint8_t filename[FILENAME_MAXLEN]={0};
- 	uint8_t arg_buf[128]={0};
+ 	uint8_t filename[FILENAME_MAXLEN]={0}; 	
  	uint8_t  read_buf[4]={0};
  	uint8_t  ELF[4] = {0};
  	uint32_t par_esp = 0;
@@ -126,8 +136,10 @@ int32_t syscall_execute(const uint8_t* command){
   ELF[1] = 0x45;
   ELF[2] = 0x4C;
   ELF[3] = 0x46;
-  if(read_dentry_by_name(filename, &dentry) == -1)
-    return -1;
+
+  if(read_dentry_by_name(filename, &dentry)==-1){
+  	return -1;
+  }
 
   read_data(dentry.inode_num, 0, read_buf, 4);
   if(strncmp((int8_t*)ELF, (int8_t*)read_buf, 4) != 0){
@@ -266,6 +278,21 @@ int32_t syscall_close(int32_t fd){
 
 /*system call 7: getargs function*/
 int32_t syscall_getargs(uint8_t* buf, int32_t nbytes){
+	int32_t length;
+
+	//error checking
+	if(buf_length == -1)
+		return -1;
+
+	//get the min(buf_length, nbytes)
+	if(nbytes < buf_length)
+		length = nbytes;
+	else
+		length = buf_length;
+
+	//copy to user space
+	memcpy(buf, arg_buf, length);
+
 	return 0;
 
 }
