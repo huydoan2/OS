@@ -349,7 +349,7 @@ void Exception_Handler_13(){
 void Exception_Handler_14(){
 
 	//print out the error message
-    clear();
+    //clear();
 	printf("Exception: Page Fault. \n");
 
 	//stop the execution 

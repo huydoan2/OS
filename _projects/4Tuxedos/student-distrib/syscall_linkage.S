@@ -16,6 +16,8 @@
 syscalls:        
         cmpl $TABLE_SIZE, %eax
         ja syscalls_default
+        cmpl $0, %eax
+        jbe syscalls_default
         pusha                           #save all registers
         pushl %edx			#push all 3 argument to KERNEL STACK
         pushl %ecx			#for c calling convention
@@ -29,9 +31,9 @@ syscalls:
         popl %ecx
         popl %edx        
         popa                            #restore all registers
-        movl RETURN_VALUE, %eax        #put return value back to EAX 
+        movl RETURN_VALUE, %eax           #put return value back to EAX 
+        iret		                  #return from interrupt
 
-        iret		#return from interrupt
 syscalls_default:
         /* return -1 */
         movl $FAIL_VALUE, %eax
