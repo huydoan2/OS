@@ -287,7 +287,7 @@ int32_t syscall_sigreturn(){
 /*function that updates the pid and PCB for next process*/
 int32_t add_process(pcb_struct_t** pcb, uint32_t eip, const parent_info_t parent)
 {
-	if(current_pid >= MAX_NUM_PCB - 1)
+	if(current_pid >= MAX_NUM_PCB)
 		return -1;
 
 	++current_pid;
