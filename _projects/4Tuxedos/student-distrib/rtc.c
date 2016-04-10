@@ -113,18 +113,18 @@ rtc_handler(void)
 	counter++;
 	frequency = rtc_freq >> (rate - 1);
 	/*print timer every second at the right top corner*/
-	if(counter % frequency == 0)
-	{
-		//oneth digit
-		*(uint8_t *)(video_mem + ((NUM_COLS-column_offset_1) << 1)) = clk%time_offset_10 + '0';
-		//tenth digit
-		if(clk/time_offset_10 != 0)
-			*(uint8_t *)(video_mem + ((NUM_COLS-column_offset_2) << 1)) = (clk/time_offset_10)%time_offset_10 + '0';
-		//hundredth digit
-		if(clk/time_offset_100 != 0)
-			*(uint8_t *)(video_mem + ((NUM_COLS-column_offset_3) << 1)) = (clk/time_offset_100)%time_offset_10 + '0'; 
-		clk ++;
-	}
+	// if(counter % frequency == 0)
+	// {
+	// 	//oneth digit
+	// 	*(uint8_t *)(video_mem + ((NUM_COLS-column_offset_1) << 1)) = clk%time_offset_10 + '0';
+	// 	//tenth digit
+	// 	if(clk/time_offset_10 != 0)
+	// 		*(uint8_t *)(video_mem + ((NUM_COLS-column_offset_2) << 1)) = (clk/time_offset_10)%time_offset_10 + '0';
+	// 	//hundredth digit
+	// 	if(clk/time_offset_100 != 0)
+	// 		*(uint8_t *)(video_mem + ((NUM_COLS-column_offset_3) << 1)) = (clk/time_offset_100)%time_offset_10 + '0'; 
+	// 	clk ++;
+	// }
 	interrupt_flag = 1;
 	asm volatile("                  \n\
 		    leave                    \n\
@@ -261,7 +261,7 @@ int32_t rtc_write(int32_t * buff, int32_t num_bytes)
 			return -1;
 	}
 	rtc_set_rate();
-	printf("rtc rate: %d \n", rate);
+	//printf("rtc rate: %d \n", rate);
 	return 0;
 }
 

@@ -210,9 +210,12 @@ entry (unsigned long magic, unsigned long addr)
 	sti();
     printf("Enabling Interrupts\n");
 	clear(); //need to clear screen in terminal driver init
+	int i;
+	 //for(;;)
+		//display_printf(" %d \n", i++);
+
 	/* Execute the first program (`shell') ... */
 	printf("%d\n",syscall_execute("shell"));
-	
 	/********TESTING READ AND WRITE for Terminal and RTC*******/
 	while(1)
 	{

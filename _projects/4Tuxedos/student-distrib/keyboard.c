@@ -357,6 +357,7 @@ int32_t keyboard_read(int32_t * buff, uint32_t offset, int32_t num_bytes)
 	//wait for the user to finish typing (hit enter)
 	while(enter_flag == 0);
  	enter_flag = 0;
+ 	cli();
  	//copy the characters in the line buffer
  	while(line_buffer[i] != '\n' && i < num_bytes)
  	//while(i < num_bytes)
@@ -364,6 +365,7 @@ int32_t keyboard_read(int32_t * buff, uint32_t offset, int32_t num_bytes)
  		read_buff [i] = line_buffer[i];
  		i++;
  	}
+ 	sti();
  	read_buff [i] = '\n';
  	i++;
  	buff = (int32_t*)read_buff;
@@ -391,12 +393,14 @@ int32_t keyboard_write(int32_t * buff, int32_t num_bytes)
 	//Check if the inputs are valid
 	if(buff == NULL || num_bytes < 0)
 		return -1;
+	cli();
 	//write character to the screen]
 	while(i < num_bytes)
 	{
 		putc(write_buff[i]);
 		i++;
 	}
+	sti();
 	return i;
 }
 
