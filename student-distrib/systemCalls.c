@@ -56,8 +56,11 @@ void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename
     	buf_length = -1;
     	return;
     }
-    buf[idx] = '\0';
-    buf_length = idx;
+    if(idx != 0)
+    {
+    	buf[idx] = '\0';
+    	buf_length = idx + 1;
+	}
   return;
 
 }
