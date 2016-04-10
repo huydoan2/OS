@@ -118,6 +118,7 @@ int32_t syscall_execute(const uint8_t* command){
   uint32_t user_esp = PROG_ESP;
   virtAddr = (uint32_t *)0x08048000;
  	dentry_t dentry;
+ 	int32_t sanity_check = 0;
 
  	/*parse the input string*/
   systcall_exec_parse(command, arg_buf, filename);
@@ -154,12 +155,18 @@ int32_t syscall_execute(const uint8_t* command){
   parent.esp0 = tss.esp0;
   parent.ss0 = tss.ss0;
 
+  //add a new PCB
+  sanity_check = add_process(&current_PCB, cur_eip, parent);
+  if(sanity_check == -1)
+  {
+  	display_printf("exceeds maximum number of processes\n");
+  	return -1;
+  }
+
   //updating TSS
   tss.ss0 = KERNEL_DS;
-  tss.esp0 = EIGHT_MB - 4 - EIGHT_KB * (current_pid);
+  tss.esp0 = EIGHT_MB - 4 - EIGHT_KB * (parent_pid);
   
-  //add a new PCB
-  add_process(&current_PCB, cur_eip, parent);
     
   /*Set up paging*/
   map_page(current_pid);
