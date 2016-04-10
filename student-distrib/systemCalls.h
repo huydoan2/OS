@@ -12,7 +12,7 @@
 
 
 
-pcb_struct_t PCB_array[MAX_NUM_PCB];
+//pcb_struct_t PCB_array[MAX_NUM_PCB];
 
   /*system call 1: halt function*/
 extern int32_t syscall_halt(uint8_t status);

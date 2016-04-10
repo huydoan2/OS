@@ -7,6 +7,7 @@
 #define FIRST_PCB_ADDR 0x7FE000 //starting address of the first PCB 
 #define EIGHT_KB       0x2000
 
+
 /*
 * void init_PCB(
 *   Description:
@@ -27,6 +28,8 @@ void init_PCB(pcb_struct_t* pcb, uint32_t pid, uint32_t eip, const parent_info_t
 	pcb->parent.pid = parent.pid;
 	pcb->parent.esp = parent.esp;
 	pcb->parent.ebp = parent.ebp;
+	pcb->parent.esp0 = parent.esp0;
+	pcb->parent.ss0 = parent.ss0;
 	pcb->parent.fd_array = parent.fd_array;
 }
 
@@ -41,7 +44,7 @@ void init_PCB(pcb_struct_t* pcb, uint32_t pid, uint32_t eip, const parent_info_t
 */
 pcb_struct_t* find_PCB(uint32_t pid){
 
-	pcb_struct_t* PCB =(pcb_struct_t*)(FIRST_PCB_ADDR - (pid)*EIGHT_KB );
+	pcb_struct_t* PCB =(pcb_struct_t*)(FIRST_PCB_ADDR - (pid-1)*EIGHT_KB );
 
 	return PCB;
 }
