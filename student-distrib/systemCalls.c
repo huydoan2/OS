@@ -11,11 +11,11 @@
 #define FILENAME_MAXLEN   32
 #define FOUR_KB       0x1000
 #define EIGHT_KB       0x2000
-#define EIGHT_MB	   0x800000
+#define EIGHT_MB     0x800000
 #define PROG_ESP     0x83FFFFC
 
 uint32_t current_pid = 0;
-uint8_t arg_buf[128]={0};	//buffer for arguments
+uint8_t arg_buf[128]={0}; //buffer for arguments
 int32_t buf_length = -1;
 
 int32_t add_process(pcb_struct_t** pcb, uint32_t eip, const parent_info_t parent);
@@ -28,7 +28,7 @@ int32_t add_process(pcb_struct_t** pcb, uint32_t eip, const parent_info_t parent
 void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename){
 
   uint32_t idx = 0;
-  buf_length = -1;		//reset the buffer
+  buf_length = -1;    //reset the buffer
 
   //get the first char of the filename
   while (*command == ' ') {
@@ -38,13 +38,11 @@ void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename
     /*get the filename*/
     while( *command != '\0' && *command != ' '&& *command != '\n' ){\
       filename[idx] = *command;
-      idx++;
       if(idx > 32)
         return;
+      idx++;
       command++;
     }
-  
-
     //get the first char of the arguments
    while (*command == ' ') {//get the first char 
          command++; 
@@ -57,15 +55,14 @@ void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename
       command++;
     }
     if(idx == 127){
-    	buf_length = -1;
-    	return;
+      buf_length = -1;
+      return;
     }
     if(idx != 0)
     {
-    	buf[idx] = '\0';
-    	buf_length = idx + 1;
-	  }
-
+      buf[idx] = '\0';
+      buf_length = idx + 1;
+  }
   return;
 
 }
@@ -74,7 +71,14 @@ void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename
 
 /*system call 1: halt function*/
 int32_t syscall_halt(uint8_t status){
-   pcb_struct_t* cur_PCB;
+  if(current_pid == 1)
+  {
+    current_pid--;
+    printf("Can't exit the first shell!\n");
+    syscall_execute((uint8_t*)"shell");
+    return 0;
+  }
+  pcb_struct_t* cur_PCB;
   uint32_t par_esp = 0;
   uint32_t par_ebp = 0;
   uint32_t * virtAddr;
@@ -118,39 +122,40 @@ asm volatile("jmp halt_ret_label;");
 
 /*system call 2: execute function*/
 int32_t syscall_execute(const uint8_t* command){
- 	/*local variable declaration*/
- 	uint32_t parent_pid = current_pid ;
- 	//pcb_struct_t* parent_PCB;
- 	pcb_struct_t* current_PCB;
- 	uint8_t filename[FILENAME_MAXLEN]={0}; 	
- 	uint8_t  read_buf[4]={0};
- 	uint8_t  ELF[4] = {0};
- 	uint32_t par_esp = 0;
- 	uint32_t par_ebp = 0;
- 	uint32_t cur_eip = 0;
+  /*local variable declaration*/
+  uint32_t parent_pid = current_pid ;
+  //pcb_struct_t* parent_PCB;
+  pcb_struct_t* current_PCB;
+  uint8_t filename[FILENAME_MAXLEN]={0};  
+  uint8_t  read_buf[4]={0};
+  uint8_t  ELF[4] = {0};
+  uint32_t par_esp = 0;
+  uint32_t par_ebp = 0;
+  uint32_t cur_eip = 0;
   uint32_t * virtAddr;
   uint32_t user_ds = USER_DS;
   uint32_t user_cs = USER_CS;
   uint32_t user_esp = PROG_ESP;
   virtAddr = (uint32_t *)0x08048000;
- 	dentry_t dentry;
- 	int32_t sanity_check = 0;
+  dentry_t dentry;
+  int32_t sanity_check = 0;
 
- 	/*parse the input string*/
+  /*parse the input string*/
   systcall_exec_parse(command, arg_buf, filename);
 
- 	/*check the file type, ELF*/
+  /*check the file type, ELF*/
   ELF[0] = 0x7F;
   ELF[1] = 0x45;
   ELF[2] = 0x4C;
   ELF[3] = 0x46;
 
   if(read_dentry_by_name(filename, &dentry)==-1){
-  	return -1;
+    return -1;
   }
+
   read_data(dentry.inode_num, 0, read_buf, 4);
   if(strncmp((int8_t*)ELF, (int8_t*)read_buf, 4) != 0){
-  	return -1;//not an executable
+    return -1;//not an executable
   } 
   
 
@@ -178,8 +183,8 @@ int32_t syscall_execute(const uint8_t* command){
   sanity_check = add_process(&current_PCB, cur_eip, parent);
   if(sanity_check == -1)
   {
-  	display_printf("exceeds maximum number of processes\n");
-  	return -1;
+    display_printf("exceeds maximum number of processes\n");
+    return -1;
   }
 
   //updating TSS
@@ -260,53 +265,53 @@ int32_t syscall_execute(const uint8_t* command){
 /*system call 3: read function*/
 int32_t syscall_read(int32_t fd, void* buf, int32_t nbytes){
   pcb_struct_t * pcb = find_PCB(current_pid);
-	return read_fd(pcb->fd_array, fd, buf, nbytes);
+  return read_fd(pcb->fd_array, fd, buf, nbytes);
 
 }
 
 /*system call 4: write function*/
 int32_t syscall_write(int32_t fd, const void* buf, int32_t nbytes){
   pcb_struct_t * pcb = find_PCB(current_pid);
-	return write_fd(pcb->fd_array, fd, buf, nbytes);
+  return write_fd(pcb->fd_array, fd, buf, nbytes);
 }
 
 /*system call 5: open function*/
 int32_t syscall_open(const uint8_t* filename){
   pcb_struct_t * pcb = find_PCB(current_pid);
-	return open_fd(pcb->fd_array, filename);
+  return open_fd(pcb->fd_array, filename);
 }
 
 /*system call 6: close*/
 int32_t syscall_close(int32_t fd){
   pcb_struct_t * pcb = find_PCB(current_pid);
-	return close_fd(pcb->fd_array, fd);
+  return close_fd(pcb->fd_array, fd);
 
 }
 
 /*system call 7: getargs function*/
 int32_t syscall_getargs(uint8_t* buf, int32_t nbytes){
-	int32_t length;
+  int32_t length;
 
-	//error checking
-	if(buf_length == -1)
-		return -1;
+  //error checking
+  if(buf_length == -1)
+    return -1;
 
-	//get the min(buf_length, nbytes)
-	if(nbytes < buf_length)
-		length = nbytes;
-	else
-		length = buf_length;
+  //get the min(buf_length, nbytes)
+  if(nbytes < buf_length)
+    length = nbytes;
+  else
+    length = buf_length;
 
-	//copy to user space
-	memcpy(buf, arg_buf, length);
+  //copy to user space
+  memcpy(buf, arg_buf, length);
 
-	return 0;
+  return 0;
 
 }
 
 /*system call 8: vidmap function*/
 int32_t syscall_vidmap(uint8_t** screen_start){
-	if(screen_start == NULL || *screen_start == NULL ||screen_start >= (uint8_t**)0x400000)
+  if(screen_start == NULL || *screen_start == NULL ||screen_start >= (uint8_t**)0x400000)
     return -1;
 
   return 0;
@@ -315,25 +320,25 @@ int32_t syscall_vidmap(uint8_t** screen_start){
 
 /*system call 9: set_handler function*/
 int32_t syscall_set_handler(int32_t signum, void* handler_address){
-	return 0;
+  return 0;
 
 }
 
 /*system call 10: sigreturn function*/
 int32_t syscall_sigreturn(){
-	return 0;
+  return 0;
 
 }
 
 /*function that updates the pid and PCB for next process*/
 int32_t add_process(pcb_struct_t** pcb, uint32_t eip, const parent_info_t parent)
 {
-	if(current_pid >= MAX_NUM_PCB)
-		return -1;
+  if(current_pid >= MAX_NUM_PCB)
+    return -1;
 
-	++current_pid;
-	*pcb = find_PCB(current_pid);
-	init_PCB(*pcb, current_pid, eip, parent);
-	return 0;
+  ++current_pid;
+  *pcb = find_PCB(current_pid);
+  init_PCB(*pcb, current_pid, eip, parent);
+  return 0;
 }
 
