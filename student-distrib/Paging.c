@@ -187,7 +187,7 @@ uint32_t get_physAddr(uint32_t virtAddr){
 void mapping_virt2Phys_Addr(uint32_t physAddr, uint32_t virtAddr){
 
 
-    unsigned long pdindex = (unsigned long)virtAddr >> 22;
+    unsigned long pdindex = (unsigned long)virtAddr >> PD_IDX_SHIFT;
     uint32_t CR3 = 0;    
 
 

@@ -8,14 +8,31 @@
 #include "x86_desc.h"
 #include "keyboard.h" // remove later
 
+#define SHIFT_8   8
+#define SHIFT_16   16
+#define SHIFT_24   24
 #define FILENAME_MAXLEN   32
+#define small_buf_size   4
+#define elf_size   4
+#define eip_size   4
+#define eip_offset   24
+#define tss_offset   4
+#define arg_buf_size   128
+#define parsing_index_max   127
+#define vidmap_limit   0x400000
+#define reenable_int 0x200
 #define FOUR_KB       0x1000
 #define EIGHT_KB       0x2000
 #define EIGHT_MB     0x800000
 #define PROG_ESP     0x83FFFFC
+#define program_img_start_addr     0x08048000
+#define ELF_0     0x7F
+#define ELF_1     0x45
+#define ELF_2     0x4C
+#define ELF_3     0x46
 
 uint32_t current_pid = 0;
-uint8_t arg_buf[128]={0}; //buffer for arguments
+uint8_t arg_buf[arg_buf_size]={0}; //buffer for arguments
 int32_t buf_length = -1;
 
 int32_t add_process(pcb_struct_t** pcb, uint32_t eip, const parent_info_t parent);
@@ -38,7 +55,7 @@ void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename
     /*get the filename*/
     while( *command != '\0' && *command != ' '&& *command != '\n' ){\
       filename[idx] = *command;
-      if(idx > 32)
+      if(idx > FILENAME_MAXLEN)
         return;
       idx++;
       command++;
@@ -49,12 +66,12 @@ void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename
      }
     /*assign arguments to the buffer*/
     idx = 0;
-    while(*command != '\0' && idx < 127){
+    while(*command != '\0' && idx < parsing_index_max){
       buf[idx] = *command;
       idx++;
       command++;
     }
-    if(idx == 127){
+    if(idx == parsing_index_max){
       buf_length = -1;
       return;
     }
@@ -82,7 +99,7 @@ int32_t syscall_halt(uint8_t status){
   uint32_t par_esp = 0;
   uint32_t par_ebp = 0;
   uint32_t * virtAddr;
-  virtAddr = (uint32_t *)0x08048000;
+  virtAddr = (uint32_t *)program_img_start_addr;
 
 
   /*get parent PCB and information of the parent*/
@@ -127,8 +144,8 @@ int32_t syscall_execute(const uint8_t* command){
   //pcb_struct_t* parent_PCB;
   pcb_struct_t* current_PCB;
   uint8_t filename[FILENAME_MAXLEN]={0};  
-  uint8_t  read_buf[4]={0};
-  uint8_t  ELF[4] = {0};
+  uint8_t  read_buf[small_buf_size]={0};
+  uint8_t  ELF[small_buf_size] = {0};
   uint32_t par_esp = 0;
   uint32_t par_ebp = 0;
   uint32_t cur_eip = 0;
@@ -136,7 +153,7 @@ int32_t syscall_execute(const uint8_t* command){
   uint32_t user_ds = USER_DS;
   uint32_t user_cs = USER_CS;
   uint32_t user_esp = PROG_ESP;
-  virtAddr = (uint32_t *)0x08048000;
+  virtAddr = (uint32_t *)program_img_start_addr;
   dentry_t dentry;
   int32_t sanity_check = 0;
 
@@ -144,28 +161,28 @@ int32_t syscall_execute(const uint8_t* command){
   systcall_exec_parse(command, arg_buf, filename);
 
   /*check the file type, ELF*/
-  ELF[0] = 0x7F;
-  ELF[1] = 0x45;
-  ELF[2] = 0x4C;
-  ELF[3] = 0x46;
+  ELF[0] = ELF_0;
+  ELF[1] = ELF_1;
+  ELF[2] = ELF_2;
+  ELF[3] = ELF_3;
 
   if(read_dentry_by_name(filename, &dentry)==-1){
     return -1;
   }
 
-  read_data(dentry.inode_num, 0, read_buf, 4);
-  if(strncmp((int8_t*)ELF, (int8_t*)read_buf, 4) != 0){
+  read_data(dentry.inode_num, 0, read_buf, elf_size);
+  if(strncmp((int8_t*)ELF, (int8_t*)read_buf, elf_size) != 0){
     return -1;//not an executable
   } 
   
 
 
   /*Get the eip from the executable file*/
-  read_data(dentry.inode_num, 24, read_buf, 4);
-  cur_eip = ((uint32_t)read_buf[0] << 0)  | cur_eip;
-  cur_eip = ((uint32_t)read_buf[1] << 8)  | cur_eip;
-  cur_eip = ((uint32_t)read_buf[2] << 16) | cur_eip;
-  cur_eip = ((uint32_t)read_buf[3] << 24) | cur_eip;
+  read_data(dentry.inode_num, eip_offset, read_buf, eip_size);
+  cur_eip = ((uint32_t)read_buf[0])  | cur_eip;
+  cur_eip = ((uint32_t)read_buf[1] << SHIFT_8)  | cur_eip;
+  cur_eip = ((uint32_t)read_buf[2] << SHIFT_16) | cur_eip;
+  cur_eip = ((uint32_t)read_buf[3] << SHIFT_24) | cur_eip;
 
 
   
@@ -189,7 +206,7 @@ int32_t syscall_execute(const uint8_t* command){
 
   //updating TSS
   tss.ss0 = KERNEL_DS;
-  tss.esp0 = EIGHT_MB - 4 - EIGHT_KB * (parent_pid);
+  tss.esp0 = EIGHT_MB - tss_offset - EIGHT_KB * (parent_pid);
   
     
   /*Set up paging*/
@@ -311,7 +328,7 @@ int32_t syscall_getargs(uint8_t* buf, int32_t nbytes){
 
 /*system call 8: vidmap function*/
 int32_t syscall_vidmap(uint8_t** screen_start){
-  if(screen_start == NULL || *screen_start == NULL ||screen_start >= (uint8_t**)0x400000)
+  if(screen_start == NULL || *screen_start == NULL ||screen_start >= (uint8_t**)vidmap_limit)
     return -1;
 
   return 0;

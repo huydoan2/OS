@@ -10,7 +10,7 @@
 #define MAX_SIZE 1024
 #define VIRMEM_START 0x00000000
 #define VIRMEM_END   0xFFFFF000
-
+#define align_4 4
 #define PHYSMEM_START 0x00000000
 
 #include "types.h"
@@ -19,8 +19,8 @@
 
 
 /*declare the page directory and the first page table*/
-uint32_t page_directory[MAX_SIZE]   __attribute__((aligned( MAX_SIZE*4)));
-uint32_t page_table[MAX_SIZE] __attribute__((aligned( MAX_SIZE*4)));
+uint32_t page_directory[MAX_SIZE]   __attribute__((aligned( MAX_SIZE*align_4)));
+uint32_t page_table[MAX_SIZE] __attribute__((aligned( MAX_SIZE*align_4)));
 
 /*function that initializes the page dir, page table and enable paging*/
 void paging_init();

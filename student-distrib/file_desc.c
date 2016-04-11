@@ -6,6 +6,8 @@
 #define RTC 0
 #define DIR	1
 #define REGULAR 2
+#define FD_2 2
+#define FD_7 2
 #define INUSE  1
 #define NOTUSE 0
 
@@ -43,7 +45,7 @@ void init_FD(file_desc_t* FD){
 	FD[1].fops.write_ptr = &keyboard_write;
 
 	/*initialize the rest of the blocks*/
-	for (i = 2; i < FD_SIZE; ++i){
+	for (i = REGULAR; i < FD_SIZE; ++i){
 		FD[i].file_pos = 0;
 	    FD[i].flags = NOTUSE;
 	}
@@ -65,7 +67,7 @@ int check_avail(file_desc_t* FD){
 	int i;
 	/*traverse through the FD size and for the first empty*/
 	//start from 2 to leave space for stdin and stdout
-	for (i = 2; i < FD_SIZE; ++i){
+	for (i = FD_2; i < FD_SIZE; ++i){
 		
 	    if (FD[i].flags == NOTUSE){
 	    	return i;
@@ -164,7 +166,7 @@ int32_t read_fd(file_desc_t* FD, int32_t fd, void * buf, int32_t nbytes)
 {
 	uint32_t offset = 0;
 	int ret_val;
-	if(fd < 0 || fd > 7 || fd == 1)
+	if(fd < 0 || fd > FD_7 || fd == 1)
 		return -1;
 	if(	FD[fd].flags == NOTUSE)
 		return -1;
@@ -197,7 +199,7 @@ int32_t read_fd(file_desc_t* FD, int32_t fd, void * buf, int32_t nbytes)
 
 int32_t write_fd(file_desc_t* FD, int32_t fd, const void * buf, int32_t nbytes)
 {
-	if(fd <= 0 || fd > 7)
+	if(fd <= 0 || fd > FD_7)
 		return -1;
 	if(	FD[fd].flags == NOTUSE)
 		return -1;
@@ -221,7 +223,7 @@ int32_t write_fd(file_desc_t* FD, int32_t fd, const void * buf, int32_t nbytes)
 
 int32_t close_fd(file_desc_t* FD, int32_t fd)
 {
-	if(fd < 2 || fd > 7)
+	if(fd < FD_2 || fd > FD_7)
 		return -1;
 	if(	FD[fd].flags == NOTUSE)
 		return -1;
