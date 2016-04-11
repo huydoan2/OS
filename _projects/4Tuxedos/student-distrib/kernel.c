@@ -13,6 +13,7 @@
 #include "rtc.h"
 #include "Paging.h"
 #include "systemCalls.h"
+#include "file.h"
 
 /* Macros. */
 /* Check if the bit BIT in FLAGS is set. */
@@ -39,20 +40,20 @@ entry (unsigned long magic, unsigned long addr)
 	/*file system test variables*/
 
 	uint32_t fileSys_startAddr;
-	uint8_t buffer_0[file_buff_size] = {0};
-	uint8_t buffer_1[file_buff_size] = {0};
+	//uint8_t buffer_0[file_buff_size] = {0};
+	//uint8_t buffer_1[file_buff_size] = {0};
 
-	uint32_t offset;
+	//uint32_t offset;
 
 	/*paging test variables*/
-	uint32_t test_phys_addr;
-	uint32_t test_virt_addr = test_virt;
-	uint32_t test_val;
+	//uint32_t test_phys_addr;
+	//uint32_t test_virt_addr = test_virt;
+	//uint32_t test_val;
 	
 	/*RTC test variables*/
-	int rtc_buff[rtc_buff_size] = {2,4,8,16,32};
-	int rtc_index = 0;
-	int rtc_read_buf[rtc_buff_size] = {2,4,8,16,32};
+	//int rtc_buff[rtc_buff_size] = {2,4,8,16,32};
+	//int rtc_index = 0;
+	//int rtc_read_buf[rtc_buff_size] = {2,4,8,16,32};
 
 	/*keyboard and terminal test variables*/
 	int keyboard_write_index;
@@ -62,11 +63,11 @@ entry (unsigned long magic, unsigned long addr)
 	int32_t num_bytes;
 
    /*file descriptor variables*/
-	int32_t fd_rtc;
-	int32_t fd_file;
-	int32_t fd_dir;
+	// int32_t fd_rtc;
+	// int32_t fd_file;
+	// int32_t fd_dir;
 
-	int32_t file_size;
+	//int32_t file_size;
 
 	/* Clear the screen. */
 	clear();
@@ -210,7 +211,7 @@ entry (unsigned long magic, unsigned long addr)
 	sti();
     printf("Enabling Interrupts\n");
 	clear(); //need to clear screen in terminal driver init
-	int i;
+	//int i;
 	 //for(;;)
 		//display_printf(" %d \n", i++);
 
@@ -223,6 +224,7 @@ entry (unsigned long magic, unsigned long addr)
 		keyboard_write_index = keyboard_read((int32_t*)buff, 0,num_byte);
 		keyboard_write((int32_t*)buff, keyboard_write_index);
 		printf("bytes written = %d\n",keyboard_write_index);
+		
 		while(keyboard_write_index>=0)
 		{		
 			buff[keyboard_write_index] = 0;
