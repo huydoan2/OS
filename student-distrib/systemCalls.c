@@ -120,7 +120,7 @@ asm volatile("jmp halt_ret_label;");
 int32_t syscall_execute(const uint8_t* command){
  	/*local variable declaration*/
  	uint32_t parent_pid = current_pid ;
- 	pcb_struct_t* parent_PCB;
+ 	//pcb_struct_t* parent_PCB;
  	pcb_struct_t* current_PCB;
  	uint8_t filename[FILENAME_MAXLEN]={0}; 	
  	uint8_t  read_buf[4]={0};
