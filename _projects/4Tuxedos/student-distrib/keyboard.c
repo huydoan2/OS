@@ -156,6 +156,7 @@ char getchar()
 		if(current_pid!=1)
 		{
 			display_c('\n');
+			printf("Exiting Program\n");
 			syscall_halt(0);
 			reset_linebuffer();
 			return 0;
@@ -336,7 +337,6 @@ int32_t keyboard_close()
  			int num_bytes = number of bytes
  *   OUTPUTS: none
  *   RETURN VALUE: none
-
  *-----------------------------------------------------------------------------------
  *   SIDE EFFECTS: 
  *			- the characters from the line buffer is stored in the input buffer
@@ -354,13 +354,12 @@ int32_t keyboard_read(int32_t * buff, uint32_t offset, int32_t num_bytes)
 	//check if the input is valid
 	if(read_buff  == NULL)
 		return -1;
-    reset_linebuffer();
+	reset_linebuffer();
 	//wait for the user to finish typing (hit enter)
 	while(enter_flag == 0);
  	enter_flag = 0;
-
- 	cli();
  	//copy the characters in the line buffer
+ 	cli();
  	while(line_buffer[i] != '\n' && i < num_bytes)
  	//while(i < num_bytes)
  	{
@@ -395,8 +394,8 @@ int32_t keyboard_write(int32_t * buff, int32_t num_bytes)
 	//Check if the inputs are valid
 	if(buff == NULL || num_bytes < 0)
 		return -1;
-	cli();
 	//write character to the screen]
+	cli();
 	while(i < num_bytes)
 	{
 		putc(write_buff[i]);
