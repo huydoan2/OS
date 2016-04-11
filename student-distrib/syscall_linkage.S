@@ -17,7 +17,7 @@ syscalls:
         cmpl $TABLE_SIZE, %eax
         ja syscalls_default
         cmpl $0, %eax
-        jb syscalls_default
+        jbe syscalls_default
         pusha                           #save all registers
         pushl %edx			#push all 3 argument to KERNEL STACK
         pushl %ecx			#for c calling convention
