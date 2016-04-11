@@ -39,8 +39,12 @@ void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename
     while( *command != '\0' && *command != ' '&& *command != '\n' ){\
       filename[idx] = *command;
       idx++;
+      if(idx > 32)
+        return;
       command++;
     }
+  
+
     //get the first char of the arguments
    while (*command == ' ') {//get the first char 
          command++; 
@@ -60,7 +64,8 @@ void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename
     {
     	buf[idx] = '\0';
     	buf_length = idx + 1;
-	}
+	  }
+
   return;
 
 }
@@ -143,7 +148,6 @@ int32_t syscall_execute(const uint8_t* command){
   if(read_dentry_by_name(filename, &dentry)==-1){
   	return -1;
   }
-
   read_data(dentry.inode_num, 0, read_buf, 4);
   if(strncmp((int8_t*)ELF, (int8_t*)read_buf, 4) != 0){
   	return -1;//not an executable
