@@ -100,10 +100,10 @@ rtc_handler(void)
 {
 	int frequency;
 
-	int32_t i;
-	for (i=NUM_ROWS*NUM_COLS-2; i < NUM_ROWS*NUM_COLS; i++) {
-		video_mem[i<<1]++;
-	}
+	//int32_t i;
+	// for (i=NUM_ROWS*NUM_COLS-2; i < NUM_ROWS*NUM_COLS; i++) {
+	// 	video_mem[i<<1]++;
+	// }
 	
 	send_eoi(RTC_IRQ_8);
 

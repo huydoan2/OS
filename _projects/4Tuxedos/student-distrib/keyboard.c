@@ -336,6 +336,7 @@ int32_t keyboard_close()
  			int num_bytes = number of bytes
  *   OUTPUTS: none
  *   RETURN VALUE: none
+
  *-----------------------------------------------------------------------------------
  *   SIDE EFFECTS: 
  *			- the characters from the line buffer is stored in the input buffer
@@ -353,10 +354,11 @@ int32_t keyboard_read(int32_t * buff, uint32_t offset, int32_t num_bytes)
 	//check if the input is valid
 	if(read_buff  == NULL)
 		return -1;
-
+    reset_linebuffer();
 	//wait for the user to finish typing (hit enter)
 	while(enter_flag == 0);
  	enter_flag = 0;
+
  	cli();
  	//copy the characters in the line buffer
  	while(line_buffer[i] != '\n' && i < num_bytes)
@@ -365,9 +367,9 @@ int32_t keyboard_read(int32_t * buff, uint32_t offset, int32_t num_bytes)
  		read_buff [i] = line_buffer[i];
  		i++;
  	}
- 	sti();
  	read_buff [i] = '\n';
  	i++;
+ 	sti();
  	buff = (int32_t*)read_buff;
  	reset_linebuffer();	//reset line buffer by reset the index
  	return i;
