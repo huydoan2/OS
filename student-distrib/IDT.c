@@ -6,6 +6,7 @@
  */
 #include "IDT.h"
 #include "syscall_linkage.h"
+#include "irq_handler.h"
 
 //Define values for IDT entry
 #define RESERVED4 0x0000
@@ -598,13 +599,13 @@ void system_calls()
  	//keyboard
  	//33 is 0x21 corresponding to irq 1
  	fill_interrupt_descriptor_table_entry(&idt_enry, KERNEL_CS, RESERVED4, RESERVED3_0, RESERVED2, RESERVED1, SIZE_32, RESERVED0, DPL_0, PRESENT);
- 	SET_IDT_ENTRY(idt_enry, keyboard_handler);
+ 	SET_IDT_ENTRY(idt_enry, keyboard_irq);
  	idt[33] = idt_enry;
 
  	//RTC
  	//40 is 0x28 corresponding to irq 8
  	fill_interrupt_descriptor_table_entry(&idt_enry, KERNEL_CS, RESERVED4, RESERVED3_0, RESERVED2, RESERVED1, SIZE_32, RESERVED0, DPL_0, PRESENT);
- 	SET_IDT_ENTRY(idt_enry, rtc_handler);
+ 	SET_IDT_ENTRY(idt_enry, rtc_irq);
  	idt[40] = idt_enry;
 
  	/*fill in the system call entry*/
