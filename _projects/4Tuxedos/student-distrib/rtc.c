@@ -49,7 +49,7 @@
 #define freq_8 512
 #define freq_9 1024
 
-static char* video_mem = (char *)VIDEO;
+//static char* video_mem = (char *)VIDEO;
 void rtc_set_rate();
 
 int counter = 0;	//count number of half seconds

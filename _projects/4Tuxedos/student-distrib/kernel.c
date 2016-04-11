@@ -216,7 +216,7 @@ entry (unsigned long magic, unsigned long addr)
 		//display_printf(" %d \n", i++);
 
 	/* Execute the first program (`shell') ... */
-	printf("%d\n",syscall_execute("shell"));
+	printf("%d\n",syscall_execute((uint8_t*)"shell"));
 	/********TESTING READ AND WRITE for Terminal and RTC*******/
 	while(1)
 	{
