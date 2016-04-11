@@ -4,6 +4,10 @@
 #ifndef RTC_H
 #define RTC_H
 
+
+
+#ifndef ASM 
+
 #include "i8259.h"
 #include "lib.h"
 
@@ -24,4 +28,6 @@ extern int32_t rtc_read(int32_t * buff, uint32_t offset, int32_t num_bytes);
 
 //write function for rtc
 extern int32_t rtc_write(int32_t * buff, int32_t num_bytes);
+
+#endif /* ASM */
 #endif 

@@ -262,11 +262,11 @@ void keyboard_handler()
 	    lb_index++;
 		line_buffer[lb_index] = c;
 	}
-	asm volatile("                  \n\
-		    leave                    \n\
-			iret                    \n\
-		    "
-			);
+	// asm volatile("                  \n\
+	// 	    leave                    \n\
+	// 		iret                    \n\
+	// 	    "
+	// 		);
 }
 
 /* 
