@@ -242,8 +242,15 @@ void keyboard_handler()
 	//handle next line input
 	if(c == '\n'|| c == '\r')
 	{
-	    lb_index++;
-		line_buffer[lb_index] = c;
+		if(lb_index < max_keys)
+	    {
+	    	lb_index++;
+			line_buffer[lb_index] = c;
+		}
+		else
+		{
+			reset_linebuffer();
+		}
 		enter_flag = 1;
 		newline();
 	}
@@ -263,6 +270,7 @@ void keyboard_handler()
 	    lb_index++;
 		line_buffer[lb_index] = c;
 	}
+
 }
 
 /* 
