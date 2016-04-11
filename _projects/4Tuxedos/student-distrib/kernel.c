@@ -38,23 +38,7 @@ entry (unsigned long magic, unsigned long addr)
 	multiboot_info_t *mbi;
 	
 	/*file system test variables*/
-
 	uint32_t fileSys_startAddr;
-	//uint8_t buffer_0[file_buff_size] = {0};
-	//uint8_t buffer_1[file_buff_size] = {0};
-
-	//uint32_t offset;
-
-	/*paging test variables*/
-	//uint32_t test_phys_addr;
-	//uint32_t test_virt_addr = test_virt;
-	//uint32_t test_val;
-	
-	/*RTC test variables*/
-	//int rtc_buff[rtc_buff_size] = {2,4,8,16,32};
-	//int rtc_index = 0;
-	//int rtc_read_buf[rtc_buff_size] = {2,4,8,16,32};
-
 	/*keyboard and terminal test variables*/
 	int keyboard_write_index;
 	char buff[size_of_keys];
@@ -62,12 +46,6 @@ entry (unsigned long magic, unsigned long addr)
 	int32_t * buf;
 	int32_t num_bytes;
 
-   /*file descriptor variables*/
-	// int32_t fd_rtc;
-	// int32_t fd_file;
-	// int32_t fd_dir;
-
-	//int32_t file_size;
 
 	/* Clear the screen. */
 	clear();
@@ -211,9 +189,6 @@ entry (unsigned long magic, unsigned long addr)
 	sti();
     printf("Enabling Interrupts\n");
 	clear(); //need to clear screen in terminal driver init
-	//int i;
-	 //for(;;)
-		//display_printf(" %d \n", i++);
 
 	/* Execute the first program (`shell') ... */
 	printf("%d\n",syscall_execute((uint8_t*)"shell"));
@@ -230,12 +205,6 @@ entry (unsigned long magic, unsigned long addr)
 			buff[keyboard_write_index] = 0;
 			keyboard_write_index--;
 		}
-		//rtc read write test
-		// write(fd_rtc,rtc_buff+rtc_index, rtc_num_byte);
-		// read(fd_rtc, rtc_read_buf, rtc_num_byte);
-		// rtc_index++;
-		// if(rtc_index == rtc_buff_size)
-		// 	rtc_index = 0;
 	}
 	
 

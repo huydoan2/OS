@@ -20,6 +20,7 @@
 #define caps_lock_off 0xBA
 #define end_of_press 0x81
 #define size_of_keys 128
+#define empty_char 87
 #define max_keys 126
 #define max_flag	8
 #define L_pressed 0x26
@@ -173,7 +174,7 @@ char getchar()
 	      		return scancode[c-1];
 	      	}
 	    	else
-	      		return scancode[87];
+	      		return scancode[empty_char];
 		}
 		/*caps lock off and shift off*/
 		else
@@ -181,7 +182,7 @@ char getchar()
 			if(c < end_of_press)
 	      		return shift_scancode[c-1];
 	    	else
-	      		return shift_scancode[87];
+	      		return shift_scancode[empty_char];
 		}
 	}
 
@@ -194,7 +195,7 @@ char getchar()
 	    	if(c < end_of_press)
 	      		return caps_shift_scancode[c-1];
 	    	else
-	      		return caps_shift_scancode[87];
+	      		return caps_shift_scancode[empty_char];
 		}
 		/*caps lock on and shift off*/
 		else
@@ -202,7 +203,7 @@ char getchar()
 			if(c < end_of_press)
 	      		return caps_scancode[c-1];
 	    	else
-	      		return caps_scancode[87];
+	      		return caps_scancode[empty_char];
 		}
 	}
 }
@@ -262,11 +263,6 @@ void keyboard_handler()
 	    lb_index++;
 		line_buffer[lb_index] = c;
 	}
-	// asm volatile("                  \n\
-	// 	    leave                    \n\
-	// 		iret                    \n\
-	// 	    "
-	// 		);
 }
 
 /* 

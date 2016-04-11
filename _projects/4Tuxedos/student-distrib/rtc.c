@@ -110,11 +110,6 @@ rtc_handler(void)
 	/*print timer every second at the right top corner*/
 	
 	interrupt_flag = 1;
-	// asm volatile("                  \n\
-	// 	    leave                    \n\
-	// 		iret                    \n\
-	// 	    "
-	// 		);
 }
 /* 
  * rtc_set_rate
