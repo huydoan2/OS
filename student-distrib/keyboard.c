@@ -157,6 +157,7 @@ char getchar()
 	{
 		if(current_pid!=1)
 		{
+			putc('\n');
 			syscall_halt(1);
 			reset_linebuffer();
 			return 0;
