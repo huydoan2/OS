@@ -7,7 +7,7 @@
 #define DIR	1
 #define REGULAR 2
 #define FD_2 2
-#define FD_7 2
+#define FD_7 7
 #define INUSE  1
 #define NOTUSE 0
 
