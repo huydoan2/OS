@@ -18,6 +18,8 @@
 #define eip_offset   24
 #define tss_offset   4
 #define arg_buf_size   128
+#define exception_status  2
+#define exception_ret_val   256
 #define parsing_index_max   127
 #define vidmap_limit   0x400000
 #define reenable_int 0x200
@@ -30,7 +32,7 @@
 #define ELF_1     0x45
 #define ELF_2     0x4C
 #define ELF_3     0x46
-
+uint32_t status_flag = 0;
 uint32_t current_pid = 0;
 uint8_t arg_buf[arg_buf_size]={0}; //buffer for arguments
 int32_t buf_length = -1;
@@ -88,6 +90,7 @@ void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename
 
 /*system call 1: halt function*/
 int32_t syscall_halt(uint8_t status){
+  status_flag = status;
   if(current_pid == 1)
   {
     current_pid--;
@@ -130,9 +133,8 @@ int32_t syscall_halt(uint8_t status){
                      :"%ebp"
                      );
 
-
   /*jump back to the execute*/
-asm volatile("jmp halt_ret_label;");
+ asm volatile("jmp halt_ret_label;");
 
   return 0;
 }
@@ -275,8 +277,11 @@ int32_t syscall_execute(const uint8_t* command){
   /*set label for return point */
   asm volatile("halt_ret_label:");
 
-
-  return 0;
+  if (status_flag == 0)
+    return 0;
+  else if (status_flag == exception_status)
+    return exception_ret_val;
+  return 1;
 }
 
 /*system call 3: read function*/
