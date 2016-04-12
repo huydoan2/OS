@@ -149,6 +149,7 @@ char getchar()
 	{
 		clear();
 		reset_linebuffer();
+		printf("391OS> ");
 		return 0;
 	}
 
