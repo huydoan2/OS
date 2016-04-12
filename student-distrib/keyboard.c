@@ -157,9 +157,7 @@ char getchar()
 	{
 		if(current_pid!=1)
 		{
-			display_c('\n');
-			printf("Exiting Program\n");
-			syscall_halt(0);
+			syscall_halt(1);
 			reset_linebuffer();
 			return 0;
 		}

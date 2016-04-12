@@ -7,6 +7,7 @@
 #include "IDT.h"
 #include "syscall_linkage.h"
 #include "irq_handler.h"
+#include "systemCalls.h"
 
 //Define values for IDT entry
 #define RESERVED4 0x0000
@@ -23,6 +24,7 @@
 #define RESERVED2 1
 #define RESERVED1 1
 #define RESERVED0 0
+#define exception_status 2
 
 
 
@@ -44,9 +46,7 @@ void Exception_Handler_0(){
 	//print out the error message
     clear();
 	printf("Exception: Divide-by-zero Error. \n");
-
-	//stop the execution 
-	while(1);
+	syscall_halt(exception_status);
 }
 
 /* 
@@ -66,11 +66,8 @@ void Exception_Handler_1(){
 	//print out the error message
     clear();
 	printf("Exception: Debug. \n");
-
-	//stop the execution 
-	while(1);
+	syscall_halt(exception_status);
 }
-
 /* 
  * Exception_Handler_2
  *   DESCRIPTION: the exception handler that handles the Non-maskable Interrupt
@@ -88,9 +85,7 @@ void Exception_Handler_2(){
 	//print out the error message
     clear();
 	printf("Exception: Non-maskable Interrupt. \n");
-
-	//stop the execution 
-	while(1);
+	syscall_halt(exception_status);
 }
 
 /* 
@@ -110,9 +105,7 @@ void Exception_Handler_3(){
 	//print out the error message
     clear();
 	printf("Exception: Breakpoint. \n");
-
-	//stop the execution 
-	while(1);
+	syscall_halt(exception_status);
 }
 
 /* 
@@ -132,9 +125,7 @@ void Exception_Handler_4(){
 	//print out the error message
     clear();
 	printf("Exception: Overflow. \n");
-
-	//stop the execution 
-	while(1);
+	syscall_halt(exception_status);
 }
 
 /* 
@@ -154,9 +145,7 @@ void Exception_Handler_5(){
 	//print out the error message
     clear();
 	printf("Exception: Bound Range Exceeded. \n");
-
-	//stop the execution 
-	while(1);
+	syscall_halt(exception_status);
 }
 
 /* 
@@ -174,11 +163,9 @@ void Exception_Handler_5(){
 void Exception_Handler_6(){
 
 	//print out the error message
-    //clear();
+    clear();
 	printf("Exception: Invalid Opcode. \n");
-
-	//stop the execution 
-	while(1);
+	syscall_halt(exception_status);
 }
 
 /* 
@@ -198,9 +185,7 @@ void Exception_Handler_7(){
 	//print out the error message
     clear();
 	printf("Exception: Device Not Available. \n");
-
-	//stop the execution 
-	while(1);
+	syscall_halt(exception_status);
 }
 
 /* 
@@ -220,9 +205,7 @@ void Exception_Handler_8(){
 	//print out the error message
     clear();
 	printf("Exception: Double Fault. \n");
-
-	//stop the execution 
-	while(1);
+	syscall_halt(exception_status);
 }
 
 /* 
@@ -242,9 +225,7 @@ void Exception_Handler_9(){
 	//print out the error message
     clear();
 	printf("Exception: Coprocessor Segment Overrun. \n");
-
-	//stop the execution 
-	while(1);
+	syscall_halt(exception_status);
 }
 
 /* 
@@ -264,9 +245,7 @@ void Exception_Handler_10(){
 	//print out the error message
     clear();
 	printf("Exception: Invalid TSS. \n");
-
-	//stop the execution 
-	while(1);
+	syscall_halt(exception_status);
 }
 
 /* 
@@ -286,9 +265,7 @@ void Exception_Handler_11(){
 	//print out the error message
     clear();
 	printf("Exception: Segment Not Present. \n");
-
-	//stop the execution 
-	while(1);
+	syscall_halt(exception_status);
 }
 
 /* 
@@ -308,9 +285,7 @@ void Exception_Handler_12(){
 	//print out the error message
     clear();
 	printf("Exception: Stack-Segment Fault. \n");
-
-	//stop the execution 
-	while(1);
+	syscall_halt(exception_status);
 }
 
 /* 
@@ -330,9 +305,7 @@ void Exception_Handler_13(){
 	//print out the error message
     clear();
 	printf("Exception: General Protection Fault. \n");
-
-	//stop the execution 
-	while(1);
+	syscall_halt(exception_status);
 }
 
 /* 
@@ -350,11 +323,9 @@ void Exception_Handler_13(){
 void Exception_Handler_14(){
 
 	//print out the error message
-    //clear();
+    clear();
 	printf("Exception: Page Fault. \n");
-
-	//stop the execution 
-	while(1);
+	syscall_halt(exception_status);
 }
 
 
@@ -374,8 +345,7 @@ void Exception_Handler_16()
 	//print out the error message
     clear();
 	printf("EXCPETION: x87 Floating-Point Exception\n");
-	//stop the execution 
-	while(1);
+	syscall_halt(exception_status);
 }
 
 /* 
@@ -394,8 +364,7 @@ void Exception_Handler_17()
 	//print out the error message
     clear();
 	printf("EXCPETION: Alignment Check\n");
-	//stop the execution 
-	while(1);
+	syscall_halt(exception_status);
 }
 
 /* 
@@ -414,8 +383,7 @@ void Exception_Handler_18()
 	//print out the error message
     clear();
 	printf("EXCPETION: Machine Check\n");
-	//stop the execution 
-	while(1);
+	syscall_halt(exception_status);
 }
 
 /* 
@@ -434,8 +402,7 @@ void Exception_Handler_19()
 	//print out the error message
     clear();
 	printf("EXCPETION: SIMD Floating-Point Exception\n");
-	//stop the execution 
-	while(1);
+	syscall_halt(exception_status);
 }
 
 /* 
@@ -454,8 +421,7 @@ void Exception_Handler_20()
 	//print out the error message
     clear();
 	printf("EXCPETION: Virtualization Exception\n");
-	//stop the execution 
-	while(1);
+	syscall_halt(exception_status);
 }
 
 /* 
@@ -474,8 +440,7 @@ void Exception_Handler_30()
 	//print out the error message
     clear();
 	printf("EXCPETION: Security Exception\n");
-	//stop the execution 
-	while(1);
+	syscall_halt(exception_status);
 }
 
 /* 
