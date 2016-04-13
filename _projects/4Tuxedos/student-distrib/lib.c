@@ -302,7 +302,6 @@ format_char_switch:
 *   Return Value: Number of bytes written
 *	Function: Output a string to the console 
 */
-
 int32_t
 puts(int8_t* s)
 {
