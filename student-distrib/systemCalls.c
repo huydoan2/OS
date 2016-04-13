@@ -39,8 +39,19 @@ int32_t add_process(pcb_struct_t** pcb, uint32_t eip, const parent_info_t parent
  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
  /*  helper functions for system calls  */
 
-/* systcall_exec_parse: parse input for execute call
- *reutrn the filename and store the command parameters in the buffer
+/* 
+ * systcall_exec_parse
+ *   DESCRIPTION: parse the input typed in by users and obtain filename and arguments
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: 
+ *        - command: input command by typed by users
+ *        - buf: buffer that stores the parsed arguments
+ *        - filename: holds the parsed filename 
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: - none
+ *
  */
 void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename){
 
@@ -55,6 +66,7 @@ void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename
     /*get the filename*/
     while( *command != '\0' && *command != ' '&& *command != '\n' ){\
       filename[idx] = *command;
+      //check if the maximum length of the filename is reached 
       if(idx > FILENAME_MAXLEN)
         return;
       idx++;
@@ -109,7 +121,7 @@ int32_t syscall_halt(uint8_t status){
   par_ebp = cur_PCB->parent.ebp;
 
   /*remap the parent code to the virtual memory*/
-  //Set up paging
+  //Set up paging - mapping back to the previous process
   --current_pid;
   map_page(current_pid);
 
@@ -163,14 +175,14 @@ int32_t syscall_execute(const uint8_t* command){
   ELF[1] = ELF_1;
   ELF[2] = ELF_2;
   ELF[3] = ELF_3;
-
+  /*obtain the program image*/
   if(read_dentry_by_name(filename, &dentry)==-1){
-    return -1;
+    return -1;  //if there is no such file
   }
 
   read_data(dentry.inode_num, 0, read_buf, elf_size);
   if(strncmp((int8_t*)ELF, (int8_t*)read_buf, elf_size) != 0){
-    return -1;//not an executable
+    return -1; //not an executable
   } 
   
 
@@ -194,7 +206,7 @@ int32_t syscall_execute(const uint8_t* command){
   parent.esp0 = tss.esp0;
   parent.ss0 = tss.ss0;
 
-  //add a new PCB
+  /* Add a new PCB*/
   sanity_check = add_process(&current_PCB, cur_eip, parent);
   if(sanity_check == -1)
   {
@@ -202,7 +214,7 @@ int32_t syscall_execute(const uint8_t* command){
     return -1;
   }
 
-  //updating TSS
+  /* Updating TSS */
   tss.ss0 = KERNEL_DS;
   tss.esp0 = EIGHT_MB - tss_offset - EIGHT_KB * (parent_pid);
   
@@ -272,9 +284,11 @@ int32_t syscall_execute(const uint8_t* command){
   asm volatile("IRET");
   /*set label for return point */
   asm volatile("halt_ret_label:");
-  
-   asm volatile("mov %%bl, %0":"=c"(status));
-  if (exception_flag == 1)
+  /*obtain the return value from halt system call*/
+  asm volatile("mov %%bl, %0":"=c"(status));
+
+   /*determine the proper return value*/
+  if (exception_flag == 1)  //if there is an exception
   {
     exception_flag = 0;
     return exception_ret_val;
@@ -351,12 +365,26 @@ int32_t syscall_sigreturn(){
 
 }
 
-/*function that updates the pid and PCB for next process*/
-int32_t add_process(pcb_struct_t** pcb, uint32_t eip, const parent_info_t parent)
+
+/* 
+ * add_process
+ *   DESCRIPTION: function that allocates a new PCB in memory for the new process
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: - pcb: new pcb structure for the new process
+ *           - eip: starting instruction pointer for the new process 
+ *           - parent: structure that stores the parent information of the new process
+ *   OUTPUTS: none
+ *   RETURN VALUE:0
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: a new PCB block is allocated in memory for the new process
+ *
+ */
+ int32_t add_process(pcb_struct_t** pcb, uint32_t eip, const parent_info_t parent)
 {
+  //check for the maximum number of programs running
   if(current_pid >= MAX_NUM_PCB)
     return -1;
-
+  //create new PCB for the new process 
   ++current_pid;
   *pcb = find_PCB(current_pid);
   init_PCB(*pcb, current_pid, eip, parent);

@@ -182,7 +182,17 @@ uint32_t get_physAddr(uint32_t virtAddr){
     
 
 }
-
+/* 
+ * mapping_virt2Phys_Addr
+ *   DESCRIPTION: links the given physical address and virtual address
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: - virtAddr: the virtual (linear) address to be linked 
+ *			 - physAddr: the physical address to be linked 
+ *   OUTPUTS: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: changed page directory and flushed TLB
+ *
+ */
 
 void mapping_virt2Phys_Addr(uint32_t physAddr, uint32_t virtAddr){
 
@@ -203,7 +213,16 @@ void mapping_virt2Phys_Addr(uint32_t physAddr, uint32_t virtAddr){
 	
 }
 
-
+/* 
+ * map_page
+ *   DESCRIPTION: maps new program to the proper virtual memory space with given process ID
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: - pid: process ID 
+ *   OUTPUTS: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: the program image corresponding to the pid is loaded to the memory 
+ *
+ */
 void map_page(uint32_t pid){
 	uint32_t prog_startAddr = FIRST_PROG + FOUR_MB* (pid -1);
 
