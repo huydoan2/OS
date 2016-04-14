@@ -348,8 +348,8 @@ int32_t syscall_vidmap(uint8_t** screen_start)
 {
   if(screen_start == NULL || screen_start < (uint8_t**)OneTwentyEight_MB || screen_start >= (uint8_t**)OneThirtyTwo_MB)
     return -1;
-  *screen_start = (uint8_t*)FOUR_KB;
   vidmap_mapping();
+  *screen_start = (uint8_t*)0x00800000;
   return 0;
 }
 

@@ -136,7 +136,6 @@ int32_t open_fd(file_desc_t* FD, const uint8_t* filename)
 	/*store the inode number*/
 	fd.inode = dentry.inode_num;
 	fd.file_pos = 0;
-	
 	//change the flag to indicate the occupied
 	fd.flags = INUSE;
 
@@ -147,8 +146,6 @@ int32_t open_fd(file_desc_t* FD, const uint8_t* filename)
 	fd.fops.open_ptr();
 
 	return FD_idx;
-
-	
 }
 /* 
  * open
