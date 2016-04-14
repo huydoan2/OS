@@ -35,6 +35,8 @@ uint32_t get_physAddr(uint32_t  virtAddr);
 
 void mapping_virt2Phys_Addr(uint32_t physAddr, uint32_t virtAddr);
 
+void vidmap_mapping();
+
 void map_page(uint32_t pid);
 
 

@@ -324,8 +324,14 @@ void Exception_Handler_13(){
 void Exception_Handler_14(){
 
 	//print out the error message
-    clear();
+    //clear();
+     uint32_t CR2 = 0;    
+
 	printf("Exception: Page Fault. \n");
+
+    asm volatile("mov %%CR2, %0":"=c"(CR2));
+    printf("ERROR CODE: %x\n", CR2);
+
 	exception_termination();
 }
 

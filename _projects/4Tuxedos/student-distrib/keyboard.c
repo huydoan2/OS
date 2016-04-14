@@ -372,9 +372,9 @@ int32_t keyboard_read(int32_t * buff, uint32_t offset, int32_t num_bytes)
  	}
  	read_buff [i] = '\n';
  	i++;
- 	sti();
  	buff = (int32_t*)read_buff;
  	reset_linebuffer();	//reset line buffer by reset the index
+ 	sti();
  	return i;
 }
 
@@ -405,6 +405,7 @@ int32_t keyboard_write(int32_t * buff, int32_t num_bytes)
 		putc(write_buff[i]);
 		i++;
 	}
+	reset_linebuffer();	//reset line buffer by reset the index
 	sti();
 	return i;
 }
