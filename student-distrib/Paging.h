@@ -21,6 +21,7 @@
 /*declare the page directory and the first page table*/
 uint32_t page_directory[MAX_SIZE]   __attribute__((aligned( MAX_SIZE*align_4)));
 uint32_t page_table[MAX_SIZE] __attribute__((aligned( MAX_SIZE*align_4)));
+uint32_t vid_page_table[MAX_SIZE] __attribute__((aligned( MAX_SIZE*align_4)));
 
 /*function that initializes the page dir, page table and enable paging*/
 void paging_init();

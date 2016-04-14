@@ -10,12 +10,13 @@
 #define  PHYSADDR_MASK_0 0xFFFFF000
 /*entry values for page directory*/
 #define  PD_ENTRY_EMP_VAL 0x00000002
-#define  PD_ENTRY_INIT_VAL_0 0x00000107
+#define  PD_ENTRY_INIT_VAL_0 0x00000103
 #define  PD_ENTRY_INIT_VAL_1 0x00000183
 #define  PD_ENTRY_INIT_VAL_2 0x00000087
+#define  PD_ENTRY_INIT_VAL_3 0x00000107
 /*entry value for page table*/
 #define  PT_ENTRY_EMP_VAL 0x00000002
-#define  PT_ENTRY_INIT_VAL_0 0x0000003
+#define  PT_ENTRY_INIT_VAL_0 0x00000003
 #define  PT_ENTRY_INIT_VAL_1 0x00000183
 #define  PT_ENTRY_INIT_VAL_2 0x00000007
 /*mask for turn on CR0 and CR4*/
@@ -75,7 +76,7 @@ void paging_init()
 	 //increment the physical address to the next segement 
 	 physAddr += PT_INCREMENT;
 	 page_directory[1] = ((physAddr )| PD_ENTRY_INIT_VAL_1);
-
+	 page_directory[2] =  ((unsigned int)vid_page_table) | PD_ENTRY_INIT_VAL_3;
 	
 	/*load page dir and enable paging*/
     uint32_t CR0 = 0;
@@ -210,7 +211,7 @@ void vidmap_mapping()
     uint32_t CR3 = 0;
     uint32_t video_addr = VIDEO;
     // Create a vidmap mapping
-	page_table[1] = ((video_addr)|PT_ENTRY_INIT_VAL_2);
+	vid_page_table[0] = ((video_addr)|PT_ENTRY_INIT_VAL_2);
     // Now you need to flush the entry in the TLB
     asm volatile("mov %%CR3, %0":"=c"(CR3));
 	CR3 = (unsigned int)page_directory;
