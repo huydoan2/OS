@@ -10,14 +10,14 @@
 #define  PHYSADDR_MASK_0 0xFFFFF000
 /*entry values for page directory*/
 #define  PD_ENTRY_EMP_VAL 0x00000002
-#define  PD_ENTRY_INIT_VAL_0 0x00000103
+#define  PD_ENTRY_INIT_VAL_0 0x00000107
 #define  PD_ENTRY_INIT_VAL_1 0x00000183
 #define  PD_ENTRY_INIT_VAL_2 0x00000087
-
 /*entry value for page table*/
 #define  PT_ENTRY_EMP_VAL 0x00000002
-#define  PT_ENTRY_INIT_VAL_0 0x00000103
+#define  PT_ENTRY_INIT_VAL_0 0x0000003
 #define  PT_ENTRY_INIT_VAL_1 0x00000183
+#define  PT_ENTRY_INIT_VAL_2 0x00000007
 /*mask for turn on CR0 and CR4*/
 #define  TURNON_PAGING 0x80000000
 #define  TURNON_4MB_PAGE 0x00000010
@@ -29,6 +29,7 @@
 #define PHYS_ADDR_OFFSET_MASK_1 0x003FFFFF//the mask for 4MB page
 #define PAGE_SIZE_MASK 0x0000080 //mask to extract the page size bit from the pd 
 
+#define VIDEO 0xB8000
 #define FIRST_PROG 0x00800000 //8MB
 #define PROG_VIRTADDR 0x08000000
 #define FOUR_MB 0x0400000
@@ -179,27 +180,20 @@ uint32_t get_physAddr(uint32_t virtAddr){
     	return phys_addr;
 
     }
-    
-
 }
-/* 
- * mapping_virt2Phys_Addr
- *   DESCRIPTION: links the given physical address and virtual address
- *-----------------------------------------------------------------------------------
- *   INPUTS: - virtAddr: the virtual (linear) address to be linked 
- *			 - physAddr: the physical address to be linked 
- *   OUTPUTS: none
- *-----------------------------------------------------------------------------------
- *   SIDE EFFECTS: changed page directory and flushed TLB
- *
- */
-
-void mapping_virt2Phys_Addr(uint32_t physAddr, uint32_t virtAddr){
 
 
+void map_page(uint32_t pid)
+{
+	uint32_t prog_startAddr = FIRST_PROG + FOUR_MB* (pid -1);
+
+	mapping_virt2Phys_Addr(prog_startAddr, PROG_VIRTADDR);
+}
+
+void mapping_virt2Phys_Addr(uint32_t physAddr, uint32_t virtAddr)
+{
     unsigned long pdindex = (unsigned long)virtAddr >> PD_IDX_SHIFT;
     uint32_t CR3 = 0;    
-
 
     // Create a large page 
     page_directory[pdindex] = ((physAddr )| PD_ENTRY_INIT_VAL_2);
@@ -209,24 +203,16 @@ void mapping_virt2Phys_Addr(uint32_t physAddr, uint32_t virtAddr){
     asm volatile("mov %%CR3, %0":"=c"(CR3));
 	CR3 = (unsigned int)page_directory;
 	asm volatile("mov %0, %%CR3"::"c"(CR3));  	
-
-	
 }
 
-/* 
- * map_page
- *   DESCRIPTION: maps new program to the proper virtual memory space with given process ID
- *-----------------------------------------------------------------------------------
- *   INPUTS: - pid: process ID 
- *   OUTPUTS: none
- *-----------------------------------------------------------------------------------
- *   SIDE EFFECTS: the program image corresponding to the pid is loaded to the memory 
- *
- */
-void map_page(uint32_t pid){
-	uint32_t prog_startAddr = FIRST_PROG + FOUR_MB* (pid -1);
-
-	mapping_virt2Phys_Addr(prog_startAddr, PROG_VIRTADDR);
+void vidmap_mapping()
+{
+    uint32_t CR3 = 0;
+    uint32_t video_addr = VIDEO;
+    // Create a vidmap mapping
+	page_table[1] = ((video_addr)|PT_ENTRY_INIT_VAL_2);
+    // Now you need to flush the entry in the TLB
+    asm volatile("mov %%CR3, %0":"=c"(CR3));
+	CR3 = (unsigned int)page_directory;
+	asm volatile("mov %0, %%CR3"::"c"(CR3));
 }
-
-
