@@ -16,6 +16,7 @@
 #define CURSOR_PORT 0x3D5
 #define CURSOR_MASK 0xFF
 #define MOVING_NUM (NUM_COLS*(NUM_ROWS - 1))*2
+#define RESOLUTION NUM_ROWS*NUM_COLS
 
 static int screen_x;
 static int screen_y;
@@ -29,16 +30,20 @@ void set_vidmem(int32_t terminal_id){
 	{
 		case 0:
 			video_mem = (char *)VIDEO_0;
+			memcpy(video_mem, (void*)(VIDEO), RESOLUTION);
 			break;
 		case 1:
 			video_mem = (char *)VIDEO_1;
+			memcpy(video_mem, (void*)(VIDEO_1), RESOLUTION);
 			break;
 		case 2:
 			video_mem = (char *)VIDEO_2;
+			memcpy(video_mem, (void*)(VIDEO_2), RESOLUTION);
 			break;
 		
 		default: 
 			video_mem = (char *)VIDEO;
+			memcpy(video_mem, (void*)(VIDEO), RESOLUTION);
 			break;
 	}		
 
@@ -874,11 +879,6 @@ void scroll_screen()
 {
 	/*set the black color*/
 
-	/*determine whether the end of screen is reached*/
-
-		/*move the currnet video display up by a line*/
-
-		/*set blank to the last line of the video*/
 	int i;
 
 	uint32_t last_line = (VIDEO + (NUM_ROWS - 1)*NUM_COLS*sizeof(uint16_t));		//the address of the last row in video memory
