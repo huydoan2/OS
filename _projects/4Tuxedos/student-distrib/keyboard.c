@@ -7,6 +7,7 @@
 
 #include "keyboard.h"
 #include "systemCalls.h"
+#include "Paging.h"
 #define keyboard_irq_num 1
 #define left_shift_on 0x2A
 #define left_shift_off 0xAA
@@ -125,6 +126,7 @@ char getScancode()
 char getchar()
 {
 	unsigned char c = getScancode();
+	uint32_t cur_terminal_id;
 
 	/*if the left shift or right shift is pressed, set the shift flag to 1*/
 	if(c == left_shift_on || c == right_shift_on)
@@ -184,11 +186,11 @@ char getchar()
 
 		if(terminal_index!=0)
 		{	
-
+            cur_terminal_id = terminal_index;
 			terminal_index = 0;
 			//change the vid mapping 
-			clear();
-			set_vidmem(terminal_index);
+			set_vid_mem(cur_terminal_id, terminal_index);
+          //  switch_vidmem(terminal_index);
 
 			printf("\nTerminal %d\n",terminal_index);
 			i=0;
@@ -202,11 +204,12 @@ char getchar()
 	if(alt_flag[terminal_index] && c == F2_pressed)
 	{
 		if(terminal_index!=1)
-		{
+		{   cur_terminal_id = terminal_index;
 			terminal_index = 1;
 			//change the vid mapping 
-			clear();
-			set_vidmem(terminal_index);
+			set_vid_mem(cur_terminal_id, terminal_index);
+            //switch_vidmem(terminal_index);
+			//set_vidmem(terminal_index);
 			printf("\nTerminal %d\n",terminal_index);
 			i=0;
 			while(i <= lb_index[terminal_index])
@@ -219,11 +222,11 @@ char getchar()
 	if(alt_flag[terminal_index] && c == F3_pressed)
 	{
 		if(terminal_index!=2)
-		{
+		{   cur_terminal_id = terminal_index;
 			terminal_index = 2;
 			//change the vid mapping 
-			clear();
-			set_vidmem(terminal_index);
+			set_vid_mem(cur_terminal_id, terminal_index);
+           // switch_vidmem(terminal_index);
 			printf("\nTerminal %d\n",terminal_index);
 			i=0;
 			while(i <= lb_index[terminal_index])

@@ -34,6 +34,7 @@
 #define FIRST_PROG 0x00800000 //8MB
 #define PROG_VIRTADDR 0x08000000
 #define FOUR_MB 0x0400000
+uint32_t vid_mem_array[3] = {757760, 761856, 765952};
 
 
 /* 
@@ -217,3 +218,22 @@ void vidmap_mapping()
 	CR3 = (unsigned int)page_directory;
 	asm volatile("mov %0, %%CR3"::"c"(CR3));
 }
+
+/*change the terminal memory mapping for different terminal*/
+void set_vid_mem(uint32_t cur_terminal_id, uint32_t next_terminal_id){
+	
+		//store the current screen 
+		memcpy((void*)vid_mem_array[cur_terminal_id], (void*)VIDEO, RESOLUTION);
+
+		//redirect the current pointer
+		mapping_virt2Phys_Addr(vid_mem_array[cur_terminal_id], vid_mem_array[cur_terminal_id]);
+
+		//copy the new screen to the vidmeme
+		memcpy((void*)VIDEO,(void*)vid_mem_array[next_terminal_id], RESOLUTION);
+		//assign the pointer
+		mapping_virt2Phys_Addr((uint32_t)VIDEO, vid_mem_array[next_terminal_id]);
+
+}
+
+
+
