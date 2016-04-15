@@ -180,7 +180,7 @@ char getchar()
 		}
 	}
 
-	int i;
+	//int i;
 	if(alt_flag[terminal_index] && c == F1_pressed)
 	{
 
@@ -188,9 +188,10 @@ char getchar()
 		{	
             cur_terminal_id = terminal_index;
 			terminal_index = 0;
+			cursor_terminal = 0;
 			//change the vid mapping 
 			set_vid_mem(cur_terminal_id, terminal_index);
-
+			cursor_update_terminal();
 		}
 	}
 	if(alt_flag[terminal_index] && c == F2_pressed)
@@ -198,8 +199,10 @@ char getchar()
 		if(terminal_index!=1)
 		{   cur_terminal_id = terminal_index;
 			terminal_index = 1;
+			cursor_terminal = 1;
 			//change the vid mapping 
 			set_vid_mem(cur_terminal_id, terminal_index);
+			cursor_update_terminal();
 		}
 	}
 	if(alt_flag[terminal_index] && c == F3_pressed)
@@ -207,9 +210,10 @@ char getchar()
 		if(terminal_index!=2)
 		{   cur_terminal_id = terminal_index;
 			terminal_index = 2;
+			cursor_terminal = 2;
 			//change the vid mapping 
 			set_vid_mem(cur_terminal_id, terminal_index);
-			
+			cursor_update_terminal();
 		}
 	}
 
