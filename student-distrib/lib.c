@@ -4,6 +4,9 @@
 
 #include "lib.h"
 #define VIDEO 0xB8000
+#define VIDEO_0 0xB8000
+#define VIDEO_1 0xB9000
+#define VIDEO_2 0xBA000
 #define NUM_COLS 80
 #define MAX_X_INDEX 79
 #define NUM_ROWS 25
@@ -16,9 +19,30 @@
 
 static int screen_x;
 static int screen_y;
-//static int max_x;
 static char* video_mem = (char *)VIDEO;
 static uint16_t blank_row[NUM_COLS];
+
+
+/*set the video memory space in accordance to the current termianl ID*/
+void set_vidmem(int32_t terminal_id){
+	switch (terminal_id)
+	{
+		case 0:
+			video_mem = (char *)VIDEO_0;
+			break;
+		case 1:
+			video_mem = (char *)VIDEO_1;
+			break;
+		case 2:
+			video_mem = (char *)VIDEO_2;
+			break;
+		
+		default: 
+			video_mem = (char *)VIDEO;
+			break;
+	}		
+
+}
 /*
 * void clear(void);
 *   Inputs: void
