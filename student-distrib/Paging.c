@@ -223,13 +223,13 @@ void vidmap_mapping()
 void set_vid_mem(uint32_t cur_terminal_id, uint32_t next_terminal_id){
 	
 		//store the current screen 
-		memcpy((void*)vid_mem_array[cur_terminal_id], (void*)VIDEO, RESOLUTION);
+		memcpy((void*)vid_mem_array[cur_terminal_id], (void*)VIDEO, RESOLUTION*2);
 
 		//redirect the current pointer
 		mapping_virt2Phys_Addr(vid_mem_array[cur_terminal_id], vid_mem_array[cur_terminal_id]);
 
 		//copy the new screen to the vidmeme
-		memcpy((void*)VIDEO,(void*)vid_mem_array[next_terminal_id], RESOLUTION);
+		memcpy((void*)VIDEO,(void*)vid_mem_array[next_terminal_id], RESOLUTION*2);
 		//assign the pointer
 		mapping_virt2Phys_Addr((uint32_t)VIDEO, vid_mem_array[next_terminal_id]);
 
