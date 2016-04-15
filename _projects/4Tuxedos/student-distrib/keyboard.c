@@ -190,15 +190,7 @@ char getchar()
 			terminal_index = 0;
 			//change the vid mapping 
 			set_vid_mem(cur_terminal_id, terminal_index);
-          //  switch_vidmem(terminal_index);
 
-			printf("\nTerminal %d\n",terminal_index);
-			i=0;
-			while(i <= lb_index[terminal_index])
-			{
-				putc(line_buffer[terminal_index][i]);
-				i++;
-			}
 		}
 	}
 	if(alt_flag[terminal_index] && c == F2_pressed)
@@ -208,15 +200,6 @@ char getchar()
 			terminal_index = 1;
 			//change the vid mapping 
 			set_vid_mem(cur_terminal_id, terminal_index);
-            //switch_vidmem(terminal_index);
-			//set_vidmem(terminal_index);
-			printf("\nTerminal %d\n",terminal_index);
-			i=0;
-			while(i <= lb_index[terminal_index])
-			{
-				putc(line_buffer[terminal_index][i]);
-				i++;
-			}
 		}
 	}
 	if(alt_flag[terminal_index] && c == F3_pressed)
@@ -226,14 +209,7 @@ char getchar()
 			terminal_index = 2;
 			//change the vid mapping 
 			set_vid_mem(cur_terminal_id, terminal_index);
-           // switch_vidmem(terminal_index);
-			printf("\nTerminal %d\n",terminal_index);
-			i=0;
-			while(i <= lb_index[terminal_index])
-			{
-				putc(line_buffer[terminal_index][i]);
-				i++;
-			}
+			
 		}
 	}
 
