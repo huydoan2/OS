@@ -164,7 +164,10 @@ int32_t read_fd(file_desc_t* FD, int32_t fd, void * buf, int32_t nbytes)
 	uint32_t offset = 0;
 	int ret_val = 0;
 	if(fd < 0 || fd > FD_7 || fd == 1)
-		return 0;
+		return -1;
+
+	/*If retunr -1, syserr passes, but fish does not blink
+	  If return 0, syserr fails, but fish blinks*/
 	if(	FD[fd].flags == NOTUSE)
 		return 0;
 	file_desc_t cur_fd = FD[fd];
