@@ -240,7 +240,6 @@ int32_t rtc_write(int32_t * buff, int32_t num_bytes)
 			return -1;
 	}
 	rtc_set_rate();
-	printf("rtc rate: %d \n", rate);
 	return 0;
 }
 
