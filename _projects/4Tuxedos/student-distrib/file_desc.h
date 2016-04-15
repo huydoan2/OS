@@ -19,7 +19,7 @@
 
 /*function pointer type for system calls*/
 typedef int32_t (*openFunc_ptr)();
-typedef int32_t (*readFunc_ptr)(int32_t*, uint32_t, int32_t);
+typedef int32_t (*readFunc_ptr)(int32_t*, uint32_t, int32_t, int32_t);
 typedef int32_t (*writeFunc_ptr)(int32_t*, int32_t);
 typedef int32_t (*closeFunc_ptr)();
 

@@ -24,7 +24,7 @@ extern int32_t rtc_open();
 extern int32_t rtc_close();
 
 //read function for rtc
-extern int32_t rtc_read(int32_t * buff, uint32_t offset, int32_t num_bytes);
+extern int32_t rtc_read(int32_t * buff, uint32_t offset, int32_t num_bytes, int32_t var);
 
 //write function for rtc
 extern int32_t rtc_write(int32_t * buff, int32_t num_bytes);
