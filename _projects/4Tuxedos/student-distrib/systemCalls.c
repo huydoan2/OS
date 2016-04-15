@@ -293,10 +293,6 @@ int32_t syscall_read(int32_t fd, void* buf, int32_t nbytes)
 {
   pcb_struct_t * pcb = find_PCB(current_pid);
   return read_fd(pcb->fd_array, fd, buf, nbytes);
-  // printf("nbytes in read: %d\n", nbytes);
-  // temp = read_fd(pcb->fd_array, fd, buf, nbytes);
-  // keyboard_write(buf,nbytes);
-  // return temp;
 }
 
 /*system call 4: write function*/
@@ -348,6 +344,7 @@ int32_t syscall_vidmap(uint8_t** screen_start)
 {
   if(screen_start == NULL || screen_start < (uint8_t**)OneTwentyEight_MB || screen_start >= (uint8_t**)OneThirtyTwo_MB)
     return -1;
+ // clear(); //DO WE NEED THIS?!?!?!?
   vidmap_mapping();
   *screen_start = (uint8_t*)0x00800000;
   return 0;
