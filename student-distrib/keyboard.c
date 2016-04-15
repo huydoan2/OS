@@ -184,7 +184,7 @@ char getchar()
 		if(terminal_index!=0)
 		{	
 			terminal_index = 0;
-			printf("\n                        Terminal %d\n",terminal_index);
+			printf("\nTerminal %d\n",terminal_index);
 			i=0;
 			while(i <= lb_index[terminal_index])
 			{
@@ -198,7 +198,7 @@ char getchar()
 		if(terminal_index!=1)
 		{
 			terminal_index = 1;
-			printf("\n                        Terminal %d\n",terminal_index);
+			printf("\nTerminal %d\n",terminal_index);
 			i=0;
 			while(i <= lb_index[terminal_index])
 			{
@@ -212,7 +212,7 @@ char getchar()
 		if(terminal_index!=2)
 		{
 			terminal_index = 2;
-			printf("\n                        Terminal %d\n",terminal_index);
+			printf("\nTerminal %d\n",terminal_index);
 			i=0;
 			while(i <= lb_index[terminal_index])
 			{
