@@ -23,7 +23,7 @@ extern int32_t dir_open();
 extern int32_t dir_close();
 
 //read function for file
-extern int32_t dir_read(int32_t* buff, uint32_t offset,int32_t num_bytes);
+extern int32_t dir_read(int32_t* buff, uint32_t offset,int32_t num_bytes, int32_t var);
 
 //write function for file
 extern int32_t dir_write(int32_t* buff,  int32_t num_bytes);
@@ -38,7 +38,7 @@ extern int32_t file_open();
 extern int32_t file_close();
 
 //read function for file
-extern int32_t file_read(int32_t* buff, uint32_t offset, int32_t num_bytes);
+extern int32_t file_read(int32_t* buff, uint32_t offset, int32_t num_bytes, int32_t var);
 
 //write function for file
 extern int32_t file_write(int32_t* buff, int32_t num_bytes);

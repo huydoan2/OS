@@ -108,7 +108,7 @@ int32_t dir_close(){
  *-----------------------------------------------------------------------------------
  *   SIDE EFFECTS: - store the file system in to data structures 
  */
-int32_t dir_read(int32_t* buff, uint32_t offset, int32_t num_bytes){
+int32_t dir_read(int32_t* buff, uint32_t offset, int32_t num_bytes, int32_t var){
 
 	dentry_t dentry;
 	//check if the input offset is valid
@@ -155,9 +155,9 @@ void file_handler(void)
  *-----------------------------------------------------------------------------------
  *   SIDE EFFECTS: none 
  */
-int32_t file_read(int32_t * buff, uint32_t offset,int32_t num_bytes)
+int32_t file_read(int32_t * buff, uint32_t offset,int32_t num_bytes, int32_t var)
 {
-	uint32_t inode = *buff;
+	uint32_t inode = var;
 
 	return read_data(inode, offset, (uint8_t*)buff, num_bytes);
 	

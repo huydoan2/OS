@@ -350,7 +350,7 @@ int32_t keyboard_close()
 
 
 
-int32_t keyboard_read(int32_t * buff, uint32_t offset, int32_t num_bytes)
+int32_t keyboard_read(int32_t * buff, uint32_t offset, int32_t num_bytes, int32_t var)
 {
 	
 	int i = 0;

@@ -162,7 +162,8 @@ int32_t open_fd(file_desc_t* FD, const uint8_t* filename)
 int32_t read_fd(file_desc_t* FD, int32_t fd, void * buf, int32_t nbytes)
 {
 	uint32_t offset = 0;
-	int ret_val = 0;
+	int32_t var;
+	int ret_val;
 	if(fd < 0 || fd > FD_7 || fd == 1)
 		return -1;
 
@@ -171,10 +172,10 @@ int32_t read_fd(file_desc_t* FD, int32_t fd, void * buf, int32_t nbytes)
 	if(	FD[fd].flags == NOTUSE)
 		return 0;
 	file_desc_t cur_fd = FD[fd];
-	*(int32_t*)buf = cur_fd.inode;
+	var = cur_fd.inode;
 	offset = cur_fd.file_pos;
 
-	ret_val = cur_fd.fops.read_ptr((int32_t*)buf, offset,nbytes);
+	ret_val = cur_fd.fops.read_ptr((int32_t*)buf, offset,nbytes, var);
 	if(FD[fd].fops.read_ptr == &dir_read)
 		FD[fd].file_pos += 1;
 
