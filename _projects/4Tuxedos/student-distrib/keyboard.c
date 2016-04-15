@@ -181,9 +181,15 @@ char getchar()
 	int i;
 	if(alt_flag[terminal_index] && c == F1_pressed)
 	{
+
 		if(terminal_index!=0)
 		{	
+
 			terminal_index = 0;
+			//change the vid mapping 
+			clear();
+			set_vidmem(terminal_index);
+
 			printf("\nTerminal %d\n",terminal_index);
 			i=0;
 			while(i <= lb_index[terminal_index])
@@ -198,6 +204,9 @@ char getchar()
 		if(terminal_index!=1)
 		{
 			terminal_index = 1;
+			//change the vid mapping 
+			clear();
+			set_vidmem(terminal_index);
 			printf("\nTerminal %d\n",terminal_index);
 			i=0;
 			while(i <= lb_index[terminal_index])
@@ -212,6 +221,9 @@ char getchar()
 		if(terminal_index!=2)
 		{
 			terminal_index = 2;
+			//change the vid mapping 
+			clear();
+			set_vidmem(terminal_index);
 			printf("\nTerminal %d\n",terminal_index);
 			i=0;
 			while(i <= lb_index[terminal_index])

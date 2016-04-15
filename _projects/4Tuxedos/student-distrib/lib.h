@@ -31,6 +31,7 @@ int32_t display_s(int8_t* s);
 void delete();
 void newline();
 void scroll_screen();
+void set_vidmem(int32_t terminal_id);
 
 /* Userspace address-check functions */
 int32_t bad_userspace_addr(const void* addr, int32_t len);
