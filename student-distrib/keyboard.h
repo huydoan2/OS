@@ -18,9 +18,8 @@
 
 
 
- int lb_index;
- char line_buffer [size_of_keys];
-
+ //int lb_index;
+ //char line_buffer [size_of_keys];
 
 //initialize the keyboard
  void keyboard_init();

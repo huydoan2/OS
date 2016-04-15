@@ -25,8 +25,14 @@
 #define max_flag	8
 #define L_pressed 0x26
 #define C_pressed 0x2E
-
-
+#define num_terminal 3
+#define left_alt_on 0x38	
+#define left_alt_off 0xB8	
+#define right_alt_on 0x38	
+#define right_alt_off 0xB8	
+#define F1_pressed 0x3B
+#define F2_pressed 0x3C
+#define F3_pressed 0x3D
 
 //scancode array for keyboard
 //0 = no output
@@ -36,16 +42,16 @@ char garbage [size_of_keys] =
 	'\0','1','2','3','4','5','6','7','8','9','0','-','=','\b',0,//backspace and tab
 	'q','w','e','r','t','y','u','i','o','p','[',']','\n',0,//Control
 	'a','s','d','f','g','h','j','k','l',';','\'','`',0,//Left shift
-  	'\\','z','x','c','v','b','n','m',',','.','/',0,
-  	'*',0,' ',0,0,0,0,0,0,0,0,0,0,0,0,0,
-  	'7',0,'9','-',0,'5',0,'+','1',0,'3','0','.',0,0,0,0,0,0, /* All Release keys are undefined */
+  	'\\','z','x','c','v','b','n','m',',','.','/',0,//Right shift
+  	'*',0/*left Alt*/,' ',0, /*start Functionkeys*/0,0,0,0,0,0,0,0,0,0,
+  	0,0,'7',0,'9','-',0,'5',0,'+','1',0,'3','0','.',0,0,0,0,0,0, /* All Release keys are undefined */
 };
 char scancode [size_of_keys] = 
 {
 	'\0','1','2','3','4','5','6','7','8','9','0','-','=','\b',0,//backspace and tab
 	'q','w','e','r','t','y','u','i','o','p','[',']','\n',0,//Control
 	'a','s','d','f','g','h','j','k','l',';','\'','`',0,//Left shift
-  	'\\','z','x','c','v','b','n','m',',','.','/',0,
+  	'\\','z','x','c','v','b','n','m',',','.','/',0,//Right shift
   	'*',0,' ',0,0,0,0,0,0,0,0,0,0,0,0,0,
   	'7',0,'9','-',0,'5',0,'+','1',0,'3','0','.',0,0,0,0,0,0, /* All Release keys are undefined */
 };
@@ -80,13 +86,14 @@ char caps_shift_scancode[size_of_keys] =
  	'7',0,'9','-',0,'5',0,'+','1',0,'3','0','.',0,0,0,0,0,0, /* All Release keys are undefined */
 };
 
-int shift_flag;				/*flag for shift*/
-int caps_lock_flag;			/*flag for caps*/
-int control_flag;			/*flag for control*/
-volatile int enter_flag;	/*flag for enter*/
-int lb_index;				/*line buffer index*/
-char line_buffer [size_of_keys] = {0};		/*initialize line buffer*/
-
+int shift_flag[num_terminal];				/*flag for shift*/
+int caps_lock_flag[num_terminal];			/*flag for caps*/
+int control_flag[num_terminal];			/*flag for control*/
+int alt_flag[num_terminal];				/*flag for alt*/
+volatile int enter_flag[num_terminal];	/*flag for enter*/
+int lb_index[num_terminal];				/*line buffer index*/
+char line_buffer[num_terminal][size_of_keys] = {{0}};		/*initialize line buffer*/
+int terminal_index = 0;
 /* 
  * getScancode
  *   DESCRIPTION: get a keyboard input from keyboard_data address and return the data
@@ -121,31 +128,38 @@ char getchar()
 
 	/*if the left shift or right shift is pressed, set the shift flag to 1*/
 	if(c == left_shift_on || c == right_shift_on)
-		shift_flag = 1;
+		shift_flag[terminal_index] = 1;
 	/*if the left shift or right shift is released, set the shift flag to 0*/
 	else if(c == left_shift_off || c == right_shift_off)
-		shift_flag = 0;
+		shift_flag[terminal_index] = 0;
 	
 	/*if the left control or right control is pressed, set the control flag to 1*/
 	if(c == left_control_on || c == right_control_on)
-		control_flag = 1;
+		control_flag[terminal_index] = 1;
 	/*if the left control or right control is released, set the control flag to 0*/
 	else if(c == left_control_off || c == right_control_off)
-		control_flag = 0;
+		control_flag[terminal_index] = 0;
 	
+	/*if the left control or right control is pressed, set the control flag to 1*/
+	if(c == left_alt_on || c == right_alt_on)
+		alt_flag[terminal_index] = 1;
+	/*if the left control or right control is released, set the control flag to 0*/
+	else if(c == left_alt_off || c == right_alt_off)
+		alt_flag[terminal_index] = 0;
+
 
 	/*if the caps lock is pressed, change the capslock flag*/
 	if(c == caps_lock_on)
-		caps_lock_flag++;
+		caps_lock_flag[terminal_index]++;
 	else if(c == caps_lock_off)
-		caps_lock_flag = caps_lock_flag;
+		caps_lock_flag[terminal_index] = caps_lock_flag[terminal_index];
 
 	/*reset the caps lock flag once it goes over the max*/
-	if(caps_lock_flag == max_flag)
-		caps_lock_flag = 0;	
+	if(caps_lock_flag[terminal_index] == max_flag)
+		caps_lock_flag[terminal_index] = 0;	
 
 	/*if control+L, clear the display */
-	if(control_flag && c == L_pressed)
+	if(control_flag[terminal_index] && c == L_pressed)
 	{
 		clear();
 		reset_linebuffer();
@@ -153,7 +167,7 @@ char getchar()
 		return 0;
 	}
 
-	if(control_flag && c == C_pressed)
+	if(control_flag[terminal_index] && c == C_pressed)
 	{
 		if(current_pid!=1)
 		{
@@ -164,11 +178,56 @@ char getchar()
 		}
 	}
 
+	int i;
+	if(alt_flag[terminal_index] && c == F1_pressed)
+	{
+		if(terminal_index!=0)
+		{	
+			terminal_index = 0;
+			printf("\nTerminal %d\n",terminal_index);
+			i=0;
+			while(i <= lb_index[terminal_index])
+			{
+				putc(line_buffer[terminal_index][i]);
+				i++;
+			}
+		}
+	}
+	if(alt_flag[terminal_index] && c == F2_pressed)
+	{
+		if(terminal_index!=1)
+		{
+			terminal_index = 1;
+			printf("\nTerminal %d\n",terminal_index);
+			i=0;
+			while(i <= lb_index[terminal_index])
+			{
+				putc(line_buffer[terminal_index][i]);
+				i++;
+			}
+		}
+	}
+	if(alt_flag[terminal_index] && c == F3_pressed)
+	{
+		if(terminal_index!=2)
+		{
+			terminal_index = 2;
+			printf("\nTerminal %d\n",terminal_index);
+			i=0;
+			while(i <= lb_index[terminal_index])
+			{
+				putc(line_buffer[terminal_index][i]);
+				i++;
+			}
+		}
+	}
+
+
 	/*caps lock off case, checking if it's even or odd*/
-	if((caps_lock_flag % 2) ==0)
+	if((caps_lock_flag[terminal_index] % 2) ==0)
 	{
 		/*caps lock off and shift on*/
-		if(shift_flag == 0)
+		if(shift_flag[terminal_index] == 0)
 		{
 	    	if(c < end_of_press){
 	      		return scancode[c-1];
@@ -190,7 +249,7 @@ char getchar()
 	else
 	{
 		/*caps lock on and shift on*/
-		if(shift_flag == 1)
+		if(shift_flag[terminal_index] == 1)
 		{
 	    	if(c < end_of_press)
 	      		return caps_shift_scancode[c-1];
@@ -242,33 +301,33 @@ void keyboard_handler()
 	//handle next line input
 	if(c == '\n'|| c == '\r')
 	{
-		if(lb_index < max_keys)
+		if(lb_index[terminal_index] < max_keys)
 	    {
-	    	lb_index++;
-			line_buffer[lb_index] = c;
+	    	lb_index[terminal_index]++;
+			line_buffer[terminal_index][lb_index[terminal_index]] = c;
 		}
 		else
 		{
 			reset_linebuffer();
 		}
-		enter_flag = 1;
+		enter_flag[terminal_index] = 1;
 		newline();
 	}
 	//handle the backspace input
 	else if(c == '\b')
 	{
-		if(lb_index >= 0)
+		if(lb_index[terminal_index] >= 0)
 		{
-			lb_index--;
+			lb_index[terminal_index]--;
 			delete(); //delete the character 
 		}
 	}
 	//limit the maximum number of input characters
-	else if(c != '\0' && lb_index < max_keys)			/*if the scancode value is not empty, print out the character*/
+	else if(c != '\0' && lb_index[terminal_index] < max_keys)			/*if the scancode value is not empty, print out the character*/
 	{
 		display_c(c);
-	    lb_index++;
-		line_buffer[lb_index] = c;
+	    lb_index[terminal_index]++;
+		line_buffer[terminal_index][lb_index[terminal_index]] = c;
 	}
 
 }
@@ -287,11 +346,11 @@ void keyboard_handler()
 void reset_linebuffer()
 {	
 	int i;
-	for (i = 0; i < lb_index; ++i)
+	for (i = 0; i < lb_index[terminal_index]; ++i)
 	{
-		line_buffer[i] = 0;
+		line_buffer[terminal_index][i] = 0;
 	}
-	lb_index = -1;
+	lb_index[terminal_index] = -1;
 }
 
 /* 
@@ -307,11 +366,15 @@ void reset_linebuffer()
  */
 int32_t keyboard_open()
 {
-	shift_flag = 0;					/*initialize the shift flag to zero*/
-	caps_lock_flag = 0;				/*initialize the caps lock flag to zero*/
-	control_flag = 0;				/*initialize flag for control*/
-	enter_flag = 0;					/*initialize enter to zero*/
-	lb_index = -1;					/*initialize line buffer index*/
+	int i;
+	for (i = 0; i < num_terminal; ++i)
+	{
+		shift_flag[i] = 0;					/*initialize the shift flag to zero*/
+		caps_lock_flag[i] = 0;				/*initialize the caps lock flag to zero*/
+		control_flag[i] = 0;				/*initialize flag for control*/
+		enter_flag[i] = 0;					/*initialize enter to zero*/
+		lb_index[i] = -1;					/*initialize line buffer index*/
+	}
 	keyboard_init();
 	return 0;
 }
@@ -360,14 +423,13 @@ int32_t keyboard_read(int32_t * buff, uint32_t offset, int32_t num_bytes, int32_
 		return -1;
 	reset_linebuffer();
 	//wait for the user to finish typing (hit enter)
-	while(enter_flag == 0);
- 	enter_flag = 0;
+	while(enter_flag[terminal_index] == 0);
+ 	enter_flag[terminal_index] = 0;
  	//copy the characters in the line buffer
  	cli();
- 	while(line_buffer[i] != '\n' && i < num_bytes)
- 	//while(i < num_bytes)
+ 	while(line_buffer[terminal_index][i] != '\n' && i < num_bytes)
  	{
- 		read_buff [i] = line_buffer[i];
+ 		read_buff [i] = line_buffer[terminal_index][i];
  		i++;
  	}
  	read_buff [i] = '\n';
