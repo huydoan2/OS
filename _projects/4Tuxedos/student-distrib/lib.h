@@ -24,7 +24,7 @@
 #define MOVING_NUM (NUM_COLS*(NUM_ROWS - 1))*2
 #define RESOLUTION NUM_ROWS*NUM_COLS
 
-
+int cursor_terminal;
 
 int32_t printf(int8_t *format, ...);
 void putc(uint8_t c);
@@ -51,6 +51,7 @@ void delete();
 void newline();
 void scroll_screen();
 void switch_vidmem(uint32_t next_terminal_id);
+void cursor_update_terminal();
 /* Userspace address-check functions */
 int32_t bad_userspace_addr(const void* addr, int32_t len);
 int32_t safe_strncpy(int8_t* dest, const int8_t* src, int32_t n);
