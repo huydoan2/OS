@@ -7,6 +7,25 @@
 
 #include "types.h"
 
+
+
+#define VIDEO 0xB8000
+#define VIDEO_0 0xB9000
+#define VIDEO_1 0xBA000
+#define VIDEO_2 0xBB000
+#define NUM_COLS 80
+#define MAX_X_INDEX 79
+#define NUM_ROWS 25
+#define ATTRIB 0x7
+#define ATTRIB_SHIFT 8
+#define BASE_PORT 0x3D4
+#define CURSOR_PORT 0x3D5
+#define CURSOR_MASK 0xFF
+#define MOVING_NUM (NUM_COLS*(NUM_ROWS - 1))*2
+#define RESOLUTION NUM_ROWS*NUM_COLS
+
+
+
 int32_t printf(int8_t *format, ...);
 void putc(uint8_t c);
 int32_t puts(int8_t *s);
@@ -31,8 +50,7 @@ int32_t display_s(int8_t* s);
 void delete();
 void newline();
 void scroll_screen();
-void set_vidmem(int32_t terminal_id);
-
+void switch_vidmem(uint32_t next_terminal_id);
 /* Userspace address-check functions */
 int32_t bad_userspace_addr(const void* addr, int32_t len);
 int32_t safe_strncpy(int8_t* dest, const int8_t* src, int32_t n);

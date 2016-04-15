@@ -23,6 +23,8 @@ uint32_t page_directory[MAX_SIZE]   __attribute__((aligned( MAX_SIZE*align_4)));
 uint32_t page_table[MAX_SIZE] __attribute__((aligned( MAX_SIZE*align_4)));
 uint32_t vid_page_table[MAX_SIZE] __attribute__((aligned( MAX_SIZE*align_4)));
 
+
+
 /*function that initializes the page dir, page table and enable paging*/
 void paging_init();
 /*function that fills a singel entry in the page directory*/
@@ -39,6 +41,8 @@ void mapping_virt2Phys_Addr(uint32_t physAddr, uint32_t virtAddr);
 void vidmap_mapping();
 
 void map_page(uint32_t pid);
+
+void set_vid_mem(uint32_t cur_terminal_id, uint32_t next_terminal_id);
 
 
 
