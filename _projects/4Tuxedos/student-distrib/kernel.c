@@ -196,7 +196,7 @@ entry (unsigned long magic, unsigned long addr)
 	while(1)
 	{
 		//keyboard read write test
-		keyboard_write_index = keyboard_read((int32_t*)buff, 0,num_byte);
+		keyboard_write_index = keyboard_read((int32_t*)buff, 0,num_byte, 0);
 		keyboard_write((int32_t*)buff, keyboard_write_index);
 		printf("bytes written = %d\n",keyboard_write_index);
 		

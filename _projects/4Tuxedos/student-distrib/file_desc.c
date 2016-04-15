@@ -170,7 +170,7 @@ int32_t read_fd(file_desc_t* FD, int32_t fd, void * buf, int32_t nbytes)
 	/*If retunr -1, syserr passes, but fish does not blink
 	  If return 0, syserr fails, but fish blinks*/
 	if(	FD[fd].flags == NOTUSE)
-		return 0;
+		return -1;
 	file_desc_t cur_fd = FD[fd];
 	var = cur_fd.inode;
 	offset = cur_fd.file_pos;
