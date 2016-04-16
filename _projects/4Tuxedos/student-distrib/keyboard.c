@@ -186,61 +186,63 @@ char getchar()
 		return 0;
 	}
 
-	//int i;
 	if(alt_flag[current_terminal])
 	{
-	switch(c)
-	{
-	case F1_pressed:
-	{
+		switch(c)
+		{
+			case F1_pressed:
+			{
 
-		if(current_terminal!=0)
-		{	
-            prev_terminal_id = current_terminal;
-			current_terminal = 0;
-			control_flag[current_terminal] = 0;
-			cursor_terminal = 0;
-			//change the vid mapping 
-			set_vid_mem(prev_terminal_id, current_terminal);
-			cursor_update_terminal();
-			if(current_pid[current_terminal] == 0)
-				syscall_execute((uint8_t*)"shell");
-		}
-		break;
-	}
-	case F2_pressed:
-	{
-		if(current_terminal!=1)
-		{   prev_terminal_id = current_terminal;
-			current_terminal = 1;
-			control_flag[current_terminal] = 0;
-			cursor_terminal = 1;
-			//change the vid mapping 
-			set_vid_mem(prev_terminal_id, current_terminal);
-			cursor_update_terminal();
-			if(current_pid[current_terminal] == 0)
-				syscall_execute((uint8_t*)"shell");
-		}
-		break;
-	}
-	case F3_pressed:
-	{
-		if(current_terminal!=2)
-		{   prev_terminal_id = current_terminal;
-			current_terminal = 2;
-			control_flag[current_terminal] = 0;
-			cursor_terminal = 2;
-			//change the vid mapping 
-			set_vid_mem(prev_terminal_id, current_terminal);
-			cursor_update_terminal();
-			if(current_pid[current_terminal] == 0)
-				syscall_execute((uint8_t*)"shell");
-		}
-		break;
+				if(current_terminal!=0)
+				{	
+		            prev_terminal_id = current_terminal;
+					current_terminal = 0;
+					control_flag[current_terminal] = 0;
+					cursor_terminal = 0;
+					//change the vid mapping 
+					set_vid_mem(prev_terminal_id, current_terminal);
+					cursor_update_terminal();
+					printf("pid: %d\n",current_pid[current_terminal]);
+					if(current_pid[current_terminal] == 0)
+						syscall_execute((uint8_t*)"shell");
+				}
+				break;
+			}
+			case F2_pressed:
+			{
+				if(current_terminal!=1)
+				{   prev_terminal_id = current_terminal;
+					current_terminal = 1;
+					control_flag[current_terminal] = 0;
+					cursor_terminal = 1;
+					//change the vid mapping 
+					set_vid_mem(prev_terminal_id, current_terminal);
+					cursor_update_terminal();
+					printf("pid: %d\n",current_pid[current_terminal]);
+					if(current_pid[current_terminal] == 0)
+						syscall_execute((uint8_t*)"shell");
+				}
+				break;
+			}
+			case F3_pressed:
+			{
+				if(current_terminal!=2)
+				{   prev_terminal_id = current_terminal;
+					current_terminal = 2;
+					control_flag[current_terminal] = 0;
+					cursor_terminal = 2;
+					//change the vid mapping 
+					set_vid_mem(prev_terminal_id, current_terminal);
+					cursor_update_terminal();
+					printf("pid: %d\n",current_pid[current_terminal]);
+					if(current_pid[current_terminal] == 0)
+						syscall_execute((uint8_t*)"shell");
+				}
+				break;
 
+			}
+		}
 	}
-	}
-}
 
 	/*caps lock off case, checking if it's even or odd*/
 	if((caps_lock_flag[current_terminal] % 2) ==0)
