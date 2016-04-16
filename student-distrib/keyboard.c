@@ -94,7 +94,8 @@ int alt_flag[num_terminal];				/*flag for alt*/
 volatile int enter_flag[num_terminal];	/*flag for enter*/
 int lb_index[num_terminal];				/*line buffer index*/
 char line_buffer[num_terminal][size_of_keys] = {{0}};		/*initialize line buffer*/
-int terminal_index = 0;
+
+int current_terminal = 0;
 /* 
  * getScancode
  *   DESCRIPTION: get a keyboard input from keyboard_data address and return the data
@@ -130,38 +131,38 @@ char getchar()
 
 	/*if the left shift or right shift is pressed, set the shift flag to 1*/
 	if(c == left_shift_on || c == right_shift_on)
-		shift_flag[terminal_index] = 1;
+		shift_flag[current_terminal] = 1;
 	/*if the left shift or right shift is released, set the shift flag to 0*/
 	else if(c == left_shift_off || c == right_shift_off)
-		shift_flag[terminal_index] = 0;
+		shift_flag[current_terminal] = 0;
 	
 	/*if the left control or right control is pressed, set the control flag to 1*/
 	if(c == left_control_on || c == right_control_on)
-		control_flag[terminal_index] = 1;
+		control_flag[current_terminal] = 1;
 	/*if the left control or right control is released, set the control flag to 0*/
 	else if(c == left_control_off || c == right_control_off)
-		control_flag[terminal_index] = 0;
+		control_flag[current_terminal] = 0;
 	
 	/*if the left control or right control is pressed, set the control flag to 1*/
 	if(c == left_alt_on || c == right_alt_on)
-		alt_flag[terminal_index] = 1;
+		alt_flag[current_terminal] = 1;
 	/*if the left control or right control is released, set the control flag to 0*/
 	else if(c == left_alt_off || c == right_alt_off)
-		alt_flag[terminal_index] = 0;
+		alt_flag[current_terminal] = 0;
 
 
 	/*if the caps lock is pressed, change the capslock flag*/
 	if(c == caps_lock_on)
-		caps_lock_flag[terminal_index]++;
+		caps_lock_flag[current_terminal]++;
 	else if(c == caps_lock_off)
-		caps_lock_flag[terminal_index] = caps_lock_flag[terminal_index];
+		caps_lock_flag[current_terminal] = caps_lock_flag[current_terminal];
 
 	/*reset the caps lock flag once it goes over the max*/
-	if(caps_lock_flag[terminal_index] == max_flag)
-		caps_lock_flag[terminal_index] = 0;	
+	if(caps_lock_flag[current_terminal] == max_flag)
+		caps_lock_flag[current_terminal] = 0;	
 
 	/*if control+L, clear the display */
-	if(control_flag[terminal_index] && c == L_pressed)
+	if(control_flag[current_terminal] && c == L_pressed)
 	{
 		clear();
 		reset_linebuffer();
@@ -169,7 +170,7 @@ char getchar()
 		return 0;
 	}
 
-	if(control_flag[terminal_index] && c == C_pressed)
+	if(control_flag[current_terminal] && c == C_pressed)
 	{
 		if(current_pid!=1)
 		{
@@ -181,51 +182,51 @@ char getchar()
 	}
 
 	//int i;
-	if(alt_flag[terminal_index] && c == F1_pressed)
+	if(alt_flag[current_terminal] && c == F1_pressed)
 	{
 
-		if(terminal_index!=0)
+		if(current_terminal!=0)
 		{	
-            cur_terminal_id = terminal_index;
-			terminal_index = 0;
-			control_flag[terminal_index] = 0;
+            cur_terminal_id = current_terminal;
+			current_terminal = 0;
+			control_flag[current_terminal] = 0;
 			cursor_terminal = 0;
 			//change the vid mapping 
-			set_vid_mem(cur_terminal_id, terminal_index);
+			set_vid_mem(cur_terminal_id, current_terminal);
 			cursor_update_terminal();
 		}
 	}
-	if(alt_flag[terminal_index] && c == F2_pressed)
+	if(alt_flag[current_terminal] && c == F2_pressed)
 	{
-		if(terminal_index!=1)
-		{   cur_terminal_id = terminal_index;
-			terminal_index = 1;
-			control_flag[terminal_index] = 0;
+		if(current_terminal!=1)
+		{   cur_terminal_id = current_terminal;
+			current_terminal = 1;
+			control_flag[current_terminal] = 0;
 			cursor_terminal = 1;
 			//change the vid mapping 
-			set_vid_mem(cur_terminal_id, terminal_index);
+			set_vid_mem(cur_terminal_id, current_terminal);
 			cursor_update_terminal();
 		}
 	}
-	if(alt_flag[terminal_index] && c == F3_pressed)
+	if(alt_flag[current_terminal] && c == F3_pressed)
 	{
-		if(terminal_index!=2)
-		{   cur_terminal_id = terminal_index;
-			terminal_index = 2;
-			control_flag[terminal_index] = 0;
+		if(current_terminal!=2)
+		{   cur_terminal_id = current_terminal;
+			current_terminal = 2;
+			control_flag[current_terminal] = 0;
 			cursor_terminal = 2;
 			//change the vid mapping 
-			set_vid_mem(cur_terminal_id, terminal_index);
+			set_vid_mem(cur_terminal_id, current_terminal);
 			cursor_update_terminal();
 		}
 	}
 
 
 	/*caps lock off case, checking if it's even or odd*/
-	if((caps_lock_flag[terminal_index] % 2) ==0)
+	if((caps_lock_flag[current_terminal] % 2) ==0)
 	{
 		/*caps lock off and shift on*/
-		if(shift_flag[terminal_index] == 0)
+		if(shift_flag[current_terminal] == 0)
 		{
 	    	if(c < end_of_press){
 	      		return scancode[c-1];
@@ -247,7 +248,7 @@ char getchar()
 	else
 	{
 		/*caps lock on and shift on*/
-		if(shift_flag[terminal_index] == 1)
+		if(shift_flag[current_terminal] == 1)
 		{
 	    	if(c < end_of_press)
 	      		return caps_shift_scancode[c-1];
@@ -299,33 +300,33 @@ void keyboard_handler()
 	//handle next line input
 	if(c == '\n'|| c == '\r')
 	{
-		if(lb_index[terminal_index] < max_keys)
+		if(lb_index[current_terminal] < max_keys)
 	    {
-	    	lb_index[terminal_index]++;
-			line_buffer[terminal_index][lb_index[terminal_index]] = c;
+	    	lb_index[current_terminal]++;
+			line_buffer[current_terminal][lb_index[current_terminal]] = c;
 		}
 		else
 		{
 			reset_linebuffer();
 		}
-		enter_flag[terminal_index] = 1;
+		enter_flag[current_terminal] = 1;
 		newline();
 	}
 	//handle the backspace input
 	else if(c == '\b')
 	{
-		if(lb_index[terminal_index] >= 0)
+		if(lb_index[current_terminal] >= 0)
 		{
-			lb_index[terminal_index]--;
+			lb_index[current_terminal]--;
 			delete(); //delete the character 
 		}
 	}
 	//limit the maximum number of input characters
-	else if(c != '\0' && lb_index[terminal_index] < max_keys)			/*if the scancode value is not empty, print out the character*/
+	else if(c != '\0' && lb_index[current_terminal] < max_keys)			/*if the scancode value is not empty, print out the character*/
 	{
 		display_c(c);
-	    lb_index[terminal_index]++;
-		line_buffer[terminal_index][lb_index[terminal_index]] = c;
+	    lb_index[current_terminal]++;
+		line_buffer[current_terminal][lb_index[current_terminal]] = c;
 	}
 
 }
@@ -344,11 +345,11 @@ void keyboard_handler()
 void reset_linebuffer()
 {	
 	int i;
-	for (i = 0; i < lb_index[terminal_index]; ++i)
+	for (i = 0; i < lb_index[current_terminal]; ++i)
 	{
-		line_buffer[terminal_index][i] = 0;
+		line_buffer[current_terminal][i] = 0;
 	}
-	lb_index[terminal_index] = -1;
+	lb_index[current_terminal] = -1;
 }
 
 /* 
@@ -421,13 +422,13 @@ int32_t keyboard_read(int32_t * buff, uint32_t offset, int32_t num_bytes, int32_
 		return -1;
 	reset_linebuffer();
 	//wait for the user to finish typing (hit enter)
-	while(enter_flag[terminal_index] == 0);
- 	enter_flag[terminal_index] = 0;
+	while(enter_flag[current_terminal] == 0);
+ 	enter_flag[current_terminal] = 0;
  	//copy the characters in the line buffer
  	cli();
- 	while(line_buffer[terminal_index][i] != '\n' && i < num_bytes)
+ 	while(line_buffer[current_terminal][i] != '\n' && i < num_bytes)
  	{
- 		read_buff [i] = line_buffer[terminal_index][i];
+ 		read_buff [i] = line_buffer[current_terminal][i];
  		i++;
  	}
  	read_buff [i] = '\n';
