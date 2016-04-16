@@ -178,26 +178,21 @@ int32_t syscall_execute(const uint8_t* command)
   ELF[2] = ELF_2;
   ELF[3] = ELF_3;
 
-  if(read_dentry_by_name(filename, &dentry)==-1){
+  if(read_dentry_by_name(filename, &dentry)==-1)
     return -1;
-  }
-
-  read_data(dentry.inode_num, 0, read_buf, elf_size);
-  if(strncmp((int8_t*)ELF, (int8_t*)read_buf, elf_size) != 0){
-    return -1;//not an executable
-  } 
   
 
-
-  /*Get the eip from the executable file*/
+  read_data(dentry.inode_num, 0, read_buf, elf_size);
+  if(strncmp((int8_t*)ELF, (int8_t*)read_buf, elf_size) != 0)
+    return -1;//not an executable
+  
+    /*Get the eip from the executable file*/
   read_data(dentry.inode_num, eip_offset, read_buf, eip_size);
   cur_eip = ((uint32_t)read_buf[0])  | cur_eip;
   cur_eip = ((uint32_t)read_buf[1] << SHIFT_8)  | cur_eip;
   cur_eip = ((uint32_t)read_buf[2] << SHIFT_16) | cur_eip;
   cur_eip = ((uint32_t)read_buf[3] << SHIFT_24) | cur_eip;
 
-
-  
   /*Create PCB*/
   parent_info_t parent;
   parent.pid = parent_pid;
@@ -209,7 +204,6 @@ int32_t syscall_execute(const uint8_t* command)
   parent.ss0 = tss.ss0;
 
   //add a new PCB
- 
   new_pid = add_process(&current_PCB, cur_eip, parent);
   if(new_pid == -1)
   {
@@ -221,13 +215,11 @@ int32_t syscall_execute(const uint8_t* command)
   tss.ss0 = KERNEL_DS;
   tss.esp0 = EIGHT_MB - tss_offset - EIGHT_KB * (parent_pid);
   
-    
   /*Set up paging*/
   map_page(new_pid);
   /*Load the progrma file*/
   prog_loader(filename, virtAddr);
 
-  
   /*create artificial IRET*/ 
   cli();
   asm volatile ("mov $0x2B, %%ax   \n\
@@ -287,7 +279,7 @@ int32_t syscall_execute(const uint8_t* command)
   /*set label for return point */
   asm volatile("halt_ret_label:");
   
-   asm volatile("mov %%bl, %0":"=c"(status));
+  asm volatile("mov %%bl, %0":"=c"(status));
   if (exception_flag == 1)
   {
     exception_flag = 0;
@@ -353,7 +345,6 @@ int32_t syscall_vidmap(uint8_t** screen_start)
 {
   if(screen_start == NULL || screen_start < (uint8_t**)OneTwentyEight_MB || screen_start >= (uint8_t**)OneThirtyTwo_MB)
     return -1;
- // clear(); //DO WE NEED THIS?!?!?!?
   vidmap_mapping();
   *screen_start = (uint8_t*)0x00800000;
   return 0;
@@ -375,8 +366,6 @@ int32_t syscall_sigreturn()
 int32_t add_process(pcb_struct_t** pcb, uint32_t eip, const parent_info_t parent)
 {
 	int i, flag = 0;
-  // if(current_pid >= MAX_NUM_PCB)
-  //   return -1;
 
 	for (i = 1 ; i <= MAX_NUM_PCB; ++i)
 	{
