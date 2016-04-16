@@ -92,11 +92,10 @@ int shift_flag[num_terminal];				/*flag for shift*/
 int caps_lock_flag[num_terminal];			/*flag for caps*/
 int control_flag[num_terminal];			/*flag for control*/
 int alt_flag[num_terminal];				/*flag for alt*/
-volatile int enter_flag[num_terminal];	/*flag for enter*/
 int lb_index[num_terminal];				/*line buffer index*/
 char line_buffer[num_terminal][size_of_keys] = {{0}};		/*initialize line buffer*/
-
 int current_terminal = 0;
+volatile int enter_flag[num_terminal];	/*flag for enter*/
 /* 
  * getScancode
  *   DESCRIPTION: get a keyboard input from keyboard_data address and return the data
@@ -192,7 +191,6 @@ char getchar()
 		{
 			case F1_pressed:
 			{
-
 				if(current_terminal!=0)
 				{	
 		            prev_terminal_id = current_terminal;
@@ -211,7 +209,8 @@ char getchar()
 			case F2_pressed:
 			{
 				if(current_terminal!=1)
-				{   prev_terminal_id = current_terminal;
+				{   
+					prev_terminal_id = current_terminal;
 					current_terminal = 1;
 					control_flag[current_terminal] = 0;
 					cursor_terminal = 1;
@@ -227,7 +226,8 @@ char getchar()
 			case F3_pressed:
 			{
 				if(current_terminal!=2)
-				{   prev_terminal_id = current_terminal;
+				{   
+					prev_terminal_id = current_terminal;
 					current_terminal = 2;
 					control_flag[current_terminal] = 0;
 					cursor_terminal = 2;
@@ -239,7 +239,6 @@ char getchar()
 						syscall_execute((uint8_t*)"shell");
 				}
 				break;
-
 			}
 		}
 	}
@@ -250,9 +249,8 @@ char getchar()
 		/*caps lock off and shift on*/
 		if(shift_flag[current_terminal] == 0)
 		{
-	    	if(c < end_of_press){
+	    	if(c < end_of_press)
 	      		return scancode[c-1];
-	      	}
 	    	else
 	      		return scancode[empty_char];
 		}
@@ -328,9 +326,7 @@ void keyboard_handler()
 			line_buffer[current_terminal][lb_index[current_terminal]] = c;
 		}
 		else
-		{
 			reset_linebuffer();
-		}
 		enter_flag[current_terminal] = 1;
 		newline();
 	}
@@ -368,9 +364,7 @@ void reset_linebuffer()
 {	
 	int i;
 	for (i = 0; i < lb_index[current_terminal]; ++i)
-	{
 		line_buffer[current_terminal][i] = 0;
-	}
 	lb_index[current_terminal] = -1;
 }
 

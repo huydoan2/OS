@@ -18,6 +18,7 @@ uint32_t find_next_pid();
 
 void pit_handler()
 {
+	cli();
 	send_eoi(pit_irq_num);
 	
 	uint32_t curr_pid, next_pid;
@@ -50,8 +51,7 @@ void pit_handler()
     next_pcb = find_PCB(next_pid);
   	/*set tss registers*/
     tss.ss0 = KERNEL_DS;
-    tss.esp0 = next_pcb->esp;
-
+    tss.esp0 = EIGHT_MB - tss_offset - EIGHT_KB * (next_pid); 
     map_page(next_pid);
 	
 }
@@ -62,8 +62,7 @@ uint32_t find_next_pid()
 	do{
 		active_pid_index+=1;
 		active_pid_index%=3;
-		if(original == active_pid_index)
-			break;
+		if(original == active_pid_index) break;
 	}while(current_pid[active_pid_index] == 0);
 	return current_pid[active_pid_index];
 }

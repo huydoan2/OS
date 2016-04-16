@@ -154,18 +154,16 @@ uint32_t get_physAddr(uint32_t virtAddr){
 	uint32_t pt_addr = 0;
 	uint32_t pt_entry;
 	uint32_t phys_addr;
-
-
 	unsigned long pd_index = (unsigned long)virtAddr >> PD_IDX_SHIFT;
     unsigned long pt_index = (unsigned long)virtAddr >> PT_IDX_SHIFT & PT_IDX_MASK;
     unsigned long phys_offset_0 = (unsigned long)(virtAddr & PHYS_ADDR_OFFSET_MASK_0);
     unsigned long phys_offset_1 = (unsigned long)(virtAddr & PHYS_ADDR_OFFSET_MASK_1);
- 
     uint32_t pd_entry = page_directory[pd_index];
     //determine the size of the page 
     uint32_t page_size = pd_entry & PAGE_SIZE_MASK;
 
-    if(page_size == 0){ //4kB page
+    if(page_size == 0)
+    { //4kB page
      	pt_addr = pd_entry & PHYSADDR_MASK_0;
      	pt_entry = ((uint32_t *)pt_addr)[pt_index];
 
@@ -174,13 +172,12 @@ uint32_t get_physAddr(uint32_t virtAddr){
 
      	return phys_addr;
     }
-    else{ // 4MB page
-
+    else
+    { // 4MB page
     	phys_addr = pd_entry & PHYSADDR_MASK_1;
     	phys_addr += phys_offset_1;
 
     	return phys_addr;
-
     }
 }
 
@@ -188,7 +185,6 @@ uint32_t get_physAddr(uint32_t virtAddr){
 void map_page(uint32_t pid)
 {
 	uint32_t prog_startAddr = FIRST_PROG + FOUR_MB* (pid -1);
-
 	mapping_virt2Phys_Addr(prog_startAddr, PROG_VIRTADDR);
 }
 
@@ -201,7 +197,6 @@ void mapping_virt2Phys_Addr(uint32_t physAddr, uint32_t virtAddr)
     page_directory[pdindex] = ((physAddr )| PD_ENTRY_INIT_VAL_2);
 
     // Now you need to flush the entry in the TLB
-
     asm volatile("mov %%CR3, %0":"=c"(CR3));
 	CR3 = (unsigned int)page_directory;
 	asm volatile("mov %0, %%CR3"::"c"(CR3));  	
@@ -220,19 +215,16 @@ void vidmap_mapping()
 }
 
 /*change the terminal memory mapping for different terminal*/
-void set_vid_mem(uint32_t cur_terminal_id, uint32_t next_terminal_id){
-	
+void set_vid_mem(uint32_t cur_terminal_id, uint32_t next_terminal_id)
+{
 		//store the current screen 
 		memcpy((void*)vid_mem_array[cur_terminal_id], (void*)VIDEO, RESOLUTION*2);
-
 		//redirect the current pointer
 		mapping_virt2Phys_Addr(vid_mem_array[cur_terminal_id], vid_mem_array[cur_terminal_id]);
-
 		//copy the new screen to the vidmeme
 		memcpy((void*)VIDEO,(void*)vid_mem_array[next_terminal_id], RESOLUTION*2);
 		//assign the pointer
 		mapping_virt2Phys_Addr((uint32_t)VIDEO, vid_mem_array[next_terminal_id]);
-
 }
 
 
