@@ -188,6 +188,7 @@ char getchar()
 		{	
             cur_terminal_id = terminal_index;
 			terminal_index = 0;
+			control_flag[terminal_index] = 0;
 			cursor_terminal = 0;
 			//change the vid mapping 
 			set_vid_mem(cur_terminal_id, terminal_index);
@@ -199,6 +200,7 @@ char getchar()
 		if(terminal_index!=1)
 		{   cur_terminal_id = terminal_index;
 			terminal_index = 1;
+			control_flag[terminal_index] = 0;
 			cursor_terminal = 1;
 			//change the vid mapping 
 			set_vid_mem(cur_terminal_id, terminal_index);
@@ -210,6 +212,7 @@ char getchar()
 		if(terminal_index!=2)
 		{   cur_terminal_id = terminal_index;
 			terminal_index = 2;
+			control_flag[terminal_index] = 0;
 			cursor_terminal = 2;
 			//change the vid mapping 
 			set_vid_mem(cur_terminal_id, terminal_index);
