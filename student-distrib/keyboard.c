@@ -35,6 +35,7 @@
 #define F2_pressed 0x3C
 #define F3_pressed 0x3D
 
+extern uint32_t current_pid[MAX_TERMINAL];
 //scancode array for keyboard
 //0 = no output
 //size of the scancode is 88
@@ -127,7 +128,7 @@ char getScancode()
 char getchar()
 {
 	unsigned char c = getScancode();
-	uint32_t cur_terminal_id;
+	uint32_t prev_terminal_id;
 
 	/*if the left shift or right shift is pressed, set the shift flag to 1*/
 	if(c == left_shift_on || c == right_shift_on)
@@ -172,55 +173,74 @@ char getchar()
 
 	if(control_flag[current_terminal] && c == C_pressed)
 	{
-		if(current_pid!=1)
-		{
-			putc('\n');
-			syscall_halt(1);
-			reset_linebuffer();
-			return 0;
-		}
+		// if(current_pid!=1)
+		// {
+		// 	putc('\n');
+		// 	syscall_halt(1);
+		// 	reset_linebuffer();
+		// 	return 0;
+		// }
+		putc('\n');
+		syscall_halt(1);
+		reset_linebuffer();
+		return 0;
 	}
 
 	//int i;
-	if(alt_flag[current_terminal] && c == F1_pressed)
+	if(alt_flag[current_terminal])
+	{
+	switch(c)
+	{
+	case F1_pressed:
 	{
 
 		if(current_terminal!=0)
 		{	
-            cur_terminal_id = current_terminal;
+            prev_terminal_id = current_terminal;
 			current_terminal = 0;
 			control_flag[current_terminal] = 0;
 			cursor_terminal = 0;
 			//change the vid mapping 
-			set_vid_mem(cur_terminal_id, current_terminal);
+			set_vid_mem(prev_terminal_id, current_terminal);
 			cursor_update_terminal();
+			if(current_pid[current_terminal] == 0)
+				syscall_execute((uint8_t*)"shell");
 		}
+		break;
 	}
-	if(alt_flag[current_terminal] && c == F2_pressed)
+	case F2_pressed:
 	{
 		if(current_terminal!=1)
-		{   cur_terminal_id = current_terminal;
+		{   prev_terminal_id = current_terminal;
 			current_terminal = 1;
 			control_flag[current_terminal] = 0;
 			cursor_terminal = 1;
 			//change the vid mapping 
-			set_vid_mem(cur_terminal_id, current_terminal);
+			set_vid_mem(prev_terminal_id, current_terminal);
 			cursor_update_terminal();
+			if(current_pid[current_terminal] == 0)
+				syscall_execute((uint8_t*)"shell");
 		}
+		break;
 	}
-	if(alt_flag[current_terminal] && c == F3_pressed)
+	case F3_pressed:
 	{
 		if(current_terminal!=2)
-		{   cur_terminal_id = current_terminal;
+		{   prev_terminal_id = current_terminal;
 			current_terminal = 2;
 			control_flag[current_terminal] = 0;
 			cursor_terminal = 2;
 			//change the vid mapping 
-			set_vid_mem(cur_terminal_id, current_terminal);
+			set_vid_mem(prev_terminal_id, current_terminal);
 			cursor_update_terminal();
+			if(current_pid[current_terminal] == 0)
+				syscall_execute((uint8_t*)"shell");
 		}
-	}
+		break;
 
+	}
+	}
+}
 
 	/*caps lock off case, checking if it's even or odd*/
 	if((caps_lock_flag[current_terminal] % 2) ==0)

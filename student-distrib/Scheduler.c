@@ -6,4 +6,7 @@
 void pit_handler()
 {
 	send_eoi(pit_irq_num);
+
+	
+
 }
