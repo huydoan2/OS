@@ -15,19 +15,15 @@
 #include "systemCalls.h"
 #include "file.h"
 #include "PIT.h"
-
 /* Macros. */
 /* Check if the bit BIT in FLAGS is set. */
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
-
 #define size_of_keys 128
 #define rtc_num_byte 4
 #define rtc_buff_size 5
 #define file_name_max_size 32
 #define test_virt_1 0x00800000
 #define test_virt 0x00400000
-
-
 #define test_phys 0x0000FFFF
 #define file_buff_size 6200
 
@@ -189,12 +185,14 @@ entry (unsigned long magic, unsigned long addr)
 	/* Initialize the filesystem*/
     parsing_fileSystem(fileSys_startAddr); //initialize file system
 	/* Enable interrupts */
+	
 	sti();
     printf("Enabling Interrupts\n");
 	clear(); //need to clear screen in terminal driver init
 
 	/* Execute the first program (`shell') ... */
 	printf("%d\n",syscall_execute((uint8_t*)"shell"));
+
 	/********TESTING READ AND WRITE for Terminal and RTC*******/
 	while(1)
 	{

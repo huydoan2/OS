@@ -6,7 +6,9 @@
 #include "lib.h"
 #include "Paging.h"
 #include "x86_desc.h"
-#include "keyboard.h" // remove later
+#include "keyboard.h"
+#include "Scheduler.h"
+#include "PCB.h"
 
 #define SHIFT_8   8
 #define SHIFT_16   16
@@ -33,13 +35,10 @@
 #define ELF_1     0x45
 #define ELF_2     0x4C
 #define ELF_3     0x46
-//uint32_t current_pid = 0;
 uint8_t arg_buf[arg_buf_size]={0}; //buffer for arguments
 int32_t buf_length = -1;
 extern uint32_t current_terminal;
-//extern uint32_t current_ter;
 uint32_t current_pid[MAX_TERMINAL] = {0};
-
 int32_t add_process(pcb_struct_t** pcb, uint32_t eip, const parent_info_t parent);
  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
  /*  helper functions for system calls  */
@@ -152,6 +151,7 @@ int32_t syscall_halt(uint8_t status)
 /*system call 2: execute function*/
 int32_t syscall_execute(const uint8_t* command)
 {
+
   /*local variable declaration*/
   uint32_t parent_pid = current_pid[current_terminal] ;
   pcb_struct_t* current_PCB;
@@ -169,7 +169,6 @@ int32_t syscall_execute(const uint8_t* command)
   virtAddr = (uint32_t *)program_img_start_addr;
   dentry_t dentry;
   int32_t new_pid = 0;
-
   /*parse the input string*/
   systcall_exec_parse(command, arg_buf, filename);
 
@@ -210,13 +209,14 @@ int32_t syscall_execute(const uint8_t* command)
   parent.ss0 = tss.ss0;
 
   //add a new PCB
+ 
   new_pid = add_process(&current_PCB, cur_eip, parent);
   if(new_pid == -1)
   {
     display_printf("exceeds maximum number of processes\n");
     return -1;
   }
-
+  current_PCB->esp = user_esp;
   //updating TSS
   tss.ss0 = KERNEL_DS;
   tss.esp0 = EIGHT_MB - tss_offset - EIGHT_KB * (parent_pid);
@@ -227,7 +227,6 @@ int32_t syscall_execute(const uint8_t* command)
   /*Load the progrma file*/
   prog_loader(filename, virtAddr);
 
- 
   
   /*create artificial IRET*/ 
   cli();
@@ -381,11 +380,11 @@ int32_t add_process(pcb_struct_t** pcb, uint32_t eip, const parent_info_t parent
 
 	for (i = 1 ; i <= MAX_NUM_PCB; ++i)
 	{
-		pcb_struct_t* pcb = find_PCB(i);
-		if (pcb->active == EMPTY)
+		pcb_struct_t* pcb_ith = find_PCB(i);
+		if (pcb_ith->active == EMPTY)
 		{
 			current_pid[current_terminal] = i;
-			init_PCB(pcb, i, eip, parent);			
+			init_PCB(pcb_ith, i, eip, parent);			
 			flag = 1;
 			break;
 		}

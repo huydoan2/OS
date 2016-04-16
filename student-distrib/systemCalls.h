@@ -5,7 +5,6 @@
 #ifndef SYSTEMCALLS_H
 #define SYSTEMCALLS_H 
 #include "types.h"
-#include "PCB.h"
 
 #define MAX_NUM_PCB 6
 #define MAX_TERMINAL 3
