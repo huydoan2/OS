@@ -17,7 +17,6 @@
 
 
 
-
  //int lb_index;
  //char line_buffer [size_of_keys];
 
