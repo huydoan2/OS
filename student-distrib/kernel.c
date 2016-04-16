@@ -14,6 +14,7 @@
 #include "Paging.h"
 #include "systemCalls.h"
 #include "file.h"
+#include "PIT.h"
 
 /* Macros. */
 /* Check if the bit BIT in FLAGS is set. */
@@ -177,6 +178,8 @@ entry (unsigned long magic, unsigned long addr)
 	fill_interrupt_descriptor_table();
 	/* Initialize the PIC */
 	i8259_init();
+	/* Initialize the Real-time Clock */
+	pit_init();
 	/* Initialize the Real-time Clock */
 	rtc_init();
 	/* Initialize the terminal I/O */

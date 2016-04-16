@@ -7,6 +7,7 @@
 #include "types.h"
 extern uint32_t keyboard_irq();
 extern uint32_t rtc_irq();
+extern uint32_t pit_irq();	
 
 
 
