@@ -111,11 +111,12 @@ int32_t syscall_halt(uint8_t status)
   par_esp = cur_PCB->parent.esp;
   par_ebp = cur_PCB->parent.ebp;
   cur_PCB->active = EMPTY;
+  current_pid[current_terminal] = cur_PCB->parent.pid;
 
   if(cur_PCB->parent.pid == 0)
   {
   	//remove the current proccess from the PCB array and start a new shell
-    current_pid[current_terminal] = cur_PCB->parent.pid;
+    
     printf("Can't exit the first shell!\n");
     syscall_execute((uint8_t*)"shell");
     return 0;
