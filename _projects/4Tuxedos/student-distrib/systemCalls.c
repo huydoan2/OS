@@ -33,9 +33,12 @@
 #define ELF_1     0x45
 #define ELF_2     0x4C
 #define ELF_3     0x46
-uint32_t current_pid = 0;
+//uint32_t current_pid = 0;
 uint8_t arg_buf[arg_buf_size]={0}; //buffer for arguments
 int32_t buf_length = -1;
+extern uint32_t current_terminal;
+//extern uint32_t current_ter;
+uint32_t current_pid[MAX_TERMINAL] = {0};
 
 int32_t add_process(pcb_struct_t** pcb, uint32_t eip, const parent_info_t parent);
  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,13 +95,9 @@ void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename
 /*system call 1: halt function*/
 int32_t syscall_halt(uint8_t status)
 {
-  if(current_pid == 1)
-  {
-    current_pid--;
-    printf("Can't exit the first shell!\n");
-    syscall_execute((uint8_t*)"shell");
-    return 0;
-  }
+	uint32_t curr_pid = current_pid[current_terminal];
+
+  
   pcb_struct_t* cur_PCB;
   uint32_t par_esp = 0;
   uint32_t par_ebp = 0;
@@ -108,14 +107,24 @@ int32_t syscall_halt(uint8_t status)
 
   /*get parent PCB and information of the parent*/
 
-  cur_PCB =find_PCB(current_pid);
+  cur_PCB =find_PCB(current_pid[current_terminal]);
   par_esp = cur_PCB->parent.esp;
   par_ebp = cur_PCB->parent.ebp;
+  cur_PCB->active = EMPTY;
+
+  if(cur_PCB->parent.pid == 0)
+  {
+  	//remove the current proccess from the PCB array and start a new shell
+    current_pid[current_terminal] = cur_PCB->parent.pid;
+    printf("Can't exit the first shell!\n");
+    syscall_execute((uint8_t*)"shell");
+    return 0;
+  }
 
   /*remap the parent code to the virtual memory*/
   //Set up paging
-  --current_pid;
-  map_page(current_pid);
+  curr_pid = cur_PCB->parent.pid;
+  map_page(curr_pid);
 
   /*set tss registers*/
    tss.ss0 = cur_PCB->parent.ss0;
@@ -143,7 +152,7 @@ int32_t syscall_halt(uint8_t status)
 int32_t syscall_execute(const uint8_t* command)
 {
   /*local variable declaration*/
-  uint32_t parent_pid = current_pid ;
+  uint32_t parent_pid = current_pid[current_terminal] ;
   pcb_struct_t* current_PCB;
   uint8_t filename[FILENAME_MAXLEN]={0};  
   uint8_t  read_buf[small_buf_size]={0};
@@ -158,7 +167,7 @@ int32_t syscall_execute(const uint8_t* command)
   uint32_t user_esp = PROG_ESP;
   virtAddr = (uint32_t *)program_img_start_addr;
   dentry_t dentry;
-  int32_t sanity_check = 0;
+  int32_t new_pid = 0;
 
   /*parse the input string*/
   systcall_exec_parse(command, arg_buf, filename);
@@ -191,17 +200,17 @@ int32_t syscall_execute(const uint8_t* command)
   
   /*Create PCB*/
   parent_info_t parent;
-  parent.pid = current_pid;
+  parent.pid = parent_pid;
   asm volatile("mov %%esp, %0" :"=c"(par_esp));
-  asm volatile("mov %%ebp, %0" :"=c"(par_ebp));
+  asm volatile("mov %%ebp, %0" :"=c"(par_ebp)); 
   parent.esp = par_esp;
   parent.ebp = par_ebp;
   parent.esp0 = tss.esp0;
   parent.ss0 = tss.ss0;
 
   //add a new PCB
-  sanity_check = add_process(&current_PCB, cur_eip, parent);
-  if(sanity_check == -1)
+  new_pid = add_process(&current_PCB, cur_eip, parent);
+  if(new_pid == -1)
   {
     display_printf("exceeds maximum number of processes\n");
     return -1;
@@ -213,7 +222,7 @@ int32_t syscall_execute(const uint8_t* command)
   
     
   /*Set up paging*/
-  map_page(current_pid);
+  map_page(new_pid);
   /*Load the progrma file*/
   prog_loader(filename, virtAddr);
 
@@ -291,28 +300,28 @@ int32_t syscall_execute(const uint8_t* command)
 /*system call 3: read function*/
 int32_t syscall_read(int32_t fd, void* buf, int32_t nbytes)
 {
-  pcb_struct_t * pcb = find_PCB(current_pid);
+  pcb_struct_t * pcb = find_PCB(current_pid[current_terminal]);
   return read_fd(pcb->fd_array, fd, buf, nbytes);
 }
 
 /*system call 4: write function*/
 int32_t syscall_write(int32_t fd, const void* buf, int32_t nbytes)
 {
-  pcb_struct_t * pcb = find_PCB(current_pid);
+  pcb_struct_t * pcb = find_PCB(current_pid[current_terminal]);
   return write_fd(pcb->fd_array, fd, buf, nbytes);
 }
 
 /*system call 5: open function*/
 int32_t syscall_open(const uint8_t* filename)
 {
-  pcb_struct_t * pcb = find_PCB(current_pid);
+  pcb_struct_t * pcb = find_PCB(current_pid[current_terminal]);
   return open_fd(pcb->fd_array, filename);
 }
 
 /*system call 6: close*/
 int32_t syscall_close(int32_t fd)
 {
-  pcb_struct_t * pcb = find_PCB(current_pid);
+  pcb_struct_t * pcb = find_PCB(current_pid[current_terminal]);
   return close_fd(pcb->fd_array, fd);
 
 }
@@ -365,12 +374,25 @@ int32_t syscall_sigreturn()
 /*function that updates the pid and PCB for next process*/
 int32_t add_process(pcb_struct_t** pcb, uint32_t eip, const parent_info_t parent)
 {
-  if(current_pid >= MAX_NUM_PCB)
-    return -1;
+	int i, flag = 0;
+  // if(current_pid >= MAX_NUM_PCB)
+  //   return -1;
 
-  ++current_pid;
-  *pcb = find_PCB(current_pid);
-  init_PCB(*pcb, current_pid, eip, parent);
-  return 0;
+	for (i = 1 ; i <= MAX_NUM_PCB; ++i)
+	{
+		pcb_struct_t* pcb = find_PCB(i);
+		if (pcb->active == EMPTY)
+		{
+			current_pid[current_terminal] = i;
+			init_PCB(pcb, i, eip, parent);			
+			flag = 1;
+			break;
+		}
+	}
+
+	//cannot find any empty PCB, return failure
+	if (flag == 0)
+		return -1;
+ 
+  return i;
 }
-

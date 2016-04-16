@@ -9,6 +9,8 @@
 #include "file_desc.h"
 
 #define PCB_OFFSET 0x1FFF
+#define IN_USE		1
+#define EMPTY		0
 
 /*structure for the parent process information */
 typedef struct {
@@ -20,14 +22,21 @@ typedef struct {
     file_desc_t* fd_array;
 } parent_info_t;
 
+
 /*structure for PCB*/
 typedef struct {
 	uint32_t pid;	
 	uint32_t eip;
+	uint32_t esp;
+	uint32_t ebp;
 	file_desc_t fd_array[FD_SIZE];
 	parent_info_t parent;
 	uint8_t* arg_buf;
+	uint32_t active; 
 }pcb_struct_t;
+
+uint32_t num_active_process;
+
 
 /*function that initializes a PCB for the new process */
 void init_PCB(pcb_struct_t* pcb, uint32_t pid, uint32_t eip, const parent_info_t parent );

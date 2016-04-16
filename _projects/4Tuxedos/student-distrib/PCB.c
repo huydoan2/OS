@@ -31,6 +31,7 @@ void init_PCB(pcb_struct_t* pcb, uint32_t pid, uint32_t eip, const parent_info_t
 	pcb->parent.esp0 = parent.esp0;
 	pcb->parent.ss0 = parent.ss0;
 	pcb->parent.fd_array = parent.fd_array;
+	pcb->active = IN_USE;
 }
 
 /*
