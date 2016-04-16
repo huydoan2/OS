@@ -19,7 +19,7 @@ Paging.o: Paging.c Paging.h types.h lib.h
 PCB.o: PCB.c PCB.h types.h file_desc.h
 PIT.o: PIT.c PIT.h lib.h types.h i8259.h
 rtc.o: rtc.c rtc.h i8259.h types.h lib.h
-Schedule.o: Schedule.c Scheduler.h PCB.h types.h file_desc.h lib.h \
+Scheduler.o: Scheduler.c Scheduler.h PCB.h types.h file_desc.h lib.h \
   i8259.h
 systemCalls.o: systemCalls.c systemCalls.h types.h PCB.h file_desc.h \
   file.h lib.h Paging.h x86_desc.h keyboard.h i8259.h
