@@ -72,7 +72,7 @@ void switch_task(uint32_t curr_pid,uint32_t next_pid)
 
     /*set tss registers*/
     tss.ss0 = KERNEL_DS;
-    tss.esp0 = EIGHT_MB - tss_offset - EIGHT_KB * (curr_pid); 
+    tss.esp0 = EIGHT_MB - tss_offset - EIGHT_KB * (next_pid); 
     map_page(next_pid);
 }
 

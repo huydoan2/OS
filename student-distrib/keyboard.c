@@ -200,7 +200,7 @@ char getchar()
 					//change the vid mapping 
 					set_vid_mem(prev_terminal_id, current_terminal);
 					cursor_update_terminal();
-					printf("pid: %d\n",current_pid[current_terminal]);
+					//printf("pid: %d\n",current_pid[current_terminal]);
 					if(current_pid[current_terminal] == 0)
 						syscall_execute((uint8_t*)"shell");
 				}
@@ -217,7 +217,7 @@ char getchar()
 					//change the vid mapping 
 					set_vid_mem(prev_terminal_id, current_terminal);
 					cursor_update_terminal();
-					printf("pid: %d\n",current_pid[current_terminal]);
+					//printf("pid: %d\n",current_pid[current_terminal]);
 					if(current_pid[current_terminal] == 0)
 						syscall_execute((uint8_t*)"shell");
 				}
@@ -234,7 +234,7 @@ char getchar()
 					//change the vid mapping 
 					set_vid_mem(prev_terminal_id, current_terminal);
 					cursor_update_terminal();
-					printf("pid: %d\n",current_pid[current_terminal]);
+					//printf("pid: %d\n",current_pid[current_terminal]);
 					if(current_pid[current_terminal] == 0)
 						syscall_execute((uint8_t*)"shell");
 				}
