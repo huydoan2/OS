@@ -20,8 +20,11 @@
 *   Return Value: void
 *	Side Effect: new pcb initialized in the proper memory location
 */
-void init_PCB(pcb_struct_t* pcb, uint32_t pid, uint32_t eip, const parent_info_t parent)
-{
+void init_PCB(pcb_struct_t* pcb, uint32_t pid, uint32_t eip, uint32_t esp, uint32_t ebp, const parent_info_t parent)
+{  
+	
+    pcb->esp = esp;
+    pcb->ebp = ebp;
 	pcb->pid = pid;
 	pcb->eip = eip;
 	init_FD(pcb->fd_array);
