@@ -199,7 +199,7 @@ char getchar()
 					cursor_terminal = 0;
 					//change the vid mapping 
 					set_vid_mem(prev_terminal_id, current_terminal);
-					switch_vidmem(current_terminal);
+					//switch_vidmem(current_terminal);
 					cursor_update_terminal();
 					//printf("pid: %d\n",current_pid[current_terminal]);
 					if(current_pid[current_terminal] == 0)
@@ -217,7 +217,7 @@ char getchar()
 					cursor_terminal = 1;
 					//change the vid mapping 
 					set_vid_mem(prev_terminal_id, current_terminal);
-					switch_vidmem(current_terminal);
+					//switch_vidmem(current_terminal);
 					cursor_update_terminal();
 					//printf("pid: %d\n",current_pid[current_terminal]);
 					if(current_pid[current_terminal] == 0)
@@ -235,7 +235,7 @@ char getchar()
 					cursor_terminal = 2;
 					//change the vid mapping 
 					set_vid_mem(prev_terminal_id, current_terminal);
-					switch_vidmem(current_terminal);
+					//switch_vidmem(current_terminal);
 					cursor_update_terminal();
 
 					//printf("pid: %d\n",current_pid[current_terminal]);

@@ -74,17 +74,17 @@ void paging_init()
 
 	/*assign the first and second entry of the page directory*/
 	//set the first two enties of the PD
-	uint32_t vid_directory_index = (0x08400000 >> 22) & 0x3FF;
-	int vid_page_index = (0x08400000 >> 12) & 0x3FF;
-	vid_page_table[vid_page_index] = 0x000B9000;
-	vid_page_table[vid_page_index+1] = 0x000BA000;
-	vid_page_table[vid_page_index+2] = 0x000BB000;
+	// uint32_t vid_directory_index = (0x08400000 >> 22) & 0x3FF;
+	// int vid_page_index = (0x08400000 >> 12) & 0x3FF;
+	// vid_page_table[vid_page_index] = 0x000B9000;
+	// vid_page_table[vid_page_index+1] = 0x000BA000;
+	// vid_page_table[vid_page_index+2] = 0x000BB000;
 
 	 page_directory[0] = ((unsigned int)page_table) | PD_ENTRY_INIT_VAL_0;
 	 //increment the physical address to the next segement 
 	 physAddr += PT_INCREMENT;
 	 page_directory[1] = ((physAddr )| PD_ENTRY_INIT_VAL_1);
-	 page_directory[vid_directory_index] =  ((unsigned int)vid_page_table) | PD_ENTRY_INIT_VAL_3;
+	 page_directory[2] =  ((unsigned int)vid_page_table) | PD_ENTRY_INIT_VAL_3;
 
 	
 	/*load page dir and enable paging*/
@@ -191,7 +191,34 @@ uint32_t get_physAddr(uint32_t virtAddr){
 
     }
 }
+void process_switch_mem_map(uint32_t next_pid,uint32_t next_pid_terminal, uint32_t cur_terminal_id){
+	   uint32_t CR3 = 0;    
 
+	//change the video memory mapping 
+	if(next_pid_terminal == cur_terminal_id){
+		page_table[184] = 0xB8000;
+	}
+	else{
+		switch (next_pid_terminal){
+			case 0:
+				page_table[184] =  0xB9000;
+				break;
+			case 1:
+				page_table[184] =  0xBA000;
+				break;
+			case 2:
+				page_table[184] =  0xBB000;
+				break;
+		}
+	}
+
+	//re map the program image 
+	map_page(next_pid);
+
+	 asm volatile("mov %%CR3, %0":"=c"(CR3));
+	CR3 = (unsigned int)page_directory;
+	asm volatile("mov %0, %%CR3"::"c"(CR3));  
+}
 
 void map_page(uint32_t pid)
 {
@@ -228,9 +255,9 @@ void vidmap_mapping(uint32_t terminal)
 {
     uint32_t CR3 = 0;
     uint32_t video_addr = VIDEO;
-    uint32_t vid_index = (0x08400000 >> 12) & 0x3FF;
+   // uint32_t vid_index = (0x08400000 >> 12) & 0x3FF;
     // Create a vidmap mapping
-	vid_page_table[vid_index + terminal] = ((video_addr)|PT_ENTRY_INIT_VAL_2);
+	vid_page_table[0] = ((video_addr)|PT_ENTRY_INIT_VAL_2);
     // Now you need to flush the entry in the TLB
     asm volatile("mov %%CR3, %0":"=c"(CR3));
 	CR3 = (unsigned int)page_directory;
@@ -246,10 +273,10 @@ void set_vid_mem(uint32_t cur_terminal_id, uint32_t next_terminal_id){
 		//copy the new screen to the vidmeme
 		memcpy((void*)VIDEO,(void*)vid_mem_phys_array[next_terminal_id], RESOLUTION*2);
 		//redirect the current pointer
-		mapping_virt2Phys_Addr(vid_mem_phys_array[cur_terminal_id], vid_mem_array[cur_terminal_id], 1);
+		//mapping_virt2Phys_Addr(vid_mem_phys_array[cur_terminal_id], vid_mem_array[cur_terminal_id], 1);
 
 		//assign the pointer
-		mapping_virt2Phys_Addr((uint32_t)VIDEO, vid_mem_array[next_terminal_id], 1);
+		//mapping_virt2Phys_Addr((uint32_t)VIDEO, vid_mem_array[next_terminal_id], 1);
 
 }
 

@@ -44,7 +44,7 @@ void map_page(uint32_t pid);
 
 void set_vid_mem(uint32_t cur_terminal_id, uint32_t next_terminal_id);
 
-
+void process_switch_mem_map(uint32_t next_pid,uint32_t next_pid_terminal, uint32_t cur_terminal_id);
 
 
 
