@@ -21,12 +21,13 @@ uint32_t find_next_pid();
 
 void pit_handler()
 {
-	cli();
+	cli(); //WHERE IS THE CORESP STI FOR THIS?
 	send_eoi(pit_irq_num);
     uint32_t curr_pid, next_pid;
     curr_pid = current_pid[active_pid_index];
     next_pid = find_next_pid();
 	switch_task(curr_pid, next_pid);
+    sti();
 }
 
 void switch_task(uint32_t curr_pid,uint32_t next_pid)
@@ -55,7 +56,13 @@ void switch_task(uint32_t curr_pid,uint32_t next_pid)
     current_pcb->esp = esp;
     current_pcb->ebp = ebp;
 
-    next_pcb = find_PCB(next_pid);
+   
+
+    /*set tss registers*/
+    tss.ss0 = KERNEL_DS;
+    tss.esp0 = EIGHT_MB - tss_offset - EIGHT_KB * (next_pid); 
+    process_switch_mem_map(next_pid, active_pid_index, current_terminal); next_pcb = find_PCB(next_pid);
+    
     esp = next_pcb->esp;
     ebp = next_pcb->ebp;
     /*update esp and ebp*/
@@ -69,11 +76,6 @@ void switch_task(uint32_t curr_pid,uint32_t next_pid)
                      :"c"(ebp)
                      :"%ebp"
                      );
-
-    /*set tss registers*/
-    tss.ss0 = KERNEL_DS;
-    tss.esp0 = EIGHT_MB - tss_offset - EIGHT_KB * (next_pid); 
-    process_switch_mem_map(next_pid, active_pid_index, current_terminal);
 }
 
 uint32_t find_next_pid()
