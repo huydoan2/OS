@@ -356,9 +356,9 @@ int32_t syscall_vidmap(uint8_t** screen_start)
     return -1;
  // clear(); //DO WE NEED THIS?!?!?!?
   vidmap_mapping(current_terminal);
-  extern uint32_t vid_mem_array[3];
-  //*screen_start = (uint8_t*)0x00800000;
-  *screen_start = (uint8_t*)vid_mem_array[current_terminal];
+  //extern uint32_t vid_mem_array[3];
+  *screen_start = (uint8_t*)0x00800000;
+ // *screen_start = (uint8_t*)vid_mem_array[current_terminal];
   return 0;
 }
 
