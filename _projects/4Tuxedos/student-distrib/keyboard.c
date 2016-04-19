@@ -8,6 +8,8 @@
 #include "keyboard.h"
 #include "systemCalls.h"
 #include "Paging.h"
+#include "PCB.h"
+
 #define keyboard_irq_num 1
 #define left_shift_on 0x2A
 #define left_shift_off 0xAA
@@ -193,11 +195,12 @@ char getchar()
 					cursor_terminal = 0;
 					//change the vid mapping 
 					set_vid_mem(prev_terminal_id, current_terminal);
-					//switch_vidmem(current_terminal);
 					cursor_update_terminal();
-					 if(current_pid[current_terminal] == 0)
+					// pcb_struct_t * prev_pcb = find_PCB(current_pid[prev_terminal_id]);
+					// switch_task(current_pid[prev_terminal_id], current_pid[current_terminal], prev_pcb->registers);
+					if(current_pid[current_terminal] == 0)
 						syscall_execute((uint8_t*)"shell");
-					sti();
+					 sti();
 				}
 				break;
 			}
@@ -212,11 +215,12 @@ char getchar()
 					cursor_terminal = 1;
 					//change the vid mapping 
 					set_vid_mem(prev_terminal_id, current_terminal);
-					//switch_vidmem(current_terminal);
 					cursor_update_terminal();
-					 if(current_pid[current_terminal] == 0)
+					// pcb_struct_t * prev_pcb = find_PCB(current_pid[prev_terminal_id]);
+					// switch_task(current_pid[prev_terminal_id], current_pid[current_terminal], prev_pcb->registers);
+					if(current_pid[current_terminal] == 0)
 					 	syscall_execute((uint8_t*)"shell");
-					sti();
+					 sti();
 				}
 				break;
 			}
@@ -231,12 +235,12 @@ char getchar()
 					cursor_terminal = 2;
 					//change the vid mapping 
 					set_vid_mem(prev_terminal_id, current_terminal);
-					//switch_vidmem(current_terminal);
 					cursor_update_terminal();
-
+					// pcb_struct_t * prev_pcb = find_PCB(current_pid[prev_terminal_id]);
+					// switch_task(current_pid[prev_terminal_id], current_pid[current_terminal], prev_pcb->registers);
 					if(current_pid[current_terminal] == 0)
 						syscall_execute((uint8_t*)"shell");
-					sti();
+					 sti();
 				}
 				break;
 			}
