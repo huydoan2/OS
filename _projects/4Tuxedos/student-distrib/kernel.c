@@ -175,7 +175,7 @@ entry (unsigned long magic, unsigned long addr)
 	/* Initialize the PIC */
 	i8259_init();
 	/* Initialize the Real-time Clock */
-	//	pit_init();
+	pit_init();
 	/* Initialize the Real-time Clock */
 	rtc_init();
 	/* Initialize the terminal I/O */
