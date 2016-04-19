@@ -38,6 +38,7 @@
 #define F3_pressed 0x3D
 
 extern uint32_t current_pid[MAX_TERMINAL];
+void switch_task(uint32_t curr_pid,uint32_t next_pid);
 //scancode array for keyboard
 //0 = no output
 //size of the scancode is 88
@@ -201,6 +202,24 @@ char getchar()
 					//if(current_pid[current_terminal] == 0)
 					//	syscall_execute((uint8_t*)"shell");
 					 sti();
+					if(current_pid[current_terminal] == 0)
+					{
+						uint32_t curr_pid = current_pid[prev_terminal_id];
+						pcb_struct_t *current_pcb;
+					    uint32_t esp = 0;
+					    uint32_t ebp = 0;
+
+					    asm volatile("mov %%esp, %0" :"=c"(esp));
+					  	asm volatile("mov %%ebp, %0" :"=c"(ebp)); 
+
+					    current_pcb = find_PCB(curr_pid);
+					    current_pcb->esp = esp;
+					    current_pcb->ebp = ebp;    
+					   
+						syscall_execute((uint8_t*)"shell");
+					}
+					else
+						switch_task(current_pid[prev_terminal_id], current_pid[current_terminal]);
 				}
 				break;
 			}
@@ -220,7 +239,23 @@ char getchar()
 					// switch_task(current_pid[prev_terminal_id], current_pid[current_terminal], prev_pcb->registers);
 					sti();
 					if(current_pid[current_terminal] == 0)
-						syscall_execute((uint8_t*)"ls");
+					{
+						uint32_t curr_pid = current_pid[prev_terminal_id];
+						pcb_struct_t *current_pcb;
+					    uint32_t esp = 0;
+					    uint32_t ebp = 0;
+
+					    asm volatile("mov %%esp, %0" :"=c"(esp));
+					  	asm volatile("mov %%ebp, %0" :"=c"(ebp)); 
+
+					    current_pcb = find_PCB(curr_pid);
+					    current_pcb->esp = esp;
+					    current_pcb->ebp = ebp;    
+					   
+						syscall_execute((uint8_t*)"shell");
+					}
+					else
+						switch_task(current_pid[prev_terminal_id], current_pid[current_terminal]);
 				
 				}
 				break;
@@ -242,6 +277,24 @@ char getchar()
 					//if(current_pid[current_terminal] == 0)
 					//	syscall_execute((uint8_t*)"shell");
 					 sti();
+					 if(current_pid[current_terminal] == 0)
+					{
+						uint32_t curr_pid = current_pid[prev_terminal_id];
+						pcb_struct_t *current_pcb;
+					    uint32_t esp = 0;
+					    uint32_t ebp = 0;
+
+					    asm volatile("mov %%esp, %0" :"=c"(esp));
+					  	asm volatile("mov %%ebp, %0" :"=c"(ebp)); 
+
+					    current_pcb = find_PCB(curr_pid);
+					    current_pcb->esp = esp;
+					    current_pcb->ebp = ebp;    
+					   
+						syscall_execute((uint8_t*)"shell");
+					}
+					else
+						switch_task(current_pid[prev_terminal_id], current_pid[current_terminal]);
 				}
 				break;
 			}
