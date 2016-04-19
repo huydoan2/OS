@@ -304,7 +304,7 @@ void Exception_Handler_12(){
 void Exception_Handler_13(){
 
 	//print out the error message
-    clear();
+    //clear();
 	printf("Exception: General Protection Fault. \n");
 	exception_termination();
 }

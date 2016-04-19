@@ -270,15 +270,16 @@ void set_vid_mem(uint32_t cur_terminal_id, uint32_t next_terminal_id){
 			//re map the program image 
 		//map_page(next_pid);
 		int32_t CR3 = 0;    
-		page_table[184] = 0xB8000 | PT_ENTRY_INIT_VAL_2;
-		asm volatile("mov %%CR3, %0":"=c"(CR3));
-		CR3 = (unsigned int)page_directory;
-		asm volatile("mov %0, %%CR3"::"c"(CR3));  
 		//store the current screen 
 		memcpy((void*)vid_mem_phys_array[cur_terminal_id], (void*)VIDEO, RESOLUTION*2);
 
 		//copy the new screen to the vidmeme
 		memcpy((void*)VIDEO,(void*)vid_mem_phys_array[next_terminal_id], RESOLUTION*2);
+		
+		page_table[184] = 0xB8000 | PT_ENTRY_INIT_VAL_2;
+		asm volatile("mov %%CR3, %0":"=c"(CR3));
+		CR3 = (unsigned int)page_directory;
+		asm volatile("mov %0, %%CR3"::"c"(CR3));  
 		
 		sti();
 		//redirect the current pointer

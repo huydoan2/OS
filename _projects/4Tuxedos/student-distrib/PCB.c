@@ -27,6 +27,8 @@ void init_PCB(pcb_struct_t* pcb, uint32_t pid, uint32_t eip, uint32_t esp, uint3
     pcb->ebp = ebp;
 	pcb->pid = pid;
 	pcb->eip = eip;
+	pcb->registers.esp = esp;
+	pcb->registers.ebp = ebp;
 	init_FD(pcb->fd_array);
 	pcb->parent.pid = parent.pid;
 	pcb->parent.esp = parent.esp;
