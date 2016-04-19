@@ -198,8 +198,8 @@ char getchar()
 					cursor_update_terminal();
 					// pcb_struct_t * prev_pcb = find_PCB(current_pid[prev_terminal_id]);
 					// switch_task(current_pid[prev_terminal_id], current_pid[current_terminal], prev_pcb->registers);
-					if(current_pid[current_terminal] == 0)
-						syscall_execute((uint8_t*)"shell");
+					//if(current_pid[current_terminal] == 0)
+					//	syscall_execute((uint8_t*)"shell");
 					 sti();
 				}
 				break;
@@ -218,9 +218,10 @@ char getchar()
 					cursor_update_terminal();
 					// pcb_struct_t * prev_pcb = find_PCB(current_pid[prev_terminal_id]);
 					// switch_task(current_pid[prev_terminal_id], current_pid[current_terminal], prev_pcb->registers);
+					sti();
 					if(current_pid[current_terminal] == 0)
-					 	syscall_execute((uint8_t*)"shell");
-					 sti();
+						syscall_execute((uint8_t*)"ls");
+				
 				}
 				break;
 			}
@@ -238,8 +239,8 @@ char getchar()
 					cursor_update_terminal();
 					// pcb_struct_t * prev_pcb = find_PCB(current_pid[prev_terminal_id]);
 					// switch_task(current_pid[prev_terminal_id], current_pid[current_terminal], prev_pcb->registers);
-					if(current_pid[current_terminal] == 0)
-						syscall_execute((uint8_t*)"shell");
+					//if(current_pid[current_terminal] == 0)
+					//	syscall_execute((uint8_t*)"shell");
 					 sti();
 				}
 				break;
