@@ -216,7 +216,6 @@ int32_t syscall_execute(const uint8_t* command)
     display_printf("exceeds maximum number of processes\n");
     return -1;
   }
-b 
   //updating TSS
   tss.ss0 = KERNEL_DS;
   tss.esp0 = EIGHT_MB - tss_offset - EIGHT_KB * (parent_pid);
