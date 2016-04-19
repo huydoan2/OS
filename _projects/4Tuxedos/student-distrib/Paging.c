@@ -213,7 +213,7 @@ void process_switch_mem_map(uint32_t next_pid, uint32_t next_pid_terminal, uint3
 	}
 
 	//re map the program image 
-	//map_page(next_pid);
+	map_page(next_pid);
 
 	asm volatile("mov %%CR3, %0":"=c"(CR3));
 	CR3 = (unsigned int)page_directory;

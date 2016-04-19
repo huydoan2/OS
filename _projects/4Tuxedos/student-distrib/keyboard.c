@@ -195,8 +195,8 @@ char getchar()
 					set_vid_mem(prev_terminal_id, current_terminal);
 					//switch_vidmem(current_terminal);
 					cursor_update_terminal();
-					// if(current_pid[current_terminal] == 0)
-					// 	syscall_execute((uint8_t*)"shell");
+					 if(current_pid[current_terminal] == 0)
+						syscall_execute((uint8_t*)"shell");
 					sti();
 				}
 				break;
@@ -214,8 +214,8 @@ char getchar()
 					set_vid_mem(prev_terminal_id, current_terminal);
 					//switch_vidmem(current_terminal);
 					cursor_update_terminal();
-					// if(current_pid[current_terminal] == 0)
-					// 	syscall_execute((uint8_t*)"shell");
+					 if(current_pid[current_terminal] == 0)
+					 	syscall_execute((uint8_t*)"shell");
 					sti();
 				}
 				break;
@@ -234,8 +234,8 @@ char getchar()
 					//switch_vidmem(current_terminal);
 					cursor_update_terminal();
 
-					// if(current_pid[current_terminal] == 0)
-					// 	syscall_execute((uint8_t*)"shell");
+					if(current_pid[current_terminal] == 0)
+						syscall_execute((uint8_t*)"shell");
 					sti();
 				}
 				break;

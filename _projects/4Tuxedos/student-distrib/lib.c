@@ -13,7 +13,7 @@ int (cursor_t[3][2]) = {{0}};
 static uint16_t blank_row[NUM_COLS];
 
 static char* video_mem = (char *)VIDEO;
-uint32_t vid_mem[3] = {757760, 761856, 765952};
+uint32_t vid_mem[3] = {0x0800000, 0x0801000, 0x0802000};
 /*set the video memory space in accordance to the current termianl ID*/
 
 /*

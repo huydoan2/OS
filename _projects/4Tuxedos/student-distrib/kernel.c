@@ -186,10 +186,10 @@ entry (unsigned long magic, unsigned long addr)
     parsing_fileSystem(fileSys_startAddr); //initialize file system
 	/* Enable interrupts */
 	
-	sti();
-    printf("Enabling Interrupts\n");
 	clear(); //need to clear screen in terminal driver init
 
+	sti();
+    //printf("Enabling Interrupts\n");
 	/* Execute the first program (`shell') ... */
 	printf("%d\n",syscall_execute((uint8_t*)"shell"));
 
