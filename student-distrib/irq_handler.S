@@ -35,6 +35,7 @@ common_interrupt_default:
 jumb_table:
         .long pit_handler, keyboard_handler, 0, 0, 0, 0, 0, 0, rtc_handler, 0, 0, 0, 0, 0, 0, 0
 
+.GLOBL process_info
 process_info:
         .rept 9
         .long 0
@@ -42,9 +43,10 @@ process_info:
 
 .GLOBL pit_irq
 pit_irq:
-        
+        pushl %eax
         movl %eax, process_info
         leal process_info, %eax
+        popl EAX(%eax)
         movl %ecx, ECX(%eax)
         movl %edx, EDX(%eax)
         movl %ebx, EBX(%eax)
