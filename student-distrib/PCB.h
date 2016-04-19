@@ -22,6 +22,17 @@ typedef struct {
     file_desc_t* fd_array;
 } parent_info_t;
 
+ typedef struct {
+	uint32_t eax;
+	uint32_t ecx;
+	uint32_t edx;
+	uint32_t ebx;
+	uint32_t esp;
+	uint32_t ebp;
+	uint32_t esi;
+	uint32_t edi;
+	uint32_t eflags;
+}process_info_t;
 
 /*structure for PCB*/
 typedef struct {
@@ -31,6 +42,7 @@ typedef struct {
 	uint32_t ebp;
 	file_desc_t fd_array[FD_SIZE];
 	parent_info_t parent;
+	process_info_t registers;
 	uint8_t* arg_buf;
 	uint32_t active; 
 }pcb_struct_t;

@@ -2,7 +2,6 @@
 #include "lib.h"
 #include "i8259.h"
 #include "keyboard.h"
-#include "PCB.h"
 #include "x86_desc.h"
 #include "Paging.h"
 
@@ -20,19 +19,15 @@ extern int current_terminal;
 extern uint32_t current_pid[MAX_TERMINAL];
 uint32_t find_next_pid();
 
-void pit_handler()
+void pit_handler(process_info_t * registers)
 {
-	cli(); //WHERE IS THE CORESP STI FOR THIS?
 	send_eoi(pit_irq_num);
-    curr_pid =find_next_pid();
-
-    next_pid = current_pid[active_pid_index];//find_next_pid();//after this, active_pid_index is updated
-	//process_switch_mem_map(next_pid, active_pid_index, current_terminal); 
-    switch_task(curr_pid, next_pid);
-    sti();
+    curr_pid = current_pid[active_pid_index];
+    next_pid = find_next_pid();
+    switch_task(curr_pid, next_pid, registers);
 }
 
-void switch_task(uint32_t curr_pid,uint32_t next_pid)
+void switch_task(uint32_t curr_pid,uint32_t next_pid, process_info_t * registers)
 {
     if(curr_pid == next_pid)
         return;
@@ -42,22 +37,10 @@ void switch_task(uint32_t curr_pid,uint32_t next_pid)
     uint32_t esp = 0;
     uint32_t ebp = 0;
 
-    /*get esp/ebp, and update those of the current process*/
-    asm volatile("movl %%esp, %0"
-                     :"=c"(esp)
-                     :
-                     :"%esp"
-                     );
-    asm volatile("movl %%ebp, %0" 
-                     :"=c"(ebp)
-                     :
-                     :"%ebp"
-                     );
-
     current_pcb = find_PCB(curr_pid);
     current_pcb->esp = esp;
     current_pcb->ebp = ebp;
-
+    current_pcb->registers = *registers;
    
 
     /*set tss registers*/
@@ -68,17 +51,8 @@ void switch_task(uint32_t curr_pid,uint32_t next_pid)
     next_pcb = find_PCB(next_pid);
     esp = next_pcb->esp;
     ebp = next_pcb->ebp;
-
-    asm volatile("movl %0, %%esp"
-                     :
-                     :"c"(esp)
-                     :"%esp"
-                     );
-    asm volatile("movl %0, %%ebp"
-                     :
-                     :"c"(ebp)
-                     :"%ebp"
-                     );
+    next_pcb->registers = current_pcb->registers;
+   
     /*swtich the program image and video memory mapping */
     process_switch_mem_map(next_pid, active_pid_index, current_terminal); 
 
