@@ -191,31 +191,31 @@ uint32_t get_physAddr(uint32_t virtAddr){
 
     }
 }
-void process_switch_mem_map(uint32_t next_pid,uint32_t next_pid_terminal, uint32_t cur_terminal_id){
+void process_switch_mem_map(uint32_t next_pid, uint32_t next_pid_terminal, uint32_t cur_terminal_id){
 	   uint32_t CR3 = 0;    
 
 	//change the video memory mapping 
 	if(next_pid_terminal == cur_terminal_id){
-		page_table[184] = 0xB8000;
+		page_table[184] = 0xB8000 | PT_ENTRY_INIT_VAL_2;
 	}
 	else{
 		switch (next_pid_terminal){
 			case 0:
-				page_table[184] =  0xB9000;
+				page_table[184] =  0xB9000 | PT_ENTRY_INIT_VAL_2;
 				break;
 			case 1:
-				page_table[184] =  0xBA000;
+				page_table[184] =  0xBA000 | PT_ENTRY_INIT_VAL_2;
 				break;
 			case 2:
-				page_table[184] =  0xBB000;
+				page_table[184] =  0xBB000 | PT_ENTRY_INIT_VAL_2;
 				break;
 		}
 	}
 
 	//re map the program image 
-	map_page(next_pid);
+	//map_page(next_pid);
 
-	 asm volatile("mov %%CR3, %0":"=c"(CR3));
+	asm volatile("mov %%CR3, %0":"=c"(CR3));
 	CR3 = (unsigned int)page_directory;
 	asm volatile("mov %0, %%CR3"::"c"(CR3));  
 }
@@ -266,12 +266,21 @@ void vidmap_mapping(uint32_t terminal)
 
 /*change the terminal memory mapping for different terminal*/
 void set_vid_mem(uint32_t cur_terminal_id, uint32_t next_terminal_id){
-	
+		cli();
+			//re map the program image 
+		//map_page(next_pid);
+		int32_t CR3 = 0;    
+		page_table[184] = 0xB8000 | PT_ENTRY_INIT_VAL_2;
+		asm volatile("mov %%CR3, %0":"=c"(CR3));
+		CR3 = (unsigned int)page_directory;
+		asm volatile("mov %0, %%CR3"::"c"(CR3));  
 		//store the current screen 
 		memcpy((void*)vid_mem_phys_array[cur_terminal_id], (void*)VIDEO, RESOLUTION*2);
 
 		//copy the new screen to the vidmeme
 		memcpy((void*)VIDEO,(void*)vid_mem_phys_array[next_terminal_id], RESOLUTION*2);
+		
+		sti();
 		//redirect the current pointer
 		//mapping_virt2Phys_Addr(vid_mem_phys_array[cur_terminal_id], vid_mem_array[cur_terminal_id], 1);
 

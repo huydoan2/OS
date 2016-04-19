@@ -172,13 +172,6 @@ char getchar()
 
 	if(control_flag[current_terminal] && c == C_pressed)
 	{
-		// if(current_pid!=1)
-		// {
-		// 	putc('\n');
-		// 	syscall_halt(1);
-		// 	reset_linebuffer();
-		// 	return 0;
-		// }
 		putc('\n');
 		syscall_halt(1);
 		reset_linebuffer();
@@ -193,6 +186,7 @@ char getchar()
 			{
 				if(current_terminal!=0)
 				{	
+					cli();
 		            prev_terminal_id = current_terminal;
 					current_terminal = 0;
 					control_flag[current_terminal] = 0;
@@ -201,9 +195,9 @@ char getchar()
 					set_vid_mem(prev_terminal_id, current_terminal);
 					//switch_vidmem(current_terminal);
 					cursor_update_terminal();
-					//printf("pid: %d\n",current_pid[current_terminal]);
-					if(current_pid[current_terminal] == 0)
-						syscall_execute((uint8_t*)"shell");
+					// if(current_pid[current_terminal] == 0)
+					// 	syscall_execute((uint8_t*)"shell");
+					sti();
 				}
 				break;
 			}
@@ -211,6 +205,7 @@ char getchar()
 			{
 				if(current_terminal!=1)
 				{   
+					cli();
 					prev_terminal_id = current_terminal;
 					current_terminal = 1;
 					control_flag[current_terminal] = 0;
@@ -219,9 +214,9 @@ char getchar()
 					set_vid_mem(prev_terminal_id, current_terminal);
 					//switch_vidmem(current_terminal);
 					cursor_update_terminal();
-					//printf("pid: %d\n",current_pid[current_terminal]);
-					if(current_pid[current_terminal] == 0)
-						syscall_execute((uint8_t*)"shell");
+					// if(current_pid[current_terminal] == 0)
+					// 	syscall_execute((uint8_t*)"shell");
+					sti();
 				}
 				break;
 			}
@@ -229,6 +224,7 @@ char getchar()
 			{
 				if(current_terminal!=2)
 				{   
+					cli();
 					prev_terminal_id = current_terminal;
 					current_terminal = 2;
 					control_flag[current_terminal] = 0;
@@ -238,9 +234,9 @@ char getchar()
 					//switch_vidmem(current_terminal);
 					cursor_update_terminal();
 
-					//printf("pid: %d\n",current_pid[current_terminal]);
-					if(current_pid[current_terminal] == 0)
-						syscall_execute((uint8_t*)"shell");
+					// if(current_pid[current_terminal] == 0)
+					// 	syscall_execute((uint8_t*)"shell");
+					sti();
 				}
 				break;
 			}
