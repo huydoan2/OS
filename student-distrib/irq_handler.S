@@ -1,13 +1,8 @@
 
 .data
-        EAX = 0
-        ECX = 4
-        EDX = 8
-        EBX = 12
-        ESP = 16
-        EBP = 20
-        ESI = 24
-        EDI = 28
+        ESP = 0
+        EBP = 4
+       
         EFLAGS = 32
         IRQ_TABLE_SIZE = 16
         FAIL_VALUE = -1
@@ -37,42 +32,28 @@ jumb_table:
 
 .GLOBL process_info
 process_info:
-        .rept 9
+        .rept 2
         .long 0
         .endr
 
+
 .GLOBL pit_irq
-pit_irq:
-        pushl %eax
-        movl %eax, process_info
-        leal process_info, %eax
-        popl EAX(%eax)
-        movl %ecx, ECX(%eax)
-        movl %edx, EDX(%eax)
-        movl %ebx, EBX(%eax)
-        movl %esp, ESP(%eax)
-        movl %ebp, EBP(%eax)
-        movl %esi, ESI(%eax)
-        movl %edi, EDI(%eax)
-        pushf
-        pop EFLAGS(%eax)              
-        #MOVL pit_handler, %eax
-        PUSHL process_info
-        CALL pit_handler
-        popl %eax
-        LEAL process_info, %eax
-        MOVL ECX(%eax), %ecx
-        MOVL EDX(%eax), %edx
-        MOVL EBX(%eax), %ebx
+pit_irq:         
+        PUSHA         
+        CALL pit_handler 
+        cmpl $1, %eax
+        je pit_not_switching
+        POPA
+        PUSHL %eax
+        LEAL process_info, %eax        
         MOVL ESP(%eax), %esp
         MOVL EBP(%eax), %ebp
-        MOVL ESI(%eax), %esi
-        MOVL EDI(%eax), %edi
-        push EFLAGS(%eax)
-        popf
-
-        movl process_info, %eax
+        POPL %eax 
         IRET
+pit_not_switching:
+        POPA
+        IRET
+
 
 #define IRQ_HANDLER(name,number)   \
 .GLOBL name                   ;\

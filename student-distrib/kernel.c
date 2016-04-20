@@ -175,8 +175,6 @@ entry (unsigned long magic, unsigned long addr)
 	/* Initialize the PIC */
 	i8259_init();
 	/* Initialize the Real-time Clock */
-	//pit_init();
-	/* Initialize the Real-time Clock */
 	rtc_init();
 	/* Initialize the terminal I/O */
 	keyboard_open();
@@ -184,6 +182,8 @@ entry (unsigned long magic, unsigned long addr)
 	paging_init();
 	/* Initialize the filesystem*/
     parsing_fileSystem(fileSys_startAddr); //initialize file system
+	/* Initialize the Real-time Clock */
+	pit_init();
 	/* Enable interrupts */
 	
 	clear(); //need to clear screen in terminal driver init
@@ -191,7 +191,8 @@ entry (unsigned long magic, unsigned long addr)
 	sti();
     //printf("Enabling Interrupts\n");
 	/* Execute the first program (`shell') ... */
-	printf("%d\n",syscall_execute((uint8_t*)"shell"));
+syscall_execute((uint8_t*)"shell");
+	//printf("%d\n",syscall_execute((uint8_t*)"shell"));
 
 	/********TESTING READ AND WRITE for Terminal and RTC*******/
 	while(1)
