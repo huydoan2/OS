@@ -152,6 +152,7 @@ int32_t syscall_halt(uint8_t status)
 /*system call 2: execute function*/
 int32_t syscall_execute(const uint8_t* command)
 {
+  
   /*local variable declaration*/
   uint32_t parent_pid = current_pid[current_terminal] ;
   pcb_struct_t* current_PCB;
@@ -171,8 +172,9 @@ int32_t syscall_execute(const uint8_t* command)
   int32_t new_pid = 0;
 
   /*parse the input string*/
+  
   systcall_exec_parse(command, arg_buf, filename);
-
+  
   /*check the file type, ELF*/
   ELF[0] = ELF_0;
   ELF[1] = ELF_1;
@@ -210,6 +212,7 @@ int32_t syscall_execute(const uint8_t* command)
   parent.ss0 = tss.ss0;
 
   //add a new PCB
+  cli();
   new_pid = add_process(&current_PCB, cur_eip, parent);
   if(new_pid == -1)
   {
@@ -229,7 +232,7 @@ int32_t syscall_execute(const uint8_t* command)
  
   
   /*create artificial IRET*/ 
-  cli();
+ 
   asm volatile ("mov $0x2B, %%ax   \n\
                  mov %%ax, %%ds    \n\
                  mov %%ax, %%es    \n\

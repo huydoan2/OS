@@ -204,22 +204,23 @@ char getchar()
 					 sti();
 					if(current_pid[current_terminal] == 0)
 					{
-						uint32_t curr_pid = current_pid[prev_terminal_id];
-						pcb_struct_t *current_pcb;
-					    uint32_t esp = 0;
-					    uint32_t ebp = 0;
+						// cli();
+						// uint32_t curr_pid = current_pid[prev_terminal_id];
+						// pcb_struct_t *current_pcb;
+					 //    uint32_t esp = 0;
+					 //    uint32_t ebp = 0;
 
-					    asm volatile("mov %%esp, %0" :"=c"(esp));
-					  	asm volatile("mov %%ebp, %0" :"=c"(ebp)); 
+					 //    asm volatile("mov %%esp, %0" :"=c"(esp));
+					 //  	asm volatile("mov %%ebp, %0" :"=c"(ebp)); 
 
-					    current_pcb = find_PCB(curr_pid);
-					    current_pcb->esp = esp;
-					    current_pcb->ebp = ebp;    
-					   
+					 //    current_pcb = find_PCB(curr_pid);
+					 //    current_pcb->esp = esp;
+					 //    current_pcb->ebp = ebp;    
+					 //    sti();
 						syscall_execute((uint8_t*)"shell");
 					}
-					else
-						switch_task(current_pid[prev_terminal_id], current_pid[current_terminal]);
+					// else
+					// 	switch_task(current_pid[prev_terminal_id], current_pid[current_terminal]);
 				}
 				break;
 			}
@@ -240,22 +241,23 @@ char getchar()
 					sti();
 					if(current_pid[current_terminal] == 0)
 					{
-						uint32_t curr_pid = current_pid[prev_terminal_id];
-						pcb_struct_t *current_pcb;
-					    uint32_t esp = 0;
-					    uint32_t ebp = 0;
+						// cli();
+						// uint32_t curr_pid = current_pid[prev_terminal_id];
+						// pcb_struct_t *current_pcb;
+					 //    uint32_t esp = 0;
+					 //    uint32_t ebp = 0;
 
-					    asm volatile("mov %%esp, %0" :"=c"(esp));
-					  	asm volatile("mov %%ebp, %0" :"=c"(ebp)); 
+					 //    asm volatile("mov %%esp, %0" :"=c"(esp));
+					 //  	asm volatile("mov %%ebp, %0" :"=c"(ebp)); 
 
-					    current_pcb = find_PCB(curr_pid);
-					    current_pcb->esp = esp;
-					    current_pcb->ebp = ebp;    
-					   
+					 //    current_pcb = find_PCB(curr_pid);
+					 //    current_pcb->esp = esp;
+					 //    current_pcb->ebp = ebp;    
+					 //   	sti();
 						syscall_execute((uint8_t*)"shell");
 					}
-					else
-						switch_task(current_pid[prev_terminal_id], current_pid[current_terminal]);
+					// else
+					// 	switch_task(current_pid[prev_terminal_id], current_pid[current_terminal]);
 				
 				}
 				break;
@@ -279,22 +281,23 @@ char getchar()
 					 sti();
 					 if(current_pid[current_terminal] == 0)
 					{
-						uint32_t curr_pid = current_pid[prev_terminal_id];
-						pcb_struct_t *current_pcb;
-					    uint32_t esp = 0;
-					    uint32_t ebp = 0;
+						// cli();
+						// uint32_t curr_pid = current_pid[prev_terminal_id];
+						// pcb_struct_t *current_pcb;
+					 //    uint32_t esp = 0;
+					 //    uint32_t ebp = 0;
 
-					    asm volatile("mov %%esp, %0" :"=c"(esp));
-					  	asm volatile("mov %%ebp, %0" :"=c"(ebp)); 
+					 //    asm volatile("mov %%esp, %0" :"=c"(esp));
+					 //  	asm volatile("mov %%ebp, %0" :"=c"(ebp)); 
 
-					    current_pcb = find_PCB(curr_pid);
-					    current_pcb->esp = esp;
-					    current_pcb->ebp = ebp;    
-					   
+					 //    current_pcb = find_PCB(curr_pid);
+					 //    current_pcb->esp = esp;
+					 //    current_pcb->ebp = ebp;    
+					 //   	sti();
 						syscall_execute((uint8_t*)"shell");
 					}
-					else
-						switch_task(current_pid[prev_terminal_id], current_pid[current_terminal]);
+					// else
+					// 	switch_task(current_pid[prev_terminal_id], current_pid[current_terminal]);
 				}
 				break;
 			}

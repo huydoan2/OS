@@ -6,7 +6,7 @@
 #define CHANNEL_0		0x40
 #define CMD		  		0x43
 
-#define INIT_VALUE		0x06		//Channel0 - Latch - square wave gen
+#define INIT_VALUE		0x36		//Channel0 - Latch - square wave gen
 #define CONSTANT		1193182
 		
 /*
