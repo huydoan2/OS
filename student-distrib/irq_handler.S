@@ -40,17 +40,7 @@ process_info:
 .GLOBL pit_irq
 pit_irq:         
         PUSHA         
-        CALL pit_handler 
-        cmpl $1, %eax
-        je pit_not_switching
-        POPA
-        PUSHL %eax
-        LEAL process_info, %eax        
-        MOVL ESP(%eax), %esp
-        MOVL EBP(%eax), %ebp
-        POPL %eax 
-        IRET
-pit_not_switching:
+        CALL pit_handler          
         POPA
         IRET
 

@@ -152,7 +152,7 @@ int32_t syscall_halt(uint8_t status)
 /*system call 2: execute function*/
 int32_t syscall_execute(const uint8_t* command)
 {
-  
+  cli();
   /*local variable declaration*/
   uint32_t parent_pid = current_pid[current_terminal] ;
   pcb_struct_t* current_PCB;
@@ -212,7 +212,7 @@ int32_t syscall_execute(const uint8_t* command)
   parent.ss0 = tss.ss0;
 
   //add a new PCB
-  cli();
+  
   new_pid = add_process(&current_PCB, cur_eip, parent);
   if(new_pid == -1)
   {
