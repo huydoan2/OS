@@ -381,8 +381,10 @@ void keyboard_init()
  */
 void keyboard_handler()
 {	
+	
 	send_eoi(keyboard_irq_num);
 	char c = getchar();
+
 	//handle next line input
 	if(c == '\n'|| c == '\r')
 	{
@@ -408,9 +410,10 @@ void keyboard_handler()
 	//limit the maximum number of input characters
 	else if(c != '\0' && lb_index[current_terminal] < max_keys)			/*if the scancode value is not empty, print out the character*/
 	{
-		display_c(c);
-	    lb_index[current_terminal]++;
-		line_buffer[current_terminal][lb_index[current_terminal]] = c;
+		
+		    lb_index[current_terminal]++;
+			line_buffer[current_terminal][lb_index[current_terminal]] = c;
+			putc(c);	
 	}
 
 }

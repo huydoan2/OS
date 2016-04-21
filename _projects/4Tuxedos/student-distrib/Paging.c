@@ -34,8 +34,8 @@
 #define FIRST_PROG 0x00800000 //8MB
 #define PROG_VIRTADDR 0x08000000
 #define FOUR_MB 0x0400000
-uint32_t vid_mem_array[3] = {0x08400000, 0x08401000, 0x08402000};
-uint32_t vid_mem_phys_array[3] = {0x000B9000, 0x000BA000, 0x000BB000};
+//uint32_t vid_mem_array[3] = {0x08400000, 0x08401000, 0x08402000};
+uint32_t vid_mem_array[3] = {0x000B9000, 0x000BA000, 0x000BB000};
 extern int current_terminal;
 
 /* 
@@ -56,11 +56,9 @@ void paging_init()
 	//assign the physical address to the starting address
     uint32_t physAddr = PHYSMEM_START;
 
-	
 	/*initialize page directory and the first page table*/
 	for(i = 0; i < MAX_SIZE; i++)
 	{
-
 	  	physAddr = PT_INCREMENT*i;
 		page_directory[i] = PD_ENTRY_EMP_VAL;
 		if (i == 0){
@@ -201,13 +199,13 @@ void process_switch_mem_map(uint32_t next_pid_terminal){
 	else{
 		switch (next_pid_terminal){
 			case 0:
-				page_table[184] =  0xB9000 | PT_ENTRY_INIT_VAL_2;
+				page_table[184] =  0x08400000 | PT_ENTRY_INIT_VAL_2;
 				break;
 			case 1:
-				page_table[184] =  0xBA000 | PT_ENTRY_INIT_VAL_2;
+				page_table[184] =  0x08401000 | PT_ENTRY_INIT_VAL_2;
 				break;
 			case 2:
-				page_table[184] =  0xBB000 | PT_ENTRY_INIT_VAL_2;
+				page_table[184] =  0x08402000 | PT_ENTRY_INIT_VAL_2;
 				break;
 		}
 	}
@@ -276,10 +274,10 @@ void set_vid_mem(uint32_t cur_terminal_id, uint32_t next_terminal_id){
 		CR3 = (unsigned int)page_directory;
 		asm volatile("mov %0, %%CR3"::"c"(CR3));  
 		//store the current screen 
-		memcpy((void*)vid_mem_phys_array[cur_terminal_id], (void*)VIDEO, RESOLUTION*2);
+		memcpy((void*)vid_mem_array[cur_terminal_id], (void*)VIDEO, RESOLUTION*2);
 
 		//copy the new screen to the vidmeme
-		memcpy((void*)VIDEO,(void*)vid_mem_phys_array[next_terminal_id], RESOLUTION*2); 
+		memcpy((void*)VIDEO,(void*)vid_mem_array[next_terminal_id], RESOLUTION*2); 
 		
 		//sti();
 		//redirect the current pointer
