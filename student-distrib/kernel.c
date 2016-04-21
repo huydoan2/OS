@@ -182,7 +182,7 @@ entry (unsigned long magic, unsigned long addr)
 	paging_init();
 	/* Initialize the filesystem*/
     parsing_fileSystem(fileSys_startAddr); //initialize file system
-	/* Initialize the Real-time Clock */
+	/* Initialize the pit */
 	pit_init();
 	/* Enable interrupts */
 	

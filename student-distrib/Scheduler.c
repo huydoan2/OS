@@ -15,9 +15,9 @@
 uint32_t scheduling_terminal = 0;
 uint32_t curr_pid, next_pid;
 /*the current terminal that is on display*/
-extern int current_terminal;
 extern uint32_t current_pid[MAX_TERMINAL];
 extern uint32_t process_info[2];
+extern int current_terminal;
 uint32_t find_next_pid();
 
 int32_t pit_handler()
@@ -28,7 +28,6 @@ int32_t pit_handler()
     if(next_pid == 0 || curr_pid == next_pid)
         return 1;    
     process_switch_mem_map(scheduling_terminal); 
-    //switch_task_from_pit(curr_pid, next_pid);
     switch_task(curr_pid, next_pid);
     return 0;
 
@@ -37,6 +36,7 @@ int32_t pit_handler()
 
 void switch_task_from_pit(uint32_t curr_pid,uint32_t next_pid)
 {
+
     //return if there is noly one process
     if(curr_pid == next_pid)
         return ;
@@ -86,6 +86,11 @@ void switch_task(const uint32_t curr_pid,const uint32_t next_pid)
 {
 	if(curr_pid == next_pid)
         return;
+
+    if(scheduling_terminal == current_terminal)
+        enable_irq(1);
+    else
+        disable_irq(1);
 
     pcb_struct_t *current_pcb, *next_pcb;
     uint32_t esp = 0;
