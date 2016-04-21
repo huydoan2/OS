@@ -24,7 +24,6 @@
 #define MOVING_NUM (NUM_COLS*(NUM_ROWS - 1))*2
 #define RESOLUTION NUM_ROWS*NUM_COLS
 
-int cursor_terminal;
 
 int32_t printf(int8_t *format, ...);
 void putc(uint8_t c);
