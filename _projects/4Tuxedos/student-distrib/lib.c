@@ -851,6 +851,7 @@ void newline()
 */
 void scroll_screen()
 {
+	cli();
 	/*set the black color*/
 
 	int i;
@@ -868,6 +869,7 @@ void scroll_screen()
 	//make the last row blank
 	memcpy((void*)last_line, blank_row, NUM_COLS*2);
 	
+	sti();
 }
 
 void switch_vidmem(uint32_t next_terminal_id){
