@@ -349,31 +349,31 @@ void keyboard_handler()
 	//handle next line input
 	if(c == '\n'|| c == '\r')
 	{
-		if(lb_index[current_terminal] < max_keys)
+		if(lb_index[scheduling_terminal] < max_keys)
 	    {
-	    	lb_index[current_terminal]++;
-			line_buffer[current_terminal][lb_index[current_terminal]] = c;
+	    	lb_index[scheduling_terminal]++;
+			line_buffer[scheduling_terminal][lb_index[scheduling_terminal]] = c;
 		}
 		else
 			reset_linebuffer();
-		enter_flag[current_terminal] = 1;
+		enter_flag[scheduling_terminal] = 1;
 		newline();
 	}
 	//handle the backspace input
 	else if(c == '\b')
 	{
-		if(lb_index[current_terminal] >= 0)
+		if(lb_index[scheduling_terminal] >= 0)
 		{
-			lb_index[current_terminal]--;
+			lb_index[scheduling_terminal]--;
 			delete(); //delete the character 
 		}
 	}
 	//limit the maximum number of input characters
-	else if(c != '\0' && lb_index[current_terminal] < max_keys)			/*if the scancode value is not empty, print out the character*/
+	else if(c != '\0' && lb_index[scheduling_terminal] < max_keys)			/*if the scancode value is not empty, print out the character*/
 	{
 		
-		    lb_index[current_terminal]++;
-			line_buffer[current_terminal][lb_index[current_terminal]] = c;
+		    lb_index[scheduling_terminal]++;
+			line_buffer[scheduling_terminal][lb_index[scheduling_terminal]] = c;
 			putc(c);	
 	}
 
@@ -393,9 +393,9 @@ void keyboard_handler()
 void reset_linebuffer()
 {	
 	int i;
-	for (i = 0; i < lb_index[current_terminal]; ++i)
-		line_buffer[current_terminal][i] = 0;
-	lb_index[current_terminal] = -1;
+	for (i = 0; i < lb_index[scheduling_terminal]; ++i)
+		line_buffer[scheduling_terminal][i] = 0;
+	lb_index[scheduling_terminal] = -1;
 }
 
 /* 
@@ -468,13 +468,13 @@ int32_t keyboard_read(int32_t * buff, uint32_t offset, int32_t num_bytes, int32_
 		return -1;
 	reset_linebuffer();
 	//wait for the user to finish typing (hit enter)
-	while(enter_flag[current_terminal] == 0);
- 	enter_flag[current_terminal] = 0;
+	while(enter_flag[scheduling_terminal] == 0);
+ 	enter_flag[scheduling_terminal] = 0;
  	//copy the characters in the line buffer
  	cli();
- 	while(line_buffer[current_terminal][i] != '\n' && i < num_bytes)
+ 	while(line_buffer[scheduling_terminal][i] != '\n' && i < num_bytes)
  	{
- 		read_buff [i] = line_buffer[current_terminal][i];
+ 		read_buff [i] = line_buffer[scheduling_terminal][i];
  		i++;
  	}
  	read_buff [i] = '\n';
