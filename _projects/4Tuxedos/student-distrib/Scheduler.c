@@ -27,8 +27,9 @@ int32_t pit_handler()
     next_pid = find_next_pid();
     if(next_pid == 0 || curr_pid == next_pid)
         return 1;    
-    process_switch_mem_map(next_pid, scheduling_terminal, current_terminal); 
-    switch_task_from_pit(curr_pid, next_pid);
+    process_switch_mem_map(scheduling_terminal); 
+    //switch_task_from_pit(curr_pid, next_pid);
+    switch_task(curr_pid, next_pid);
     return 0;
 
 }
@@ -65,16 +66,16 @@ void switch_task_from_pit(uint32_t curr_pid,uint32_t next_pid)
     process_info[0] = next_pcb->esp;
     process_info[1] = next_pcb->ebp;
 
-   //  asm volatile("movl %0, %%esp"
-   //                   :
-   //                   :"c"(next_pcb->esp)
-   //                   :"%esp"
-   //                   );
-   // asm volatile("movl %0, %%ebp" 
-   //                   :
-   //                   :"c"(next_pcb->ebp)
-   //                   :"%ebp"
-   //                   );
+    asm volatile("movl %0, %%esp"
+                     :
+                     :"c"(next_pcb->esp)
+                     :"%esp"
+                     );
+   asm volatile("movl %0, %%ebp" 
+                     :
+                     :"c"(next_pcb->ebp)
+                     :"%ebp"
+                     );
    
 
 

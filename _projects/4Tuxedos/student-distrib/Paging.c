@@ -36,7 +36,7 @@
 #define FOUR_MB 0x0400000
 uint32_t vid_mem_array[3] = {0x08400000, 0x08401000, 0x08402000};
 uint32_t vid_mem_phys_array[3] = {0x000B9000, 0x000BA000, 0x000BB000};
-
+extern int current_terminal;
 
 /* 
  * paging_init
@@ -191,11 +191,11 @@ uint32_t get_physAddr(uint32_t virtAddr){
 
     }
 }
-void process_switch_mem_map(uint32_t next_pid, uint32_t next_pid_terminal, uint32_t cur_terminal_id){
+void process_switch_mem_map(uint32_t next_pid_terminal){
 	   uint32_t CR3 = 0;    
 
 	//change the video memory mapping 
-	if(next_pid_terminal == cur_terminal_id){
+	if(next_pid_terminal == current_terminal){
 		page_table[184] = 0xB8000 | PT_ENTRY_INIT_VAL_2;
 	}
 	else{

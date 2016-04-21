@@ -191,7 +191,7 @@ entry (unsigned long magic, unsigned long addr)
 	sti();
     //printf("Enabling Interrupts\n");
 	/* Execute the first program (`shell') ... */
-syscall_execute((uint8_t*)"shell");
+	syscall_execute((uint8_t*)"shell");
 	//printf("%d\n",syscall_execute((uint8_t*)"shell"));
 
 	/********TESTING READ AND WRITE for Terminal and RTC*******/
