@@ -96,6 +96,7 @@ void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename
 /*system call 1: halt function*/
 int32_t syscall_halt(uint8_t status)
 {
+
   uint32_t curr_pid = current_pid[current_terminal];
 
   
@@ -131,7 +132,7 @@ int32_t syscall_halt(uint8_t status)
    tss.ss0 = cur_PCB->parent.ss0;
    tss.esp0 = cur_PCB->parent.esp0;
 
-
+   current_pid[current_terminal] = curr_pid;
    /*set esp and ebp to the parent stack*/
    asm volatile("movl %0, %%esp"
                      :
