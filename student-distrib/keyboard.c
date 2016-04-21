@@ -509,8 +509,7 @@ int32_t keyboard_write(int32_t * buff, int32_t num_bytes)
 	cli();
 	while(i < num_bytes)
 	{
-		//putc(write_buff[i]);
-		display_c(write_buff[i],0);
+		putc(write_buff[i]);
 		i++;
 	}
 	reset_linebuffer();	//reset line buffer by reset the index
