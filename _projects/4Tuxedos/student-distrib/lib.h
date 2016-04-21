@@ -42,10 +42,10 @@ int8_t* strcpy(int8_t* dest, const int8_t*src);
 int8_t* strncpy(int8_t* dest, const int8_t*src, uint32_t n);
 
 /*functions we made*/
-int32_t display_printf(int8_t *format, ...);
+//int32_t display_printf(int8_t *format, ...);
+// int32_t display_s(int8_t* s);
 void cursor_update(int col, int row);
-void display_c(uint8_t c);
-int32_t display_s(int8_t* s);
+void display_c(uint8_t c, int terminal);
 void delete();
 void newline();
 void scroll_screen();

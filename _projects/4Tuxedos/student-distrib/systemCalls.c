@@ -217,7 +217,7 @@ int32_t syscall_execute(const uint8_t* command)
   new_pid = add_process(&current_PCB, cur_eip, parent);
   if(new_pid == -1)
   {
-    display_printf("exceeds maximum number of processes\n");
+    printf("exceeds maximum number of processes\n");
     return -1;
   }
   //updating TSS
