@@ -61,11 +61,11 @@ void switch_task(const uint32_t curr_pid,const uint32_t next_pid)
     //update esp and ebp of the next process
     next_pcb = find_PCB(next_pid);
     
-   //  asm volatile("movl %0, %%esp"
-   //                   :
-   //                   :"c"(next_pcb->esp)
-   //                   :"%esp"
-   //                   );
+    asm volatile("movl %0, %%esp"
+                     :
+                     :"c"(next_pcb->esp)
+                     :"%esp"
+                     );
    asm volatile("movl %0, %%ebp" 
                      :
                      :"c"(next_pcb->ebp)
