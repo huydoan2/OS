@@ -325,12 +325,12 @@ void
 putc(uint8_t c)
 {
     if(c == '\n' || c == '\r') {
-        cursor_t[cursor_terminal][1]++;
-        cursor_t[cursor_terminal][0]=0;
-		if (cursor_t[cursor_terminal][1] > NUM_ROWS - 1)
+        cursor_t[0][1]++;
+        cursor_t[0][0]=0;
+		if (cursor_t[0][1] > NUM_ROWS - 1)
 		{
 			scroll_screen();
-			--cursor_t[cursor_terminal][1];
+			--cursor_t[0][1];
 		}
     }
     else {
