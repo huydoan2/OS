@@ -41,7 +41,6 @@ void switch_task(const uint32_t curr_pid,const uint32_t next_pid)
     else
         disable_irq(1);
 
-    cursor_update_terminal();
     pcb_struct_t *current_pcb, *next_pcb;
     uint32_t esp = 0;
     uint32_t ebp = 0;
