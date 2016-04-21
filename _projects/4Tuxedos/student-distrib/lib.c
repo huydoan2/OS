@@ -34,9 +34,9 @@ clear(void)
         *(uint8_t *)(video_mem + (i << 1) + 1) = ATTRIB;
     }
     //reset the cursor location to left top corner
-    cursor_t[cursor_terminal][0] = 0;	
-    cursor_t[cursor_terminal][1] = 0;
-    cursor_update(cursor_t[cursor_terminal][0], cursor_t[cursor_terminal][1]);
+    cursor_t[current_terminal][0] = 0;	
+    cursor_t[current_terminal][1] = 0;
+    cursor_update(cursor_t[current_terminal][0], cursor_t[current_terminal][1]);
 }
 
 /* Standard printf().
@@ -325,27 +325,27 @@ void
 putc(uint8_t c)
 {
     if(c == '\n' || c == '\r') {
-        cursor_t[cursor_terminal][1]++;
-        cursor_t[cursor_terminal][0]=0;
-		if (cursor_t[cursor_terminal][1] > NUM_ROWS - 1)
+        cursor_t[current_terminal][1]++;
+        cursor_t[current_terminal][0]=0;
+		if (cursor_t[current_terminal][1] > NUM_ROWS - 1)
 		{
 			scroll_screen();
-			--cursor_t[cursor_terminal][1];
+			--cursor_t[current_terminal][1];
 		}
     }
     else {
-		if (cursor_t[cursor_terminal][1] > NUM_ROWS - 1)
+		if (cursor_t[current_terminal][1] > NUM_ROWS - 1)
 		{
 			scroll_screen();
-			--cursor_t[cursor_terminal][1];
+			--cursor_t[current_terminal][1];
 		}
-        *(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[cursor_terminal][1] + cursor_t[cursor_terminal][0]) << 1)) = c;
-        *(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[cursor_terminal][1] + cursor_t[cursor_terminal][0]) << 1) + 1) = ATTRIB;
-        cursor_t[cursor_terminal][0]++;
-	    cursor_t[cursor_terminal][1] = (cursor_t[cursor_terminal][1] + (cursor_t[cursor_terminal][0] / NUM_COLS));
-	    cursor_t[cursor_terminal][0] %= NUM_COLS;
+        *(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[current_terminal][1] + cursor_t[current_terminal][0]) << 1)) = c;
+        *(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[current_terminal][1] + cursor_t[current_terminal][0]) << 1) + 1) = ATTRIB;
+        cursor_t[current_terminal][0]++;
+	    cursor_t[current_terminal][1] = (cursor_t[current_terminal][1] + (cursor_t[current_terminal][0] / NUM_COLS));
+	    cursor_t[current_terminal][0] %= NUM_COLS;
     }
-    //cursor_update(cursor_t[cursor_terminal][0], cursor_t[cursor_terminal][1]);
+    //cursor_update(cursor_t[current_terminal][0], cursor_t[current_terminal][1]);
 }
 /*
 * int8_t* itoa(uint32_t value, int8_t* buf, int32_t radix);
@@ -740,7 +740,7 @@ void cursor_update(int row, int col)
 
 void cursor_update_terminal()
 {
-	cursor_update(cursor_t[cursor_terminal][0], cursor_t[cursor_terminal][1]);
+	cursor_update(cursor_t[current_terminal][0], cursor_t[current_terminal][1]);
 }
 
 /*
@@ -753,29 +753,29 @@ void
 display_c(uint8_t c)
 {
 	if(c == '\n' || c == '\r') {
-        cursor_t[cursor_terminal][1]++;
-        cursor_t[cursor_terminal][0]=0;
+        cursor_t[current_terminal][1]++;
+        cursor_t[current_terminal][0]=0;
 
-		if (cursor_t[cursor_terminal][1] > NUM_ROWS - 1)
+		if (cursor_t[current_terminal][1] > NUM_ROWS - 1)
 		{
 			scroll_screen();
-			--cursor_t[cursor_terminal][1];
+			--cursor_t[current_terminal][1];
 		}
     } 
     else {
     	
-		if (cursor_t[cursor_terminal][1] > NUM_ROWS - 1)
+		if (cursor_t[current_terminal][1] > NUM_ROWS - 1)
 		{
 			scroll_screen();
-			--cursor_t[cursor_terminal][1];
+			--cursor_t[current_terminal][1];
 		}
-        *(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[cursor_terminal][1] + cursor_t[cursor_terminal][0]) << 1)) = c;
-        *(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[cursor_terminal][1] + cursor_t[cursor_terminal][0]) << 1) + 1) = ATTRIB;
-        cursor_t[cursor_terminal][0]++;
-	    cursor_t[cursor_terminal][1] = (cursor_t[cursor_terminal][1] + (cursor_t[cursor_terminal][0] / NUM_COLS));
-	    cursor_t[cursor_terminal][0] %= NUM_COLS;
+        *(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[current_terminal][1] + cursor_t[current_terminal][0]) << 1)) = c;
+        *(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[current_terminal][1] + cursor_t[current_terminal][0]) << 1) + 1) = ATTRIB;
+        cursor_t[current_terminal][0]++;
+	    cursor_t[current_terminal][1] = (cursor_t[current_terminal][1] + (cursor_t[current_terminal][0] / NUM_COLS));
+	    cursor_t[current_terminal][0] %= NUM_COLS;
     }
-    cursor_update(cursor_t[cursor_terminal][0], cursor_t[cursor_terminal][1]);
+    cursor_update(cursor_t[current_terminal][0], cursor_t[current_terminal][1]);
 }
 
 /*
@@ -806,21 +806,21 @@ display_s(int8_t* s)
 void delete()
 {
 	//update screen x
-	cursor_t[cursor_terminal][0]--;	
+	cursor_t[current_terminal][0]--;	
 
 	//if it's in the top left already, dont' move
-    if(cursor_t[cursor_terminal][0] < 0 && cursor_t[cursor_terminal][1] == 0)
-    	cursor_t[cursor_terminal][0] = 0;
+    if(cursor_t[current_terminal][0] < 0 && cursor_t[current_terminal][1] == 0)
+    	cursor_t[current_terminal][0] = 0;
     //if it's in the middle and goes to previous line, update the screen x and y
-    else if (cursor_t[cursor_terminal][0] < 0)
+    else if (cursor_t[current_terminal][0] < 0)
 	{
-		cursor_t[cursor_terminal][1]--;
-		cursor_t[cursor_terminal][0] = NUM_COLS - 1;
+		cursor_t[current_terminal][1]--;
+		cursor_t[current_terminal][0] = NUM_COLS - 1;
 	}
 	//put a empty char in the space
-   	*(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[cursor_terminal][1] + cursor_t[cursor_terminal][0]) << 1)) = ' '; 
+   	*(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[current_terminal][1] + cursor_t[current_terminal][0]) << 1)) = ' '; 
    	//update the cursor
-   	cursor_update(cursor_t[cursor_terminal][0], cursor_t[cursor_terminal][1]);
+   	cursor_update(cursor_t[current_terminal][0], cursor_t[current_terminal][1]);
 }
 
 /*
@@ -833,16 +833,16 @@ void delete()
 void newline()
 {
 	//update screen x and y
-	cursor_t[cursor_terminal][0] = 0;
-    cursor_t[cursor_terminal][1]++;
+	cursor_t[current_terminal][0] = 0;
+    cursor_t[current_terminal][1]++;
     //if the screen_y goes over the max y, scroll the screen
- 	if (cursor_t[cursor_terminal][1] > NUM_ROWS - 1)
+ 	if (cursor_t[current_terminal][1] > NUM_ROWS - 1)
 	{
 		scroll_screen();
-		--cursor_t[cursor_terminal][1];
+		--cursor_t[current_terminal][1];
 	}
 	//update the cursor
-    cursor_update(cursor_t[cursor_terminal][0], cursor_t[cursor_terminal][1]);
+    cursor_update(cursor_t[current_terminal][0], cursor_t[current_terminal][1]);
 }
 
 /*

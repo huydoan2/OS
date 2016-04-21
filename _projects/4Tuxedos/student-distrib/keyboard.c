@@ -194,7 +194,7 @@ char getchar()
 		            prev_terminal_id = current_terminal;
 					current_terminal = 0;
 					control_flag[current_terminal] = 0;
-					cursor_terminal = 0;
+					current_terminal = 0;
 					set_vid_mem(prev_terminal_id, current_terminal);
 					cursor_update_terminal();
 					if(current_pid[current_terminal] == 0)
@@ -221,7 +221,7 @@ char getchar()
 					prev_terminal_id = current_terminal;
 					current_terminal = 1;
 					control_flag[current_terminal] = 0;
-					cursor_terminal = 1;
+					current_terminal = 1;
 					set_vid_mem(prev_terminal_id, current_terminal);
 					cursor_update_terminal();
 					if(current_pid[current_terminal] == 0)
@@ -248,7 +248,7 @@ char getchar()
 					prev_terminal_id = current_terminal;
 					current_terminal = 2;
 					control_flag[current_terminal] = 0;
-					cursor_terminal = 2;
+					current_terminal = 2;
 					set_vid_mem(prev_terminal_id, current_terminal);
 					cursor_update_terminal();
 					if(current_pid[current_terminal] == 0)
