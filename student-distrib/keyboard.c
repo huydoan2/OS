@@ -194,7 +194,6 @@ char getchar()
 		            prev_terminal_id = current_terminal;
 					current_terminal = 0;
 					control_flag[current_terminal] = 0;
-					current_terminal = 0;
 					set_vid_mem(prev_terminal_id, current_terminal);
 					cursor_update_terminal();
 					if(current_pid[current_terminal] == 0)
@@ -221,7 +220,6 @@ char getchar()
 					prev_terminal_id = current_terminal;
 					current_terminal = 1;
 					control_flag[current_terminal] = 0;
-					current_terminal = 1;
 					set_vid_mem(prev_terminal_id, current_terminal);
 					cursor_update_terminal();
 					if(current_pid[current_terminal] == 0)
@@ -248,7 +246,6 @@ char getchar()
 					prev_terminal_id = current_terminal;
 					current_terminal = 2;
 					control_flag[current_terminal] = 0;
-					current_terminal = 2;
 					set_vid_mem(prev_terminal_id, current_terminal);
 					cursor_update_terminal();
 					if(current_pid[current_terminal] == 0)
@@ -512,7 +509,8 @@ int32_t keyboard_write(int32_t * buff, int32_t num_bytes)
 	cli();
 	while(i < num_bytes)
 	{
-		putc(write_buff[i]);
+		//putc(write_buff[i]);
+		display_c(write_buff[i],0);
 		i++;
 	}
 	reset_linebuffer();	//reset line buffer by reset the index
