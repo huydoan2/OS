@@ -503,7 +503,6 @@ int32_t keyboard_read(int32_t * buff, uint32_t offset, int32_t num_bytes, int32_
  */
 int32_t keyboard_write(int32_t * buff, int32_t num_bytes)
 {
-	putc('A');
 	int i =0;
 	char*write_buff = (char*)buff;
 	//Check if the inputs are valid
