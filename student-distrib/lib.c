@@ -13,7 +13,6 @@ int (cursor_t[3][2]) = {{0}};
 static uint16_t blank_row[NUM_COLS];
 
 extern uint32_t scheduling_terminal;
-extern int current_terminal;
 static char* video_mem = (char *)VIDEO;
 uint32_t vid_mem[3] = {0x0800000, 0x0801000, 0x0802000};
 /*set the video memory space in accordance to the current termianl ID*/
@@ -34,9 +33,9 @@ clear(void)
         *(uint8_t *)(video_mem + (i << 1) + 1) = ATTRIB;
     }
     //reset the cursor location to left top corner
-    cursor_t[current_terminal][0] = 0;	
-    cursor_t[current_terminal][1] = 0;
-    cursor_update(cursor_t[current_terminal][0], cursor_t[current_terminal][1]);
+    cursor_t[scheduling_terminal][0] = 0;	
+    cursor_t[scheduling_terminal][1] = 0;
+    cursor_update(cursor_t[scheduling_terminal][0], cursor_t[scheduling_terminal][1]);
 }
 
 /* Standard printf().
@@ -326,27 +325,27 @@ putc(uint8_t c)
 {
 	cli();
     if(c == '\n' || c == '\r') {
-        cursor_t[current_terminal][1]++;
-        cursor_t[current_terminal][0]=0;
-		if (cursor_t[current_terminal][1] > NUM_ROWS - 1)
+        cursor_t[scheduling_terminal][1]++;
+        cursor_t[scheduling_terminal][0]=0;
+		if (cursor_t[scheduling_terminal][1] > NUM_ROWS - 1)
 		{
 			scroll_screen();
-			--cursor_t[current_terminal][1];
+			--cursor_t[scheduling_terminal][1];
 		}
     }
     else {
-		if (cursor_t[current_terminal][1] > NUM_ROWS - 1)
+		if (cursor_t[scheduling_terminal][1] > NUM_ROWS - 1)
 		{
 			scroll_screen();
-			--cursor_t[current_terminal][1];
+			--cursor_t[scheduling_terminal][1];
 		}
-        *(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[current_terminal][1] + cursor_t[current_terminal][0]) << 1)) = c;
-        *(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[current_terminal][1] + cursor_t[current_terminal][0]) << 1) + 1) = ATTRIB;
-        cursor_t[current_terminal][0]++;
-	    cursor_t[current_terminal][1] = (cursor_t[current_terminal][1] + (cursor_t[current_terminal][0] / NUM_COLS));
-	    cursor_t[current_terminal][0] %= NUM_COLS;
+        *(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[scheduling_terminal][1] + cursor_t[scheduling_terminal][0]) << 1)) = c;
+        *(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[scheduling_terminal][1] + cursor_t[scheduling_terminal][0]) << 1) + 1) = ATTRIB;
+        cursor_t[scheduling_terminal][0]++;
+	    cursor_t[scheduling_terminal][1] = (cursor_t[scheduling_terminal][1] + (cursor_t[scheduling_terminal][0] / NUM_COLS));
+	    cursor_t[scheduling_terminal][0] %= NUM_COLS;
     }
-    cursor_update(cursor_t[current_terminal][0], cursor_t[current_terminal][1]);
+    cursor_update(cursor_t[scheduling_terminal][0], cursor_t[scheduling_terminal][1]);
     sti();
 }
 /*
@@ -742,7 +741,7 @@ void cursor_update(int row, int col)
 
 void cursor_update_terminal()
 {
-	cursor_update(cursor_t[current_terminal][0], cursor_t[current_terminal][1]);
+	cursor_update(cursor_t[scheduling_terminal][0], cursor_t[scheduling_terminal][1]);
 }
 
 /*
@@ -751,34 +750,34 @@ void cursor_update_terminal()
 *   Return Value: void
 *	Function: Output a character to the console 
 */
-void
-display_c(uint8_t c, int terminal)
-{
-	cli();
-    if(c == '\n' || c == '\r') {
-        cursor_t[terminal][1]++;
-        cursor_t[terminal][0]=0;
-		if (cursor_t[terminal][1] > NUM_ROWS - 1)
-		{
-			scroll_screen();
-			--cursor_t[terminal][1];
-		}
-    }
-    else {
-		if (cursor_t[terminal][1] > NUM_ROWS - 1)
-		{
-			scroll_screen();
-			--cursor_t[terminal][1];
-		}
-        *(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[terminal][1] + cursor_t[terminal][0]) << 1)) = c;
-        *(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[terminal][1] + cursor_t[terminal][0]) << 1) + 1) = ATTRIB;
-        cursor_t[terminal][0]++;
-	    cursor_t[terminal][1] = (cursor_t[terminal][1] + (cursor_t[terminal][0] / NUM_COLS));
-	    cursor_t[terminal][0] %= NUM_COLS;
-    }
-    cursor_update(cursor_t[terminal][0], cursor_t[terminal][1]);
-    sti();
-}
+// void
+// display_c(uint8_t c, int terminal)
+// {
+// 	cli();
+//     if(c == '\n' || c == '\r') {
+//         cursor_t[terminal][1]++;
+//         cursor_t[terminal][0]=0;
+// 		if (cursor_t[terminal][1] > NUM_ROWS - 1)
+// 		{
+// 			scroll_screen();
+// 			--cursor_t[terminal][1];
+// 		}
+//     }
+//     else {
+// 		if (cursor_t[terminal][1] > NUM_ROWS - 1)
+// 		{
+// 			scroll_screen();
+// 			--cursor_t[terminal][1];
+// 		}
+//         *(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[terminal][1] + cursor_t[terminal][0]) << 1)) = c;
+//         *(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[terminal][1] + cursor_t[terminal][0]) << 1) + 1) = ATTRIB;
+//         cursor_t[terminal][0]++;
+// 	    cursor_t[terminal][1] = (cursor_t[terminal][1] + (cursor_t[terminal][0] / NUM_COLS));
+// 	    cursor_t[terminal][0] %= NUM_COLS;
+//     }
+//     cursor_update(cursor_t[terminal][0], cursor_t[terminal][1]);
+//     sti();
+// }
 
 /*
 * void display_s(int8_t* s);
@@ -808,21 +807,21 @@ display_c(uint8_t c, int terminal)
 void delete()
 {
 	//update screen x
-	cursor_t[current_terminal][0]--;	
+	cursor_t[scheduling_terminal][0]--;	
 
 	//if it's in the top left already, dont' move
-    if(cursor_t[current_terminal][0] < 0 && cursor_t[current_terminal][1] == 0)
-    	cursor_t[current_terminal][0] = 0;
+    if(cursor_t[scheduling_terminal][0] < 0 && cursor_t[scheduling_terminal][1] == 0)
+    	cursor_t[scheduling_terminal][0] = 0;
     //if it's in the middle and goes to previous line, update the screen x and y
-    else if (cursor_t[current_terminal][0] < 0)
+    else if (cursor_t[scheduling_terminal][0] < 0)
 	{
-		cursor_t[current_terminal][1]--;
-		cursor_t[current_terminal][0] = NUM_COLS - 1;
+		cursor_t[scheduling_terminal][1]--;
+		cursor_t[scheduling_terminal][0] = NUM_COLS - 1;
 	}
 	//put a empty char in the space
-   	*(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[current_terminal][1] + cursor_t[current_terminal][0]) << 1)) = ' '; 
+   	*(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[scheduling_terminal][1] + cursor_t[scheduling_terminal][0]) << 1)) = ' '; 
    	//update the cursor
-   	cursor_update(cursor_t[current_terminal][0], cursor_t[current_terminal][1]);
+   	cursor_update(cursor_t[scheduling_terminal][0], cursor_t[scheduling_terminal][1]);
 }
 
 /*
@@ -835,16 +834,16 @@ void delete()
 void newline()
 {
 	//update screen x and y
-	cursor_t[current_terminal][0] = 0;
-    cursor_t[current_terminal][1]++;
+	cursor_t[scheduling_terminal][0] = 0;
+    cursor_t[scheduling_terminal][1]++;
     //if the screen_y goes over the max y, scroll the screen
- 	if (cursor_t[current_terminal][1] > NUM_ROWS - 1)
+ 	if (cursor_t[scheduling_terminal][1] > NUM_ROWS - 1)
 	{
 		scroll_screen();
-		--cursor_t[current_terminal][1];
+		--cursor_t[scheduling_terminal][1];
 	}
 	//update the cursor
-    cursor_update(cursor_t[current_terminal][0], cursor_t[current_terminal][1]);
+    cursor_update(cursor_t[scheduling_terminal][0], cursor_t[scheduling_terminal][1]);
 }
 
 /*
