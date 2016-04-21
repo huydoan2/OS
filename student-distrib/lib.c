@@ -851,9 +851,8 @@ void newline()
 */
 void scroll_screen()
 {
-	cli();
 	/*set the black color*/
-
+	cli();
 	int i;
 
 	uint32_t last_line = (VIDEO + (NUM_ROWS - 1)*NUM_COLS*sizeof(uint16_t));		//the address of the last row in video memory
@@ -868,7 +867,6 @@ void scroll_screen()
 
 	//make the last row blank
 	memcpy((void*)last_line, blank_row, NUM_COLS*2);
-	
 	sti();
 }
 
