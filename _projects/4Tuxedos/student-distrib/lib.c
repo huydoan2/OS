@@ -12,7 +12,8 @@ int (cursor_t[3][2]) = {{0}};
 
 static uint16_t blank_row[NUM_COLS];
 
-extern int current_terminal;
+extern volatile uint32_t scheduling_terminal;
+extern volatile int current_terminal;
 static char* video_mem = (char *)VIDEO;
 uint32_t vid_mem[3] = {0x0800000, 0x0801000, 0x0802000};
 /*set the video memory space in accordance to the current termianl ID*/
@@ -724,7 +725,7 @@ test_interrupts(void)
 */
 void cursor_update(int row, int col)
  {
-    unsigned short position = (col*NUM_COLS) + row;
+ 	unsigned short position = (col*NUM_COLS) + row;
  
     // cursor off
     outb(0x0F, BASE_PORT);	// 0x0F is for the low-byte (Cursor Off)
@@ -733,6 +734,7 @@ void cursor_update(int row, int col)
     // cursor on
     outb(0x0E, BASE_PORT);	// 0x0E is for the hi-byte (Cursor On)
     outb( (unsigned char)( (position>>8) & CURSOR_MASK), CURSOR_PORT); // >>8 for getting high byte in position
+ 
  }
 
 

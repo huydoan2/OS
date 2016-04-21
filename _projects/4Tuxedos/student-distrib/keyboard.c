@@ -184,44 +184,33 @@ char getchar()
 
 	if(alt_flag[current_terminal])
 	{
+		cli();
 		switch(c)
 		{
 			case F1_pressed:
 			{
 				if(current_terminal!=0)
 				{	
-					cli();
 		            prev_terminal_id = current_terminal;
 					current_terminal = 0;
 					control_flag[current_terminal] = 0;
 					cursor_terminal = 0;
-					//change the vid mapping 
 					set_vid_mem(prev_terminal_id, current_terminal);
 					cursor_update_terminal();
-					// pcb_struct_t * prev_pcb = find_PCB(current_pid[prev_terminal_id]);
-					// switch_task(current_pid[prev_terminal_id], current_pid[current_terminal], prev_pcb->registers);
-					//if(current_pid[current_terminal] == 0)
-					//	syscall_execute((uint8_t*)"shell");
-					 sti();
 					if(current_pid[current_terminal] == 0)
 					{
-						cli();
 						uint32_t curr_pid = current_pid[prev_terminal_id];
 						pcb_struct_t *current_pcb;
 					    uint32_t esp = 0;
 					    uint32_t ebp = 0;
-
+					    scheduling_terminal = 0;
 					    asm volatile("mov %%esp, %0" :"=c"(esp));
 					  	asm volatile("mov %%ebp, %0" :"=c"(ebp)); 
-
 					    current_pcb = find_PCB(curr_pid);
 					    current_pcb->esp = esp;
 					    current_pcb->ebp = ebp;    
-					    sti();
 						syscall_execute((uint8_t*)"shell");
 					}
-					// else
-					// 	switch_task(current_pid[prev_terminal_id], current_pid[current_terminal]);
 				}
 				break;
 			}
@@ -229,39 +218,26 @@ char getchar()
 			{
 				if(current_terminal!=1)
 				{   
-					cli();
 					prev_terminal_id = current_terminal;
 					current_terminal = 1;
 					control_flag[current_terminal] = 0;
 					cursor_terminal = 1;
-					//change the vid mapping 
 					set_vid_mem(prev_terminal_id, current_terminal);
 					cursor_update_terminal();
-					// pcb_struct_t * prev_pcb = find_PCB(current_pid[prev_terminal_id]);
-					// switch_task(current_pid[prev_terminal_id], current_pid[current_terminal], prev_pcb->registers);
-					sti();
 					if(current_pid[current_terminal] == 0)
 					{
-						cli();
 						uint32_t curr_pid = current_pid[prev_terminal_id];
 						pcb_struct_t *current_pcb;
 					    uint32_t esp = 0;
 					    uint32_t ebp = 0;
-
 					    scheduling_terminal = 1;
-
 					    asm volatile("mov %%esp, %0" :"=c"(esp));
 					  	asm volatile("mov %%ebp, %0" :"=c"(ebp)); 
-
 					    current_pcb = find_PCB(curr_pid);
 					    current_pcb->esp = esp;
 					    current_pcb->ebp = ebp;    
-					   	sti();
 						syscall_execute((uint8_t*)"shell");
-					}
-					// else
-					// 	switch_task(current_pid[prev_terminal_id], current_pid[current_terminal]);
-				
+					}				
 				}
 				break;
 			}
@@ -269,44 +245,32 @@ char getchar()
 			{
 				if(current_terminal!=2)
 				{   
-					cli();
 					prev_terminal_id = current_terminal;
 					current_terminal = 2;
 					control_flag[current_terminal] = 0;
 					cursor_terminal = 2;
-					//change the vid mapping 
 					set_vid_mem(prev_terminal_id, current_terminal);
 					cursor_update_terminal();
-					// pcb_struct_t * prev_pcb = find_PCB(current_pid[prev_terminal_id]);
-					// switch_task(current_pid[prev_terminal_id], current_pid[current_terminal], prev_pcb->registers);
-					//if(current_pid[current_terminal] == 0)
-					//	syscall_execute((uint8_t*)"shell");
-					 sti();
-					 if(current_pid[current_terminal] == 0)
+					if(current_pid[current_terminal] == 0)
 					{
-						cli();
 						uint32_t curr_pid = current_pid[prev_terminal_id];
 						pcb_struct_t *current_pcb;
 					    uint32_t esp = 0;
 					    uint32_t ebp = 0;
-
 					    scheduling_terminal = 2;
-					    
 					    asm volatile("mov %%esp, %0" :"=c"(esp));
 					  	asm volatile("mov %%ebp, %0" :"=c"(ebp)); 
-
 					    current_pcb = find_PCB(curr_pid);
 					    current_pcb->esp = esp;
 					    current_pcb->ebp = ebp;    
-					   	sti();
 						syscall_execute((uint8_t*)"shell");
 					}
-					// else
-					// 	switch_task(current_pid[prev_terminal_id], current_pid[current_terminal]);
 				}
 				break;
 			}
 		}
+		sti();
+
 	}
 
 	/*caps lock off case, checking if it's even or odd*/
@@ -539,6 +503,7 @@ int32_t keyboard_read(int32_t * buff, uint32_t offset, int32_t num_bytes, int32_
  */
 int32_t keyboard_write(int32_t * buff, int32_t num_bytes)
 {
+	putc('A');
 	int i =0;
 	char*write_buff = (char*)buff;
 	//Check if the inputs are valid

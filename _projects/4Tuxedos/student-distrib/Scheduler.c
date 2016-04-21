@@ -22,7 +22,8 @@ uint32_t find_next_pid();
 
 int32_t pit_handler()
 {
-	send_eoi(pit_irq_num);
+	
+    send_eoi(pit_irq_num);
     curr_pid = current_pid[scheduling_terminal];
     next_pid = find_next_pid();
     if(next_pid == 0 || curr_pid == next_pid)
@@ -33,65 +34,14 @@ int32_t pit_handler()
 
 }
 
-
-void switch_task_from_pit(uint32_t curr_pid,uint32_t next_pid)
-{
-
-    //return if there is noly one process
-    if(curr_pid == next_pid)
-        return ;
-
-    //store the esp and ebp of the current process
-    pcb_struct_t *current_pcb, *next_pcb;
-    uint32_t esp, ebp;
-
-    asm volatile("mov %%esp, %0" :"=c"(esp));
-    asm volatile("mov %%ebp, %0" :"=c"(ebp)); 
-
-    current_pcb = find_PCB(curr_pid);
-    current_pcb->esp = esp;
-    current_pcb->ebp = ebp;    
-   
-    //set tss registers
-    tss.ss0 =  KERNEL_DS;
-    tss.esp0 = EIGHT_MB - tss_offset - EIGHT_KB * (next_pid); 
-
-    //re-map the program image
-    map_page(next_pid);
-
-    //update esp and ebp of the next process
-    next_pcb = find_PCB(next_pid);
-    // esp = next_pcb->esp;
-    // ebp = next_pcb->ebp;
-    process_info[0] = next_pcb->esp;
-    process_info[1] = next_pcb->ebp;
-
-    asm volatile("movl %0, %%esp"
-                     :
-                     :"c"(next_pcb->esp)
-                     :"%esp"
-                     );
-   asm volatile("movl %0, %%ebp" 
-                     :
-                     :"c"(next_pcb->ebp)
-                     :"%ebp"
-                     );
-   
-
-
-}
-
-
 void switch_task(const uint32_t curr_pid,const uint32_t next_pid)
 {
-	if(curr_pid == next_pid)
-        return;
-
     if(scheduling_terminal == current_terminal)
         enable_irq(1);
     else
         disable_irq(1);
 
+    cursor_update_terminal();
     pcb_struct_t *current_pcb, *next_pcb;
     uint32_t esp = 0;
     uint32_t ebp = 0;
@@ -105,29 +55,22 @@ void switch_task(const uint32_t curr_pid,const uint32_t next_pid)
    
 
     //set tss registers
-    tss.ss0 =  KERNEL_DS;
     tss.esp0 = EIGHT_MB - tss_offset - EIGHT_KB * (next_pid); 
 
 	map_page(next_pid);
     //update esp and ebp of the next process
     next_pcb = find_PCB(next_pid);
-    // esp = next_pcb->esp;
-    // ebp = next_pcb->ebp;
     
-    asm volatile("movl %0, %%esp"
-                     :
-                     :"c"(next_pcb->esp)
-                     :"%esp"
-                     );
+   //  asm volatile("movl %0, %%esp"
+   //                   :
+   //                   :"c"(next_pcb->esp)
+   //                   :"%esp"
+   //                   );
    asm volatile("movl %0, %%ebp" 
                      :
                      :"c"(next_pcb->ebp)
                      :"%ebp"
                      );
-   
-
-    //swtich the program image and video memory mapping 
-    //process_switch_mem_map(next_pid, scheduling_terminal, current_terminal); 
 }
 
 uint32_t find_next_pid()
@@ -140,8 +83,5 @@ uint32_t find_next_pid()
 		if(original == scheduling_terminal)
          break;
 	}while(current_pid[scheduling_terminal] == 0);
-
 	return current_pid[scheduling_terminal];
-
-    //return current_pid[(current_terminal+1) % 3];
 }

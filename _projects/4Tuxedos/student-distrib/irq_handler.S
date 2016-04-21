@@ -30,21 +30,6 @@ common_interrupt_default:
 jumb_table:
         .long pit_handler, keyboard_handler, 0, 0, 0, 0, 0, 0, rtc_handler, 0, 0, 0, 0, 0, 0, 0
 
-.GLOBL process_info
-process_info:
-        .rept 2
-        .long 0
-        .endr
-
-
-.GLOBL pit_irq
-pit_irq:         
-        PUSHA         
-        CALL pit_handler          
-        POPA
-        IRET
-
-
 #define IRQ_HANDLER(name,number)   \
 .GLOBL name                   ;\
 name:   PUSHA	              ;\
@@ -54,7 +39,7 @@ name:   PUSHA	              ;\
 	IRET
 
 /* the system call library wrappers */
-/*IRQ_HANDLER(pit_irq,0)*/
+IRQ_HANDLER(pit_irq,0)
 IRQ_HANDLER(keyboard_irq,1)
 IRQ_HANDLER(rtc_irq,8)
 
