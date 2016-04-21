@@ -38,6 +38,7 @@
 #define F3_pressed 0x3D
 
 extern uint32_t current_pid[MAX_TERMINAL];
+extern uint32_t scheduling_terminal;
 void switch_task(uint32_t curr_pid,uint32_t next_pid);
 //scancode array for keyboard
 //0 = no output
@@ -247,6 +248,8 @@ char getchar()
 					    uint32_t esp = 0;
 					    uint32_t ebp = 0;
 
+					    scheduling_terminal = 1;
+
 					    asm volatile("mov %%esp, %0" :"=c"(esp));
 					  	asm volatile("mov %%ebp, %0" :"=c"(ebp)); 
 
@@ -287,6 +290,8 @@ char getchar()
 					    uint32_t esp = 0;
 					    uint32_t ebp = 0;
 
+					    scheduling_terminal = 2;
+					    
 					    asm volatile("mov %%esp, %0" :"=c"(esp));
 					  	asm volatile("mov %%ebp, %0" :"=c"(ebp)); 
 
