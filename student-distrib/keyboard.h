@@ -42,10 +42,10 @@
  int32_t keyboard_close();
 
 //read function for keyboard
- int32_t keyboard_read(int32_t*buff, uint32_t offset, int32_t num_bytes, int32_t var);
+ int32_t terminal_read(int32_t*buff, uint32_t offset, int32_t num_bytes, int32_t var);
 
 //write function for keyboard
- int32_t keyboard_write(int32_t*buff, int32_t num_bytes);
+ int32_t terminal_write(int32_t*buff, int32_t num_bytes);
 
 
 #endif /* ASM */

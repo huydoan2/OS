@@ -15,7 +15,7 @@ static uint16_t blank_row[NUM_COLS];
 extern int current_terminal;
 extern uint32_t scheduling_terminal;
 static char* video_mem = (char *)VIDEO;
-uint32_t vid_mem[3] = {0x0800000, 0x0801000, 0x0802000};
+uint32_t vid_mem[3] = {0xB9000, 0xBA000, 0xBB000};
 /*set the video memory space in accordance to the current termianl ID*/
 
 /*
@@ -676,7 +676,7 @@ void newline()
 */
 void scroll_screen()
 {
-	/*set the black color*/
+		/*set the black color*/
 	int i;
 
 	for (i = 0; i < NUM_COLS; ++i)
@@ -684,11 +684,22 @@ void scroll_screen()
 		blank_row[i] = ATTRIB << ATTRIB_SHIFT;
 	}
 	cli();
-	uint32_t last_line = (VIDEO + (NUM_ROWS - 1)*NUM_COLS*sizeof(uint16_t));		//the address of the last row in video memory
+	if(current_terminal != scheduling_terminal){
+	uint32_t last_line = (vid_mem[scheduling_terminal] + (NUM_ROWS - 1)*NUM_COLS*sizeof(uint16_t));		//the address of the last row in video memory
 	//move NUM_COLS -1 rows to the top of the screen
-	memcpy(video_mem, (void*)(VIDEO + NUM_COLS*sizeof(uint16_t)), MOVING_NUM);
+	memcpy(vid_mem[scheduling_terminal], (void*)(vid_mem[scheduling_terminal] + NUM_COLS*sizeof(uint16_t)), MOVING_NUM);
 	//make the last row blank
 	memcpy((void*)last_line, blank_row, NUM_COLS*2);
+	}	
+
+
+	else{
+	uint32_t last_line = (VIDEO+ (NUM_ROWS - 1)*NUM_COLS*sizeof(uint16_t));		//the address of the last row in video memory
+	//move NUM_COLS -1 rows to the top of the screen
+	memcpy(VIDEO, (void*)(VIDEO + NUM_COLS*sizeof(uint16_t)), MOVING_NUM);
+	//make the last row blank
+	memcpy((void*)last_line, blank_row, NUM_COLS*2);
+	}
 	sti();
 
 }
