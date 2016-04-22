@@ -442,7 +442,7 @@ int32_t keyboard_close()
 
 
 /* 
- * keyboard_read
+ * terminal_read
  *   DESCRIPTION: read keyboard
  *-----------------------------------------------------------------------------------
  *   INPUTS: char * buff = buffer to copy chars from the line buffer 
@@ -458,7 +458,7 @@ int32_t keyboard_close()
 
 
 
-int32_t keyboard_read(int32_t * buff, uint32_t offset, int32_t num_bytes, int32_t var)
+int32_t terminal_read(int32_t * buff, uint32_t offset, int32_t num_bytes, int32_t var)
 {
 	
 	int i = 0;
@@ -486,7 +486,7 @@ int32_t keyboard_read(int32_t * buff, uint32_t offset, int32_t num_bytes, int32_
 }
 
 /* 
- * keyboard_write
+ * terminal_write
  *   DESCRIPTION: write keyboard, display the content from the buffer to the screen
  *-----------------------------------------------------------------------------------
  *   INPUTS: char * buff = buffer that has characters to be written
@@ -498,16 +498,20 @@ int32_t keyboard_read(int32_t * buff, uint32_t offset, int32_t num_bytes, int32_
  *			- characters passed in by the buffer are displayed on the screen
  *
  */
-int32_t keyboard_write(int32_t * buff, int32_t num_bytes)
-{
-	// printf("\nSecheduling index: %d\n",scheduling_terminal);
+
+int32_t terminal_write(int32_t * buff, int32_t num_bytes)
+{ 
+	cli();
+	// if(scheduling_terminal == 1){
+	// 	printf("iteration: %d || ",idx++);
+	// }
 	int i =0;
 	char*write_buff = (char*)buff;
 	//Check if the inputs are valid
 	if(buff == NULL || num_bytes < 0)
 		return -1;
 	//write character to the screen]
-	cli();
+	
 	while(i < num_bytes)
 	{
 		putc(write_buff[i]);

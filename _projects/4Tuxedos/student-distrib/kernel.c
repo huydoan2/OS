@@ -37,7 +37,7 @@ entry (unsigned long magic, unsigned long addr)
 	/*file system test variables*/
 	uint32_t fileSys_startAddr;
 	/*keyboard and terminal test variables*/
-	int keyboard_write_index;
+	int terminal_write_index;
 	char buff[size_of_keys];
 	int num_byte = size_of_keys;
 	int32_t * buf;
@@ -198,14 +198,14 @@ entry (unsigned long magic, unsigned long addr)
 	while(1)
 	{
 		//keyboard read write test
-		keyboard_write_index = keyboard_read((int32_t*)buff, 0,num_byte, 0);
-		keyboard_write((int32_t*)buff, keyboard_write_index);
-		printf("bytes written = %d\n",keyboard_write_index);
+		terminal_write_index = terminal_read((int32_t*)buff, 0,num_byte, 0);
+		terminal_write((int32_t*)buff, terminal_write_index);
+		printf("bytes written = %d\n",terminal_write_index);
 		
-		while(keyboard_write_index>=0)
+		while(terminal_write_index>=0)
 		{		
-			buff[keyboard_write_index] = 0;
-			keyboard_write_index--;
+			buff[terminal_write_index] = 0;
+			terminal_write_index--;
 		}
 	}
 	

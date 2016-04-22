@@ -107,19 +107,24 @@ int32_t dir_close(){
  *				   - 0: is the reach the end of the directory 
  *-----------------------------------------------------------------------------------
  *   SIDE EFFECTS: - store the file system in to data structures 
- */
+ */int32_t index_temp = 0;
 int32_t dir_read(int32_t* buff, uint32_t offset, int32_t num_bytes, int32_t var){
 	dentry_t dentry;
+	
+
 	//check if the input offset is valid
 	if(offset >= bootblock.num_dentries)
 		return 0;
-	cli();
 
+	cli();
+printf("idx: %d|| ", ++index_temp);
 	//obtain the directory entry
 	read_dentry_by_index(offset, &dentry);
 	//obtian the file name of that entry 
 	strncpy((int8_t*)buff,dentry.filename, num_bytes);
+	printf("==>from read dir: %s || ",buff);
 	sti();
+
 	return strlen(dentry.filename);
 }
 
@@ -219,6 +224,7 @@ int32_t read_dentry_by_name(const uint8_t* fname, struct dentry_t* dentry)
  *-----------------------------------------------------------------------------------
  *   SIDE EFFECTS: - store target directory entry into dentry
  */
+
 int32_t read_dentry_by_index(uint32_t index, struct dentry_t* dentry)
 {
 	//check if index is valid

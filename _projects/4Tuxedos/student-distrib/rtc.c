@@ -121,13 +121,13 @@ rtc_handler(void)
 void rtc_set_rate()
 {
 	char previous;
-	cli();
+	//cli();
 	//set the register A
 	outb(REGISTER_A|NMI_DISABLE, RTC_PORT);		//disable NMI and select reg A
 	previous = inb(CMOS_PORT);					//read current value of reg A
 	outb(REGISTER_A|NMI_DISABLE, RTC_PORT);		//disable NMI and select reg A
 	outb((previous & PREV_MASK) | rate, CMOS_PORT);
-	sti();
+	//sti();
 }
 
 /* 

@@ -33,16 +33,16 @@ void init_FD(file_desc_t* FD){
     FD[0].flags = INUSE;
 	FD[0].fops.open_ptr = &keyboard_open;
 	FD[0].fops.close_ptr = &keyboard_close;
-	FD[0].fops.read_ptr = &keyboard_read;
-	FD[0].fops.write_ptr = &keyboard_write;
+	FD[0].fops.read_ptr = &terminal_read;
+	FD[0].fops.write_ptr = &terminal_write;
 
 	/*stdout*/
     FD[1].file_pos = 0;
     FD[1].flags = INUSE;
 	FD[1].fops.open_ptr = &keyboard_open;
 	FD[1].fops.close_ptr = &keyboard_close;
-	FD[1].fops.read_ptr = &keyboard_read;
-	FD[1].fops.write_ptr = &keyboard_write;
+	FD[1].fops.read_ptr = &terminal_read;
+	FD[1].fops.write_ptr = &terminal_write;
 
 	/*initialize the rest of the blocks*/
 	for (i = REGULAR; i < FD_SIZE; ++i){
