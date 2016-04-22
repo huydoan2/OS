@@ -293,15 +293,19 @@ int32_t syscall_execute(const uint8_t* command)
 /*system call 3: read function*/
 int32_t syscall_read(int32_t fd, void* buf, int32_t nbytes)
 {
+ 
   pcb_struct_t * pcb = find_PCB(current_pid[current_terminal]);
   return read_fd(pcb->fd_array, fd, buf, nbytes);
+  
 }
 
 /*system call 4: write function*/
 int32_t syscall_write(int32_t fd, const void* buf, int32_t nbytes)
 {
+
   pcb_struct_t * pcb = find_PCB(current_pid[current_terminal]);
   return write_fd(pcb->fd_array, fd, buf, nbytes);
+ 
 }
 
 /*system call 5: open function*/
