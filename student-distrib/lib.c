@@ -198,7 +198,8 @@ void
 putc(uint8_t c)
 {
 	cli();
-    if(c == '\n' || c == '\r') {
+    if(c == '\n' || c == '\r') 
+    {
         cursor_t[scheduling_terminal][1]++;
         cursor_t[scheduling_terminal][0]=0;
 		if (cursor_t[scheduling_terminal][1] > NUM_ROWS - 1)
@@ -207,7 +208,8 @@ putc(uint8_t c)
 			--cursor_t[scheduling_terminal][1];
 		}
     }
-    else {
+    else 
+    {
 		if (cursor_t[scheduling_terminal][1] > NUM_ROWS - 1)
 		{
 			scroll_screen();
