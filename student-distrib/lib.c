@@ -677,22 +677,18 @@ void newline()
 void scroll_screen()
 {
 	/*set the black color*/
-
 	int i;
 
 	for (i = 0; i < NUM_COLS; ++i)
 	{
 		blank_row[i] = ATTRIB << ATTRIB_SHIFT;
 	}
-	
-	cli();
 	uint32_t last_line = (VIDEO + (NUM_ROWS - 1)*NUM_COLS*sizeof(uint16_t));		//the address of the last row in video memory
 	//move NUM_COLS -1 rows to the top of the screen
 	memcpy(video_mem, (void*)(VIDEO + NUM_COLS*sizeof(uint16_t)), MOVING_NUM);
-
 	//make the last row blank
 	memcpy((void*)last_line, blank_row, NUM_COLS*2);
-	sti();
+
 }
 
 void switch_vidmem(uint32_t next_terminal_id){
