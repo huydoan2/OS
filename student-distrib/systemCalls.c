@@ -117,7 +117,6 @@ int32_t syscall_halt(uint8_t status)
 
   if(cur_PCB->parent.pid == 0)
   {
-    sti();
     //remove the current proccess from the PCB array and start a new shell
     printf("Can't exit the first shell!\n");
     syscall_execute((uint8_t*)"shell");
@@ -176,7 +175,6 @@ int32_t syscall_execute(const uint8_t* command)
   int32_t new_pid = 0;
 
   /*parse the input string*/
-  
   systcall_exec_parse(command, arg_buf, filename);
   
   /*check the file type, ELF*/
@@ -194,8 +192,6 @@ int32_t syscall_execute(const uint8_t* command)
     return -1;//not an executable
   } 
   
-
-
   /*Get the eip from the executable file*/
   read_data(dentry.inode_num, eip_offset, read_buf, eip_size);
   cur_eip = ((uint32_t)read_buf[0])  | cur_eip;
@@ -203,8 +199,6 @@ int32_t syscall_execute(const uint8_t* command)
   cur_eip = ((uint32_t)read_buf[2] << SHIFT_16) | cur_eip;
   cur_eip = ((uint32_t)read_buf[3] << SHIFT_24) | cur_eip;
 
-
-  
   /*Create PCB*/
   parent_info_t parent;
   parent.pid = parent_pid;
@@ -216,25 +210,22 @@ int32_t syscall_execute(const uint8_t* command)
   parent.ss0 = tss.ss0;
 
   //add a new PCB
-  
   new_pid = add_process(&current_PCB, cur_eip, parent);
   if(new_pid == -1)
   {
     printf("exceeds maximum number of processes\n");
     return -1;
   }
+
   //updating TSS
   tss.ss0 = KERNEL_DS;
   tss.esp0 = EIGHT_MB - tss_offset - EIGHT_KB * (parent_pid);
   
-    
   /*Set up paging*/
   map_page(new_pid);
   /*Load the progrma file*/
   prog_loader(filename, virtAddr);
 
- 
-  
   /*create artificial IRET*/ 
  
   asm volatile ("mov $0x2B, %%ax   \n\
@@ -247,10 +238,6 @@ int32_t syscall_execute(const uint8_t* command)
                  :
                  :"%ax"
                 );
-
-   asm volatile("movl %%esp, %0":"=c"(par_esp));
-   asm volatile("movl %%ebp, %0" :"=c"(par_ebp));
-   
 
    //push user ss
    asm volatile("movl %0, %%eax;\n"
@@ -286,8 +273,6 @@ int32_t syscall_execute(const uint8_t* command)
   asm volatile("pushl %0"
                 :
                 :"c"(cur_eip)); //push currnet EIP
-
-
 
   /*IRET*/
   asm volatile("IRET");
