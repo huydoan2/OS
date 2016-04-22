@@ -96,7 +96,7 @@ void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename
 /*system call 1: halt function*/
 int32_t syscall_halt(uint8_t status)
 {
-
+  cli();
   uint32_t curr_pid = current_pid[current_terminal];
 
   
@@ -117,9 +117,11 @@ int32_t syscall_halt(uint8_t status)
 
   if(cur_PCB->parent.pid == 0)
   {
+    sti();
     //remove the current proccess from the PCB array and start a new shell
     printf("Can't exit the first shell!\n");
     syscall_execute((uint8_t*)"shell");
+    sti();
     return 0;
   }
 
@@ -147,6 +149,7 @@ int32_t syscall_halt(uint8_t status)
 
   /*jump back to the execute*/
  asm volatile("jmp halt_ret_label;");
+ sti();
   return 0;
 }
 
