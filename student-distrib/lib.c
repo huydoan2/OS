@@ -728,7 +728,6 @@ test_interrupts(void)
 void cursor_update(int row, int col)
  {
  	unsigned short position = (col*NUM_COLS) + row;
- 
     // cursor off
     outb(0x0F, BASE_PORT);	// 0x0F is for the low-byte (Cursor Off)
     outb( (unsigned char)(position & CURSOR_MASK), CURSOR_PORT);
@@ -856,16 +855,16 @@ void newline()
 void scroll_screen()
 {
 	/*set the black color*/
-	cli();
-	int i;
 
-	uint32_t last_line = (VIDEO + (NUM_ROWS - 1)*NUM_COLS*sizeof(uint16_t));		//the address of the last row in video memory
+	int i;
 
 	for (i = 0; i < NUM_COLS; ++i)
 	{
 		blank_row[i] = ATTRIB << ATTRIB_SHIFT;
 	}
 	
+	cli();
+	uint32_t last_line = (VIDEO + (NUM_ROWS - 1)*NUM_COLS*sizeof(uint16_t));		//the address of the last row in video memory
 	//move NUM_COLS -1 rows to the top of the screen
 	memcpy(video_mem, (void*)(VIDEO + NUM_COLS*sizeof(uint16_t)), MOVING_NUM);
 

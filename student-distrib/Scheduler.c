@@ -20,17 +20,17 @@ extern uint32_t process_info[2];
 extern int current_terminal;
 uint32_t find_next_pid();
 
-int32_t pit_handler()
+void pit_handler()
 {
-	
-    send_eoi(pit_irq_num);
+	send_eoi(pit_irq_num);
     curr_pid = current_pid[scheduling_terminal];
     next_pid = find_next_pid();
     if(next_pid == 0 || curr_pid == next_pid)
-        return 1;    
+        return;    
     process_switch_mem_map(scheduling_terminal); 
     switch_task(curr_pid, next_pid);
-    return 0;
+    
+    return;
 
 }
 
@@ -41,6 +41,11 @@ void switch_task(const uint32_t curr_pid,const uint32_t next_pid)
     else
         disable_irq(1);
     
+
+    //set tss registers
+    tss.ss0 =  KERNEL_DS;
+    tss.esp0 = EIGHT_MB - EIGHT_KB * (next_pid - 1); 
+
     pcb_struct_t *current_pcb, *next_pcb;
     uint32_t esp = 0;
     uint32_t ebp = 0;
@@ -51,10 +56,6 @@ void switch_task(const uint32_t curr_pid,const uint32_t next_pid)
     current_pcb = find_PCB(curr_pid);
     current_pcb->esp = esp;
     current_pcb->ebp = ebp;    
-   
-
-    //set tss registers
-    tss.esp0 = EIGHT_MB - tss_offset - EIGHT_KB * (next_pid); 
 
 	map_page(next_pid);
     //update esp and ebp of the next process

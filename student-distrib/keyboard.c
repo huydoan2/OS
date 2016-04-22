@@ -342,7 +342,7 @@ void keyboard_init()
  */
 void keyboard_handler()
 {	
-	
+	cli();
 	send_eoi(keyboard_irq_num);
 	char c = getchar();
 
@@ -376,7 +376,7 @@ void keyboard_handler()
 			line_buffer[scheduling_terminal][lb_index[scheduling_terminal]] = c;
 			putc(c);	
 	}
-
+	sti();
 }
 
 /* 
