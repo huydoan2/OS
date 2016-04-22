@@ -1,6 +1,6 @@
 #include "PIT.h"
 #include "i8259.h"
-#define DEFAULT_FREQ	36000		//40ms Period
+#define DEFAULT_FREQ	18000		//40ms Period
 #define RTC_IRQ_0 		0
 
 void pit_init()
