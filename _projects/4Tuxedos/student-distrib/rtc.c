@@ -98,18 +98,14 @@ void rtc_init(){
 void
 rtc_handler(void)
 {
-	int frequency;
-	
-	send_eoi(RTC_IRQ_8);
 
+	send_eoi(RTC_IRQ_8);
+    
+    interrupt_flag = 1;
 	outb(REGISTER_C , RTC_PORT);	// select register C
-	inb(CMOS_PORT);		// just throw away contents
+	inb(CMOS_PORT);		            // just throw away contents
 	
-	counter++;
-	frequency = rtc_freq >> (rate - 1);
-	/*print timer every second at the right top corner*/
-	
-	interrupt_flag = 1;
+
 }
 /* 
  * rtc_set_rate

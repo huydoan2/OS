@@ -38,6 +38,7 @@
 uint8_t arg_buf[arg_buf_size]={0}; //buffer for arguments
 int32_t buf_length = -1;
 extern uint32_t current_terminal;
+extern uint32_t scheduling_terminal;
 //extern uint32_t current_ter;
 uint32_t current_pid[MAX_TERMINAL] = {0};
 
@@ -97,7 +98,7 @@ void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename
 int32_t syscall_halt(uint8_t status)
 {
   cli();
-  uint32_t curr_pid = current_pid[current_terminal];
+  uint32_t curr_pid = current_pid[scheduling_terminal];
 
   
   pcb_struct_t* cur_PCB;
@@ -113,7 +114,7 @@ int32_t syscall_halt(uint8_t status)
   par_esp = cur_PCB->parent.esp;
   par_ebp = cur_PCB->parent.ebp;
   cur_PCB->active = EMPTY;
-  current_pid[current_terminal] = cur_PCB->parent.pid;
+  current_pid[scheduling_terminal] = cur_PCB->parent.pid;
 
   if(cur_PCB->parent.pid == 0)
   {
@@ -133,7 +134,7 @@ int32_t syscall_halt(uint8_t status)
    tss.ss0 = cur_PCB->parent.ss0;
    tss.esp0 = cur_PCB->parent.esp0;
 
-   current_pid[current_terminal] = curr_pid;
+   current_pid[scheduling_terminal] = curr_pid;
    /*set esp and ebp to the parent stack*/
    asm volatile("movl %0, %%esp"
                      :
@@ -219,7 +220,7 @@ int32_t syscall_execute(const uint8_t* command)
 
   //updating TSS
   tss.ss0 = KERNEL_DS;
-  tss.esp0 = EIGHT_MB - tss_offset - EIGHT_KB * (parent_pid);
+  tss.esp0 = EIGHT_MB - EIGHT_KB * (new_pid - 1);
   
   /*Set up paging*/
   map_page(new_pid);
