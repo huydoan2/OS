@@ -209,10 +209,6 @@ void process_switch_mem_map(uint32_t next_pid_terminal){
 				break;
 		}
 	}
-
-	//re map the program image 
-	//map_page(next_pid);
-
 	asm volatile("mov %%CR3, %0":"=c"(CR3));
 	CR3 = (unsigned int)page_directory;
 	asm volatile("mov %0, %%CR3"::"c"(CR3));  
@@ -228,22 +224,13 @@ void map_page(uint32_t pid)
 void mapping_virt2Phys_Addr(uint32_t physAddr, uint32_t virtAddr, int type)
 {
     unsigned long pdindex = (unsigned long)virtAddr >> PD_IDX_SHIFT;
-    unsigned long vid_page_index = (0x08400000 >> 12) & 0x3FF;
     uint32_t CR3 = 0;    
 
     // Create a large page 
     if(type == 0)
     	page_directory[pdindex] = (physAddr | PD_ENTRY_INIT_VAL_2);
-	else if( virtAddr == 0x08400000)
-		vid_page_table[vid_page_index] = (physAddr | PT_ENTRY_INIT_VAL_2);
-	else if(virtAddr == 0x08401000)
-		vid_page_table[vid_page_index+1] = (physAddr | PT_ENTRY_INIT_VAL_2);
-	else if(virtAddr == 0x08402000)
-		vid_page_table[vid_page_index+ 2] = (physAddr | PT_ENTRY_INIT_VAL_2);
-
 
     // Now you need to flush the entry in the TLB
-
     asm volatile("mov %%CR3, %0":"=c"(CR3));
 	CR3 = (unsigned int)page_directory;
 	asm volatile("mov %0, %%CR3"::"c"(CR3));  	

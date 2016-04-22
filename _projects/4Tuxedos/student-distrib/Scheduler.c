@@ -26,10 +26,9 @@ void pit_handler()
     curr_pid = current_pid[scheduling_terminal];
     next_pid = find_next_pid();
     if(next_pid == 0 || curr_pid == next_pid)
-        return;    
+        return;        
     process_switch_mem_map(scheduling_terminal); 
     switch_task(curr_pid, next_pid);
-    
     return;
 
 }
@@ -40,7 +39,6 @@ void switch_task(const uint32_t curr_pid,const uint32_t next_pid)
         enable_irq(1);
     else
         disable_irq(1);
-    
 
     //set tss registers
     tss.ss0 =  KERNEL_DS;

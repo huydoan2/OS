@@ -184,7 +184,6 @@ char getchar()
 
 	if(alt_flag[current_terminal])
 	{
-		cli();
 		switch(c)
 		{
 			case F1_pressed:
@@ -195,6 +194,7 @@ char getchar()
 					current_terminal = 0;
 					control_flag[current_terminal] = 0;
 					set_vid_mem(prev_terminal_id, current_terminal);
+    				process_switch_mem_map(scheduling_terminal); 
 					cursor_update_terminal();
 					if(current_pid[current_terminal] == 0)
 					{
@@ -221,6 +221,7 @@ char getchar()
 					current_terminal = 1;
 					control_flag[current_terminal] = 0;
 					set_vid_mem(prev_terminal_id, current_terminal);
+   					process_switch_mem_map(scheduling_terminal); 
 					cursor_update_terminal();
 					if(current_pid[current_terminal] == 0)
 					{
@@ -247,6 +248,7 @@ char getchar()
 					current_terminal = 2;
 					control_flag[current_terminal] = 0;
 					set_vid_mem(prev_terminal_id, current_terminal);
+    				process_switch_mem_map(scheduling_terminal); 
 					cursor_update_terminal();
 					if(current_pid[current_terminal] == 0)
 					{
@@ -266,8 +268,6 @@ char getchar()
 				break;
 			}
 		}
-		sti();
-
 	}
 
 	/*caps lock off case, checking if it's even or odd*/
@@ -500,6 +500,7 @@ int32_t keyboard_read(int32_t * buff, uint32_t offset, int32_t num_bytes, int32_
  */
 int32_t keyboard_write(int32_t * buff, int32_t num_bytes)
 {
+	// printf("\nSecheduling index: %d\n",scheduling_terminal);
 	int i =0;
 	char*write_buff = (char*)buff;
 	//Check if the inputs are valid
