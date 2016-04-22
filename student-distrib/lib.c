@@ -176,7 +176,7 @@ format_char_switch:
 */
 int32_t
 puts(int8_t* s)
-{
+{  
 	register int32_t index = 0;
 	while(s[index] != '\0') {
 		putc(s[index]);
@@ -197,7 +197,7 @@ puts(int8_t* s)
 void
 putc(uint8_t c)
 {
-	cli();
+
     if(c == '\n' || c == '\r') 
     {
         cursor_t[scheduling_terminal][1]++;
@@ -222,7 +222,7 @@ putc(uint8_t c)
 	    cursor_t[scheduling_terminal][0] %= NUM_COLS;
     }
     cursor_update_terminal();
-    sti();
+
 }
 /*
 * int8_t* itoa(uint32_t value, int8_t* buf, int32_t radix);
@@ -683,11 +683,13 @@ void scroll_screen()
 	{
 		blank_row[i] = ATTRIB << ATTRIB_SHIFT;
 	}
+	cli();
 	uint32_t last_line = (VIDEO + (NUM_ROWS - 1)*NUM_COLS*sizeof(uint16_t));		//the address of the last row in video memory
 	//move NUM_COLS -1 rows to the top of the screen
 	memcpy(video_mem, (void*)(VIDEO + NUM_COLS*sizeof(uint16_t)), MOVING_NUM);
 	//make the last row blank
 	memcpy((void*)last_line, blank_row, NUM_COLS*2);
+	sti();
 
 }
 
