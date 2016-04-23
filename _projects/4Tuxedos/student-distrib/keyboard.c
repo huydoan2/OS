@@ -188,9 +188,14 @@ char getchar()
 		{
 			case F1_pressed:
 			{
-				if(current_terminal!=0)
-				{	
-		            prev_terminal_id = current_terminal;
+				if(current_terminal!=0){
+		            if(check_for_max_process() && current_pid[0] == 0)
+					{
+						printf("\nreached maximum process number\n");
+						printf("391OS> ");
+						return 0;
+					}
+					prev_terminal_id = current_terminal;
 					current_terminal = 0;
 					control_flag[current_terminal] = 0;
 					set_vid_mem(prev_terminal_id, current_terminal);
@@ -198,12 +203,6 @@ char getchar()
 					cursor_update_terminal();
 					if(current_pid[current_terminal] == 0)
 					{
-						if(check_for_max_process())
-						{
-							printf("\nreached maximum process number\n");
-							printf("391OS> ");
-							return 0;
-						}
 						uint32_t curr_pid = current_pid[prev_terminal_id];
 						pcb_struct_t *current_pcb;
 					    uint32_t esp = 0;
@@ -223,6 +222,12 @@ char getchar()
 			{
 				if(current_terminal!=1)
 				{   
+					if(check_for_max_process() &&  current_pid[1] == 0)
+					{
+						printf("\nreached maximum process number\n");
+						printf("391OS> ");
+						return 0;
+					}
 					prev_terminal_id = current_terminal;
 					current_terminal = 1;
 					control_flag[current_terminal] = 0;
@@ -231,12 +236,7 @@ char getchar()
 					cursor_update_terminal();
 					if(current_pid[current_terminal] == 0)
 					{
-						if(check_for_max_process())
-						{
-							printf("\nreached maximum process number\n");
-							printf("391OS> ");
-							return 0;
-						}
+						
 						uint32_t curr_pid = current_pid[prev_terminal_id];
 						pcb_struct_t *current_pcb;
 					    uint32_t esp = 0;
@@ -256,6 +256,12 @@ char getchar()
 			{
 				if(current_terminal!=2)
 				{   
+					if(check_for_max_process() &&  current_pid[2] == 0)
+					{
+						printf("\nreached maximum process number\n");
+						printf("391OS> ");
+						return 0;
+					}
 					prev_terminal_id = current_terminal;
 					current_terminal = 2;
 					control_flag[current_terminal] = 0;
@@ -264,12 +270,7 @@ char getchar()
 					cursor_update_terminal();
 					if(current_pid[current_terminal] == 0)
 					{
-						if(check_for_max_process())
-						{
-							printf("\nreached maximum process number\n");
-							printf("391OS> ");
-							return 0;
-						}
+						
 						uint32_t curr_pid = current_pid[prev_terminal_id];
 						pcb_struct_t *current_pcb;
 					    uint32_t esp = 0;
