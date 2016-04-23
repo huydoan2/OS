@@ -4,14 +4,9 @@
 
 #include "lib.h"
 
-
-// int screen_x = 0;
-// int screen_y = 0;
-
 int (cursor_t[3][2]) = {{0}};
 
 static uint16_t blank_row[NUM_COLS];
-
 extern int current_terminal;
 extern uint32_t scheduling_terminal;
 static char* video_mem = (char *)VIDEO;
@@ -193,7 +188,6 @@ puts(int8_t* s)
 *   Return Value: void
 *	Function: Output a character to the console 
 */
-
 void
 putc(uint8_t c)
 {
@@ -613,7 +607,12 @@ void cursor_update(int row, int col)
  
  }
 
-
+/*
+* void cursor_update_terminal
+*   Inputs: 
+*   Return Value: none
+*	Function: Updates position of cursor of the displayed terminal
+*/
 void cursor_update_terminal()
 {
 	cursor_update(cursor_t[current_terminal][0], cursor_t[current_terminal][1]);
@@ -676,13 +675,13 @@ void newline()
 */
 void scroll_screen()
 {
-		/*set the black color*/
 	int i;
-
+	/*set the black color*/
 	for (i = 0; i < NUM_COLS; ++i)
 	{
 		blank_row[i] = ATTRIB << ATTRIB_SHIFT;
 	}
+	/*if the current screen is not scheduling  screen, scroll background */
 	if(current_terminal != scheduling_terminal)
 	{
 		uint32_t last_line = (vid_mem[scheduling_terminal] + (NUM_ROWS - 1)*NUM_COLS*sizeof(uint16_t));		//the address of the last row in video memory
@@ -691,6 +690,7 @@ void scroll_screen()
 		//make the last row blank
 		memcpy((void*)last_line, blank_row, NUM_COLS*2);
 	}	
+	/*if the current screen is scheduling  screen, scroll current screen */
 	else
 	{
 		uint32_t last_line = (VIDEO+ (NUM_ROWS - 1)*NUM_COLS*sizeof(uint16_t));		//the address of the last row in video memory
