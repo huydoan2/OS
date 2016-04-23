@@ -99,7 +99,6 @@ int32_t syscall_halt(uint8_t status)
 {
   cli();
   uint32_t curr_pid = current_pid[scheduling_terminal];
-
   
   pcb_struct_t* cur_PCB;
   uint32_t par_esp = 0;
@@ -119,10 +118,9 @@ int32_t syscall_halt(uint8_t status)
   if(cur_PCB->parent.pid == 0)
   {
     //remove the current proccess from the PCB array and start a new shell
-    printf("Can't exit the first shell!\n");
+    printf("Can't exit the first shell!   ");
+    // printf("Can't exit the first shell!2222\n");
     syscall_execute((uint8_t*)"shell");
-    sti();
-    return 0;
   }
 
   /*remap the parent code to the virtual memory*/
@@ -147,9 +145,10 @@ int32_t syscall_halt(uint8_t status)
                      :"%ebp"
                      );
 
-  /*jump back to the execute*/
- asm volatile("jmp halt_ret_label;");
- sti();
+  /*jump back to the execute*/ 
+  sti();
+  asm volatile("jmp halt_ret_label;");
+
   return 0;
 }
 

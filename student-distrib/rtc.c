@@ -180,8 +180,8 @@ int32_t rtc_close()
  */
 int32_t rtc_read(int32_t * buff, uint32_t offset,int32_t num_bytes, int32_t var)
 {	
-	while(!interrupt_flag[current_terminal]);
-	interrupt_flag[current_terminal] = 0;
+	while(!interrupt_flag[scheduling_terminal]);
+	interrupt_flag[scheduling_terminal] = 0;
 	return 0;
 }
 
