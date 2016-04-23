@@ -132,7 +132,10 @@ char getchar()
 {
 	unsigned char c = getScancode();
 	uint32_t prev_terminal_id;
-
+	uint32_t curr_pid;
+ 	uint32_t esp;
+	uint32_t ebp;
+	pcb_struct_t *current_pcb;
 	/*if the left shift or right shift is pressed, set the shift flag to 1*/
 	if(c == left_shift_on || c == right_shift_on)
 		shift_flag[current_terminal] = 1;
@@ -181,38 +184,44 @@ char getchar()
 		reset_linebuffer();
 		return 0;
 	}
-
+	/*Check for change of terminal*/
 	if(alt_flag[current_terminal])
 	{
 		switch(c)
 		{
+			/* F1: change to the first terminal */
 			case F1_pressed:
 			{
+				/*change terminal if not at first terminal already*/
 				if(current_terminal!=0){
+					/* Check for maximum number of processes */
 		            if(check_for_max_process() && current_pid[0] == 0)
 					{
 						printf("\nreached maximum process number\n");
 						printf("391OS> ");
 						return 0;
 					}
+					/*update terminal IDs*/
 					prev_terminal_id = current_terminal;
 					current_terminal = 0;
 					control_flag[current_terminal] = 0;
+					/* change the video memory for the next terminal */
 					set_vid_mem(prev_terminal_id, current_terminal);
     				process_switch_mem_map(scheduling_terminal); 
+    				/* up date cursor location */
 					cursor_update_terminal();
+					/* if there is no process in the terminal*/
 					if(current_pid[current_terminal] == 0)
 					{
-						uint32_t curr_pid = current_pid[prev_terminal_id];
-						pcb_struct_t *current_pcb;
-					    uint32_t esp = 0;
-					    uint32_t ebp = 0;
+						/* save informaiton for the process running in the current terminal */
+						curr_pid = current_pid[prev_terminal_id];
 					    scheduling_terminal = 0;
 					    asm volatile("mov %%esp, %0" :"=c"(esp));
 					  	asm volatile("mov %%ebp, %0" :"=c"(ebp)); 
 					    current_pcb = find_PCB(curr_pid);
 					    current_pcb->esp = esp;
 					    current_pcb->ebp = ebp;    
+					    /* luanch a new shell in the next terminal*/
 						syscall_execute((uint8_t*)"shell");
 					}
 				}
@@ -220,33 +229,37 @@ char getchar()
 			}
 			case F2_pressed:
 			{
+				/*change terminal if not at first terminal already*/
 				if(current_terminal!=1)
 				{   
+					/* Check for maximum number of processes */
 					if(check_for_max_process() &&  current_pid[1] == 0)
 					{
 						printf("\nreached maximum process number\n");
 						printf("391OS> ");
 						return 0;
 					}
+					/*update terminal IDs*/
 					prev_terminal_id = current_terminal;
 					current_terminal = 1;
 					control_flag[current_terminal] = 0;
+					/* change the video memory for the next terminal */
 					set_vid_mem(prev_terminal_id, current_terminal);
-   					process_switch_mem_map(scheduling_terminal); 
+   					process_switch_mem_map(scheduling_terminal);
+   					/* up date cursor location */ 
 					cursor_update_terminal();
+					/* if there is no process in the terminal*/
 					if(current_pid[current_terminal] == 0)
 					{
-						
-						uint32_t curr_pid = current_pid[prev_terminal_id];
-						pcb_struct_t *current_pcb;
-					    uint32_t esp = 0;
-					    uint32_t ebp = 0;
+						/* save informaiton for the process running in the current terminal */
+						curr_pid = current_pid[prev_terminal_id];
 					    scheduling_terminal = 1;
 					    asm volatile("mov %%esp, %0" :"=c"(esp));
 					  	asm volatile("mov %%ebp, %0" :"=c"(ebp)); 
 					    current_pcb = find_PCB(curr_pid);
 					    current_pcb->esp = esp;
 					    current_pcb->ebp = ebp;    
+					    /* luanch a new shell in the next terminal*/
 						syscall_execute((uint8_t*)"shell");
 					}				
 				}
@@ -256,31 +269,34 @@ char getchar()
 			{
 				if(current_terminal!=2)
 				{   
+					/*change terminal if not at first terminal already*/
 					if(check_for_max_process() &&  current_pid[2] == 0)
 					{
 						printf("\nreached maximum process number\n");
 						printf("391OS> ");
 						return 0;
 					}
+					/*update terminal IDs*/
 					prev_terminal_id = current_terminal;
 					current_terminal = 2;
 					control_flag[current_terminal] = 0;
+					/* change the video memory for the next terminal */
 					set_vid_mem(prev_terminal_id, current_terminal);
     				process_switch_mem_map(scheduling_terminal); 
+    				/* up date cursor location */ 
 					cursor_update_terminal();
+					/* if there is no process in the terminal*/
 					if(current_pid[current_terminal] == 0)
 					{
-						
+						/* save informaiton for the process running in the current terminal */
 						uint32_t curr_pid = current_pid[prev_terminal_id];
-						pcb_struct_t *current_pcb;
-					    uint32_t esp = 0;
-					    uint32_t ebp = 0;
 					    scheduling_terminal = 2;
 					    asm volatile("mov %%esp, %0" :"=c"(esp));
 					  	asm volatile("mov %%ebp, %0" :"=c"(ebp)); 
 					    current_pcb = find_PCB(curr_pid);
 					    current_pcb->esp = esp;
 					    current_pcb->ebp = ebp;    
+					     /* luanch a new shell in the next terminal*/
 						syscall_execute((uint8_t*)"shell");
 					}
 				}
