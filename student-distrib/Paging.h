@@ -35,15 +35,15 @@ void fill_pt_entry(uint32_t * pt, int index, uint32_t val);
 
 /*functions that might be useful in the future for manipulating the paging*/
 uint32_t get_physAddr(uint32_t  virtAddr);
-
-void mapping_virt2Phys_Addr(uint32_t physAddr, uint32_t virtAddr, int type);
-
-void vidmap_mapping(uint32_t terminal);
-
+/* map a virtual address and a physical memory */
+void mapping_virt2Phys_Addr(uint32_t physAddr, uint32_t virtAddr);
+/* helper function for the vid_map system call*/
+void vidmap_mapping();
+/* map the program image to 128MB */
 void map_page(uint32_t pid);
-
+/* switch the display based on the terminal id */
 void set_vid_mem(uint32_t cur_terminal_id, uint32_t next_terminal_id);
-
+/* change the vide memory mapping based on the terminal id */
 void process_switch_mem_map(uint32_t next_pid_terminal);
 
 
