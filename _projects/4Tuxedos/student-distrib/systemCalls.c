@@ -158,7 +158,7 @@ int32_t syscall_execute(const uint8_t* command)
 {
   cli();
   /*local variable declaration*/
-  uint32_t parent_pid = current_pid[scheduling_terminal] ;
+  uint32_t parent_pid = current_pid[current_terminal] ;
   pcb_struct_t* current_PCB;
   uint8_t filename[FILENAME_MAXLEN]={0};  
   uint8_t  read_buf[small_buf_size]={0};
@@ -348,7 +348,7 @@ int32_t syscall_vidmap(uint8_t** screen_start)
   if(screen_start == NULL || screen_start < (uint8_t**)OneTwentyEight_MB || screen_start >= (uint8_t**)OneThirtyTwo_MB)
     return -1;
  // clear(); //DO WE NEED THIS?!?!?!?
-  vidmap_mapping(current_terminal);
+  vidmap_mapping(scheduling_terminal);
   //extern uint32_t vid_mem_array[3];
   *screen_start = (uint8_t*)0x00800000;
  // *screen_start = (uint8_t*)vid_mem_array[current_terminal];

@@ -188,17 +188,21 @@ void process_switch_mem_map(uint32_t next_pid_terminal){
 	//change the video memory mapping 
 	if(next_pid_terminal == current_terminal){
 		page_table[184] = 0xB8000 | PT_ENTRY_INIT_VAL_2;
+		vid_page_table[0] = (0xB8000|PT_ENTRY_INIT_VAL_2);
 	}
 	else{
 		switch (next_pid_terminal){
 			case 0:
 				page_table[184] =  0xB9000 | PT_ENTRY_INIT_VAL_2;
+				vid_page_table[0] = (0xB9000|PT_ENTRY_INIT_VAL_2);
 				break;
 			case 1:
 				page_table[184] =  0xBA000 | PT_ENTRY_INIT_VAL_2;
+				vid_page_table[0] = (0xBA000|PT_ENTRY_INIT_VAL_2);
 				break;
 			case 2:
 				page_table[184] =  0xBB000 | PT_ENTRY_INIT_VAL_2;
+				vid_page_table[0] = (0xBB000|PT_ENTRY_INIT_VAL_2);	
 				break;
 		}
 	}
@@ -233,7 +237,6 @@ void vidmap_mapping(uint32_t terminal)
 {
     uint32_t CR3 = 0;
     uint32_t video_addr = VIDEO;
-   // uint32_t vid_index = (0x08400000 >> 12) & 0x3FF;
     // Create a vidmap mapping
 	vid_page_table[0] = ((video_addr)|PT_ENTRY_INIT_VAL_2);
     // Now you need to flush the entry in the TLB
