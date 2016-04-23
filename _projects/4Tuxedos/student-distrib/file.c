@@ -19,7 +19,6 @@
 bootblock_t bootblock;	//boot block structure
 dentry_t directory_entry[max_dentries];	//data entry structure
 inode_t inode_array[max_dentries];	//inode array
-int test = 0;
 
 /*starting addresses for the file system*/
 uint32_t* inode_startAddr;
@@ -73,7 +72,6 @@ void parsing_fileSystem(uint32_t * startAddr){
 		//fill in the data block entry (data block numbers)
 		for(j = 0 ; j < (inode_array[i].length_in_B/BLOCK_SIZE)+1; j++){
 			inode_array[i].data_block[j] =  curr_inode_addr[j+1];
-			test++;
 		}
 		//go to the next inode block 
 	 	curr_inode_addr += ADDRPERBLOCK;
