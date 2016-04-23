@@ -377,7 +377,6 @@ void keyboard_init()
  */
 void keyboard_handler()
 {	
-	cli();
 	send_eoi(keyboard_irq_num);
 	char c = getchar();
 
@@ -411,7 +410,6 @@ void keyboard_handler()
 			line_buffer[scheduling_terminal][lb_index[scheduling_terminal]] = c;
 			putc(c);	
 	}
-	sti();
 }
 
 /* 
@@ -505,7 +503,6 @@ int32_t terminal_read(int32_t * buff, uint32_t offset, int32_t num_bytes, int32_
 	while(enter_flag[scheduling_terminal] == 0);
  	enter_flag[scheduling_terminal] = 0;
  	//copy the characters in the line buffer
- 	cli();
  	while(line_buffer[scheduling_terminal][i] != '\n' && i < num_bytes)
  	{
  		read_buff [i] = line_buffer[scheduling_terminal][i];
@@ -515,7 +512,6 @@ int32_t terminal_read(int32_t * buff, uint32_t offset, int32_t num_bytes, int32_
  	i++;
  	buff = (int32_t*)read_buff;
  	reset_linebuffer();	//reset line buffer by reset the index
- 	sti();
  	return i;
 }
 
