@@ -56,7 +56,8 @@ int counter = 0;	//count number of half seconds
 int clk = 0;		//timer to be printed at the right top corner
 int rate = 15;		//rate of rtc, initialize to 15 which is slowest rate
 
-volatile int interrupt_flag;	//flag for interrupt
+extern uint32_t scheduling_terminal;
+volatile int interrupt_flag[3];	//flag for interrupt
 
 void rtc_init(){
 	char previous;
@@ -99,9 +100,8 @@ void
 rtc_handler(void)
 {
 
+    interrupt_flag[scheduling_terminal] = 1;
 	send_eoi(RTC_IRQ_8);
-    
-    interrupt_flag = 1;
 	outb(REGISTER_C , RTC_PORT);	// select register C
 	inb(CMOS_PORT);		            // just throw away contents
 	
@@ -143,7 +143,9 @@ void rtc_set_rate()
  */
 int32_t rtc_open()
 {
-	interrupt_flag = 0;
+	interrupt_flag[0] = 0;
+    interrupt_flag[1] = 0;
+    interrupt_flag[2] = 0;
 	return 0;
 }
 
@@ -177,8 +179,8 @@ int32_t rtc_close()
  */
 int32_t rtc_read(int32_t * buff, uint32_t offset,int32_t num_bytes, int32_t var)
 {	
-	while(!interrupt_flag);
-	interrupt_flag = 0;
+	while(!interrupt_flag[scheduling_terminal]);
+	interrupt_flag[scheduling_terminal] = 0;
 	return 0;
 }
 

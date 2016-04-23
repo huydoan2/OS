@@ -39,7 +39,7 @@
 
 extern uint32_t current_pid[MAX_TERMINAL];
 extern uint32_t scheduling_terminal;
-void switch_task(uint32_t curr_pid,uint32_t next_pid);
+int32_t check_for_max_process();
 //scancode array for keyboard
 //0 = no output
 //size of the scancode is 88
@@ -198,6 +198,12 @@ char getchar()
 					cursor_update_terminal();
 					if(current_pid[current_terminal] == 0)
 					{
+						if(check_for_max_process())
+						{
+							printf("\nreached maximum process number\n");
+							printf("391OS> ");
+							return 0;
+						}
 						uint32_t curr_pid = current_pid[prev_terminal_id];
 						pcb_struct_t *current_pcb;
 					    uint32_t esp = 0;
@@ -225,6 +231,12 @@ char getchar()
 					cursor_update_terminal();
 					if(current_pid[current_terminal] == 0)
 					{
+						if(check_for_max_process())
+						{
+							printf("\nreached maximum process number\n");
+							printf("391OS> ");
+							return 0;
+						}
 						uint32_t curr_pid = current_pid[prev_terminal_id];
 						pcb_struct_t *current_pcb;
 					    uint32_t esp = 0;
@@ -252,6 +264,12 @@ char getchar()
 					cursor_update_terminal();
 					if(current_pid[current_terminal] == 0)
 					{
+						if(check_for_max_process())
+						{
+							printf("\nreached maximum process number\n");
+							printf("391OS> ");
+							return 0;
+						}
 						uint32_t curr_pid = current_pid[prev_terminal_id];
 						pcb_struct_t *current_pcb;
 					    uint32_t esp = 0;
@@ -518,4 +536,12 @@ int32_t terminal_write(int32_t * buff, int32_t num_bytes)
 	return i;
 }
 
+
+int32_t check_for_max_process()
+{
+	if(current_pid[0] == 6 || current_pid[1] == 6 || current_pid[2] == 6)
+		return 1;
+	else
+		return 0;
+}
 
