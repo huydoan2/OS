@@ -41,8 +41,9 @@ Bits         Usage
  0            BCD/Binary mode: 0 = 16-bit binary, 1 = four-digit BCD
 */
 
+/* initialization of the PIT */
 void pit_init();
-
+/* set frequency for the PIT */
 void pit_set_freq(uint32_t freq);
 
 #endif

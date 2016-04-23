@@ -154,16 +154,17 @@ uint32_t get_physAddr(uint32_t virtAddr){
 	uint32_t pt_entry;
 	uint32_t phys_addr;
 
-
+	/* obtain the page table entry index and page directory entry index */
 	unsigned long pd_index = (unsigned long)virtAddr >> PD_IDX_SHIFT;
     unsigned long pt_index = (unsigned long)virtAddr >> PT_IDX_SHIFT & PT_IDX_MASK;
     unsigned long phys_offset_0 = (unsigned long)(virtAddr & PHYS_ADDR_OFFSET_MASK_0);
     unsigned long phys_offset_1 = (unsigned long)(virtAddr & PHYS_ADDR_OFFSET_MASK_1);
- 
+ 	/*obtain the page direcotry entry */
     uint32_t pd_entry = page_directory[pd_index];
     //determine the size of the page 
     uint32_t page_size = pd_entry & PAGE_SIZE_MASK;
 
+    /*if the page to be created is a small page*/
     if(page_size == 0){ //4kB page
      	pt_addr = pd_entry & PHYSADDR_MASK_0;
      	pt_entry = ((uint32_t *)pt_addr)[pt_index];
@@ -173,6 +174,7 @@ uint32_t get_physAddr(uint32_t virtAddr){
 
      	return phys_addr;
     }
+    /* if the page to be created is a large page*/
     else{ // 4MB page
 
     	phys_addr = pd_entry & PHYSADDR_MASK_1;
@@ -182,15 +184,30 @@ uint32_t get_physAddr(uint32_t virtAddr){
 
     }
 }
+
+/* 
+ * process_switch_mem_map
+ *   DESCRIPTION: switch the video memory mapping when task switching 
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: 
+ *		- next_pid_terminal: the terminal to switch to 
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS:  video memory changed in the page table
+ *
+ */
 void process_switch_mem_map(uint32_t next_pid_terminal){
 	   uint32_t CR3 = 0;    
 
-	//change the video memory mapping 
+	/*change the video memory mapping*/
+	/*if the next terminal is the terminal is currently on display*/
 	if(next_pid_terminal == current_terminal){
 		page_table[184] = 0xB8000 | PT_ENTRY_INIT_VAL_2;
 		vid_page_table[0] = (0xB8000|PT_ENTRY_INIT_VAL_2);
 	}
 	else{
+		/* map the video memory based on the next terminal*/
 		switch (next_pid_terminal){
 			case 0:
 				page_table[184] =  0xB9000 | PT_ENTRY_INIT_VAL_2;
@@ -206,55 +223,112 @@ void process_switch_mem_map(uint32_t next_pid_terminal){
 				break;
 		}
 	}
+	/* Flush TLB */
 	asm volatile("mov %%CR3, %0":"=c"(CR3));
 	CR3 = (unsigned int)page_directory;
 	asm volatile("mov %0, %%CR3"::"c"(CR3));  
 }
 
+
+
+/* 
+ * map_page
+ *   DESCRIPTION: map a program image to the 128MB in virtual address space
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: 
+ *		- pid: the pid of the program the function is trying to map
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: changed page table entry
+ *
+ */
 void map_page(uint32_t pid)
 {
+	/* get the starting address of the prgoram image*/
 	uint32_t prog_startAddr = FIRST_PROG + FOUR_MB* (pid -1);
-
-	mapping_virt2Phys_Addr(prog_startAddr, PROG_VIRTADDR, 0);
+	/* map the program image to 128 MB */
+	mapping_virt2Phys_Addr(prog_startAddr, PROG_VIRTADDR);
 }
 
-void mapping_virt2Phys_Addr(uint32_t physAddr, uint32_t virtAddr, int type)
+
+/* 
+ * mapping_virt2Phys_Addr
+ *   DESCRIPTION: mapping a given phsical address to a given virtual address
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: 
+ *		- physAddr: the physical address 
+ *  	- virtAddr: the virtual address
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: page table entry changed
+ *
+ */
+void mapping_virt2Phys_Addr(uint32_t physAddr, uint32_t virtAddr)
 {
     unsigned long pdindex = (unsigned long)virtAddr >> PD_IDX_SHIFT;
     uint32_t CR3 = 0;    
 
     // Create a large page 
-    if(type == 0)
-    	page_directory[pdindex] = (physAddr | PD_ENTRY_INIT_VAL_2);
+     page_directory[pdindex] = (physAddr | PD_ENTRY_INIT_VAL_2);
 
-    // Now you need to flush the entry in the TLB
+    // flush TLB
     asm volatile("mov %%CR3, %0":"=c"(CR3));
 	CR3 = (unsigned int)page_directory;
 	asm volatile("mov %0, %%CR3"::"c"(CR3));  	
 }
 
-void vidmap_mapping(uint32_t terminal)
+
+/* 
+ * vidmap_mapping
+ *   DESCRIPTION: helper function for the vid_map system call, given user program 
+ *                access to change the video memory 
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: none
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: page table entry changed
+ *
+ */
+void vidmap_mapping()
 {
     uint32_t CR3 = 0;
     uint32_t video_addr = VIDEO;
     // Create a vidmap mapping
 	vid_page_table[0] = ((video_addr)|PT_ENTRY_INIT_VAL_2);
-    // Now you need to flush the entry in the TLB
+    // flush the TLB 
     asm volatile("mov %%CR3, %0":"=c"(CR3));
 	CR3 = (unsigned int)page_directory;
 	asm volatile("mov %0, %%CR3"::"c"(CR3));
 }
 
-/*change the terminal memory mapping for different terminal*/
+
+/* 
+ * set_vid_mem
+ *   DESCRIPTION: function that changes the display when switching terminal
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: 
+ *		- cur_terminal_id: terminal is currently on dispaly 
+ *      - next_terminal_id: the destination terminal to switch to 
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ */
 void set_vid_mem(uint32_t cur_terminal_id, uint32_t next_terminal_id){
+		/* map the virtual video memory to the physical video memory */
 		int32_t CR3 = 0;   
 		page_table[184] = 0xB8000 | PT_ENTRY_INIT_VAL_2;
 		asm volatile("mov %%CR3, %0":"=c"(CR3));
 		CR3 = (unsigned int)page_directory;
 		asm volatile("mov %0, %%CR3"::"c"(CR3));  
-		//store the current screen 
+
+		/* save the current display to the background video memory*/
 		memcpy((void*)vid_mem_array[cur_terminal_id], (void*)VIDEO, RESOLUTION*2);
-		//copy the new screen to the vidmeme
+		/* resotre the display to the next terminal's video memory*/
 		memcpy((void*)VIDEO,(void*)vid_mem_array[next_terminal_id], RESOLUTION*2); 
 }
 
