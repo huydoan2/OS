@@ -37,8 +37,11 @@
 #define F2_pressed 0x3C
 #define F3_pressed 0x3D
 
+/*current pid for each terminal*/
 extern uint32_t current_pid[MAX_TERMINAL];
+/*terminal that is being processed*/
 extern uint32_t scheduling_terminal;
+/*check if there are maximum number of process running*/
 int32_t check_for_max_process();
 //scancode array for keyboard
 //0 = no output
@@ -98,7 +101,7 @@ int control_flag[num_terminal];			/*flag for control*/
 int alt_flag[num_terminal];				/*flag for alt*/
 int lb_index[num_terminal];				/*line buffer index*/
 char line_buffer[num_terminal][size_of_keys] = {{0}};		/*initialize line buffer*/
-int current_terminal = 0;
+int current_terminal = 0;				/*index of current terminal*/
 volatile int enter_flag[num_terminal];	/*flag for enter*/
 /* 
  * getScancode
@@ -549,9 +552,21 @@ int32_t terminal_write(int32_t * buff, int32_t num_bytes)
 	return i;
 }
 
-
+/* 
+ * check_for_max_process
+ *   DESCRIPTION: check if there are maximum number of process running
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: 
+ *   OUTPUTS: 1 if max if running, 0 if not
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ *
+ */
 int32_t check_for_max_process()
 {
+	/*if any of the terminal has pid of 6, return 1*/
 	if(current_pid[0] == MAX_NUM_PCB || current_pid[1] == MAX_NUM_PCB || current_pid[2] == MAX_NUM_PCB)
 		return 1;
 	else

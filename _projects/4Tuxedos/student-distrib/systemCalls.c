@@ -37,64 +37,35 @@
 //uint32_t current_pid = 0;
 uint8_t arg_buf[arg_buf_size]={0}; //buffer for arguments
 int32_t buf_length = -1;
+/*index for terminal being dsiplayed*/
 extern uint32_t current_terminal;
+/*index for terminal being processed*/
 extern uint32_t scheduling_terminal;
 //extern uint32_t current_ter;
 uint32_t current_pid[MAX_TERMINAL] = {0};
-
+/*function that updates the pid and PCB for next process*/
 int32_t add_process(pcb_struct_t** pcb, uint32_t eip, const parent_info_t parent);
- ///////////////////////////////////////////////////////////////////////////////////////////////////////////
- /*  helper functions for system calls  */
+/*function that parses filename and arguments*/
+void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename);
 
-/* systcall_exec_parse: parse input for execute call
- *reutrn the filename and store the command parameters in the buffer
+/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------------*/
+
+
+/*system call 1: halt function
+ *   DESCRIPTION: halts the process
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: status: halting status (normal halt, exception halt, abnormal halt)
+ *   OUTPUTS: 
+ *   RETURN VALUE: 0
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: if user try to exit the first shell on each terminal, it prevents it
+ *                and starts a new shell
+ *
  */
-void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename)
-{
-
-  uint32_t idx = 0;
-  buf_length = -1;    //reset the buffer
-
-  //get the first char of the filename
-  while (*command == ' ') {
-      command++; 
-    }
-
-    /*get the filename*/
-    while( *command != '\0' && *command != ' '&& *command != '\n' ){\
-      filename[idx] = *command;
-      if(idx > FILENAME_MAXLEN)
-        return;
-      idx++;
-      command++;
-    }
-    //get the first char of the arguments
-   while (*command == ' ') {//get the first char 
-         command++; 
-     }
-    /*assign arguments to the buffer*/
-    idx = 0;
-    while(*command != '\0' && idx < parsing_index_max){
-      buf[idx] = *command;
-      idx++;
-      command++;
-    }
-    if(idx == parsing_index_max){
-      buf_length = -1;
-      return;
-    }
-    if(idx != 0)
-    {
-      buf[idx] = '\0';
-      buf_length = idx + 1;
-  }
-  return;
-
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/*system call 1: halt function*/
 int32_t syscall_halt(uint8_t status)
 {
   cli();
@@ -119,7 +90,6 @@ int32_t syscall_halt(uint8_t status)
   {
     //remove the current proccess from the PCB array and start a new shell
     printf("Can't exit the first shell!   ");
-    // printf("Can't exit the first shell!2222\n");
     syscall_execute((uint8_t*)"shell");
   }
 
@@ -152,7 +122,18 @@ int32_t syscall_halt(uint8_t status)
   return 0;
 }
 
-/*system call 2: execute function*/
+/*system call 2: execute function
+ *   DESCRIPTION: execute a process
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: command: user typed command. contains a executable name and arguments
+ *   OUTPUTS: 
+ *   RETURN VALUE: -1 if error
+ *                  256 if exception
+ *                  1~255 if success depending on process
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: if the number of running process is reached, stops the execution
+ *
+ */
 int32_t syscall_execute(const uint8_t* command)
 {
   cli();
@@ -279,7 +260,7 @@ int32_t syscall_execute(const uint8_t* command)
   /*set label for return point */
   asm volatile("halt_ret_label:");
   
-   asm volatile("mov %%bl, %0":"=c"(status));
+  asm volatile("mov %%bl, %0":"=c"(status));
   if (exception_flag == 1)
   {
     exception_flag = 0;
@@ -289,28 +270,68 @@ int32_t syscall_execute(const uint8_t* command)
     return (int32_t) status;
 }
 
-/*system call 3: read function*/
+/*system call 3: read function
+ *   DESCRIPTION: systemm read function
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: fd: file descriptor to read
+            buf: buffer to store the read data
+            nbytes: number of bytes to read
+ *   OUTPUTS: 
+ *   RETURN VALUE: number of bytes read
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ */
 int32_t syscall_read(int32_t fd, void* buf, int32_t nbytes)
 {
   pcb_struct_t * pcb = find_PCB(current_pid[scheduling_terminal]);
   return read_fd(pcb->fd_array, fd, buf, nbytes);
 }
 
-/*system call 4: write function*/
+/*system call 4: write function
+ *   DESCRIPTION: systemm write function
+ *-----------------------------------------------------------------------------------
+ *   INPUTS:  fd: file descriptor to write
+            buf: buffer to store the read write
+            nbytes:  number of bytes to write
+ *   OUTPUTS: 
+ *   RETURN VALUE: number of bytes written
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ */
 int32_t syscall_write(int32_t fd, const void* buf, int32_t nbytes)
 {
   pcb_struct_t * pcb = find_PCB(current_pid[scheduling_terminal]);
   return write_fd(pcb->fd_array, fd, buf, nbytes);
 }
 
-/*system call 5: open function*/
+/*system call 5: open function
+ *   DESCRIPTION: systemm open function
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: filename: file name to be opened
+ *   OUTPUTS: 
+ *   RETURN VALUE: the index of FD block that stores the newly opened fd (fd value)
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ */
 int32_t syscall_open(const uint8_t* filename)
 {
   pcb_struct_t * pcb = find_PCB(current_pid[scheduling_terminal]);
   return open_fd(pcb->fd_array, filename);
 }
 
-/*system call 6: close*/
+/*system call 6: close
+ *   DESCRIPTION: systemm close function
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: fd: file descriptor to close
+ *   OUTPUTS: 
+ *   RETURN VALUE: 0 for successed and -1 for failed
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ */
 int32_t syscall_close(int32_t fd)
 {
   pcb_struct_t * pcb = find_PCB(current_pid[scheduling_terminal]);
@@ -318,7 +339,17 @@ int32_t syscall_close(int32_t fd)
 
 }
 
-/*system call 7: getargs function*/
+/*system call 7: getargs function
+ *   DESCRIPTION: 
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: buf: buffer that contained parsed arguments
+            nbytes: number of bytes to get
+ *   OUTPUTS: 
+ *   RETURN VALUE: 0
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ */
 int32_t syscall_getargs(uint8_t* buf, int32_t nbytes)
 {
   int32_t length;
@@ -340,39 +371,76 @@ int32_t syscall_getargs(uint8_t* buf, int32_t nbytes)
 
 }
 
-/*system call 8: vidmap function*/
+/*system call 8: vidmap function
+ *   DESCRIPTION: map video memory
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: screen_start: video memory start address
+ *   OUTPUTS: 
+ *   RETURN VALUE: -1 on fial 0 on success
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ */
 int32_t syscall_vidmap(uint8_t** screen_start)
 {
   cli();
   if(screen_start == NULL || screen_start < (uint8_t**)OneTwentyEight_MB || screen_start >= (uint8_t**)OneThirtyTwo_MB)
     return -1;
- // clear(); //DO WE NEED THIS?!?!?!?
-  vidmap_mapping(scheduling_terminal);
-  //extern uint32_t vid_mem_array[3];
-  *screen_start = (uint8_t*)0x00800000;
- // *screen_start = (uint8_t*)vid_mem_array[current_terminal];
+  vidmap_mapping();
+  *screen_start = (uint8_t*)EIGHT_MB;
   sti();
   return 0;
 }
 
-/*system call 9: set_handler function*/
+/*system call 9: set_handler function
+ *   DESCRIPTION: not used
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: signum: 
+ *            handler_address:
+ *   OUTPUTS: 
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ */
 int32_t syscall_set_handler(int32_t signum, void* handler_address)
 {
   return -1;
 }
 
-/*system call 10: sigreturn function*/
+/*system call 10: sigreturn function
+ *   DESCRIPTION: not used
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: pcb: 
+ *            eip:
+ *            parent:
+ *   OUTPUTS: 
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ */
 int32_t syscall_sigreturn()
 {
   return -1;
 }
 
-/*function that updates the pid and PCB for next process*/
+/* 
+ * add_process
+ *   DESCRIPTION: add process to correct terminal
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: pcb: pcb structure to be added
+ *            eip: current eip
+ *            parent: infomation about parent process
+ *   OUTPUTS: 
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ */
 int32_t add_process(pcb_struct_t** pcb, uint32_t eip, const parent_info_t parent)
 {
   int i, flag = 0;
-  // if(current_pid >= MAX_NUM_PCB)
-  //   return -1;
   uint32_t esp = 0;
   uint32_t ebp = 0;
   /*get esp and ebp*/
@@ -386,21 +454,76 @@ int32_t add_process(pcb_struct_t** pcb, uint32_t eip, const parent_info_t parent
                    :
                    :"%ebp"
                    );
+  /*loop through pcbs and find the empty pcb and add a new process*/
   for (i = 1 ; i <= MAX_NUM_PCB; ++i)
   {
-    pcb_struct_t* pcb = find_PCB(i);
-    if (pcb->active == EMPTY)
+    pcb_struct_t* pcb_i = find_PCB(i);
+    if (pcb_i->active == EMPTY)
     {
       current_pid[current_terminal] = i;
-      init_PCB(pcb, i, eip, esp, ebp, parent);      
+      init_PCB(pcb_i, i, eip, esp, ebp, parent);      
       flag = 1;
       break;
     }
   }
-
   //cannot find any empty PCB, return failure
   if (flag == 0)
     return -1;
  
   return i;
+}
+
+/* 
+ * systcall_exec_parse
+ *   DESCRIPTION: parse input for execute call
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: command: user typed command to be parsed
+ *            buf: parsed argument
+ *            filename: parsed filename
+ *   OUTPUTS: filename and store the command parameters in the buffer
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ */
+void systcall_exec_parse(const uint8_t* command, uint8_t* buf, uint8_t* filename)
+{
+
+  uint32_t idx = 0;
+  buf_length = -1;    //reset the buffer
+
+  //get the first char of the filename
+  while (*command == ' ') {
+      command++; 
+    }
+
+    /*get the filename*/
+    while( *command != '\0' && *command != ' '&& *command != '\n' ){\
+      filename[idx] = *command;
+      if(idx > FILENAME_MAXLEN)
+        return;
+      idx++;
+      command++;
+    }
+    //get the first char of the arguments
+   while (*command == ' ') {//get the first char 
+         command++; 
+     }
+    /*assign arguments to the buffer*/
+    idx = 0;
+    while(*command != '\0' && idx < parsing_index_max){
+      buf[idx] = *command;
+      idx++;
+      command++;
+    }
+    if(idx == parsing_index_max){
+      buf_length = -1;
+      return;
+    }
+    if(idx != 0)
+    {
+      buf[idx] = '\0';
+      buf_length = idx + 1;
+  }
+  return;
 }

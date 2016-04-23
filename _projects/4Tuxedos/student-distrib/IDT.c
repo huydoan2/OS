@@ -304,7 +304,7 @@ void Exception_Handler_12(){
 void Exception_Handler_13(){
 
 	//print out the error message
-    //clear();
+    clear();
 	printf("Exception: General Protection Fault. \n");
 	exception_termination();
 }
@@ -325,13 +325,7 @@ void Exception_Handler_14(){
 
 	//print out the error message
     //clear(); 
-
 	printf("Exception: Page Fault. \n");
-
-    uint32_t CR2 = 0;   
-    asm volatile("mov %%CR2, %0":"=c"(CR2));
-    printf("ERROR CODE: %x\n", CR2);
-
 	exception_termination();
 }
 

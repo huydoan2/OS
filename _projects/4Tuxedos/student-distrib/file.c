@@ -164,6 +164,17 @@ int32_t file_read(int32_t * buff, uint32_t offset,int32_t num_bytes, int32_t var
 	
 }
 
+/* 
+ * file_write
+ *   DESCRIPTION: not needed
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: - 
+ *           
+ *   OUTPUTS: - 
+ *   RETURN VALUE: 
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: none 
+ */
 int32_t file_write(int32_t * buff, int32_t num_bytes)
 {
 	return -1;
