@@ -41,6 +41,8 @@ int32_t buf_length = -1;
 extern uint32_t current_terminal;
 /*index for terminal being processed*/
 extern uint32_t scheduling_terminal;
+/*number of active process*/
+extern uint32_t num_active_process;
 //extern uint32_t current_ter;
 uint32_t current_pid[MAX_TERMINAL] = {0};
 /*function that updates the pid and PCB for next process*/
@@ -93,6 +95,7 @@ int32_t syscall_halt(uint8_t status)
     syscall_execute((uint8_t*)"shell");
   }
 
+  num_active_process--;
   /*remap the parent code to the virtual memory*/
   //Set up paging
   curr_pid = cur_PCB->parent.pid;
@@ -461,7 +464,8 @@ int32_t add_process(pcb_struct_t** pcb, uint32_t eip, const parent_info_t parent
     if (pcb_i->active == EMPTY)
     {
       current_pid[current_terminal] = i;
-      init_PCB(pcb_i, i, eip, esp, ebp, parent);      
+      init_PCB(pcb_i, i, eip, esp, ebp, parent);  
+      num_active_process++;    
       flag = 1;
       break;
     }

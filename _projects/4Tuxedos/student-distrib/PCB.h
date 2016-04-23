@@ -47,7 +47,7 @@ typedef struct {
 	uint32_t active; 
 }pcb_struct_t;
 
-uint32_t num_active_process;
+
 
 
 /*function that initializes a PCB for the new process */

@@ -7,6 +7,7 @@
 #define FIRST_PCB_ADDR 0x7FE000 //starting address of the first PCB 
 #define EIGHT_KB       0x2000
 
+uint32_t num_active_process = 0;
 
 /*
 * void init_PCB(

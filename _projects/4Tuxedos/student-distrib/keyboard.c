@@ -41,6 +41,8 @@
 extern uint32_t current_pid[MAX_TERMINAL];
 /*terminal that is being processed*/
 extern uint32_t scheduling_terminal;
+/*number of active process*/
+extern uint32_t num_active_process;
 /*check if there are maximum number of process running*/
 int32_t check_for_max_process();
 //scancode array for keyboard
@@ -566,8 +568,8 @@ int32_t terminal_write(int32_t * buff, int32_t num_bytes)
  */
 int32_t check_for_max_process()
 {
-	/*if any of the terminal has pid of 6, return 1*/
-	if(current_pid[0] == MAX_NUM_PCB || current_pid[1] == MAX_NUM_PCB || current_pid[2] == MAX_NUM_PCB)
+	/*if num_active_process is 6, return 1*/
+	if(num_active_process == 6)
 		return 1;
 	else
 		return 0;
