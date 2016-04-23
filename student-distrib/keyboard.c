@@ -289,7 +289,7 @@ char getchar()
 					if(current_pid[current_terminal] == 0)
 					{
 						/* save informaiton for the process running in the current terminal */
-						uint32_t curr_pid = current_pid[prev_terminal_id];
+						curr_pid = current_pid[prev_terminal_id];
 					    scheduling_terminal = 2;
 					    asm volatile("mov %%esp, %0" :"=c"(esp));
 					  	asm volatile("mov %%ebp, %0" :"=c"(ebp)); 
