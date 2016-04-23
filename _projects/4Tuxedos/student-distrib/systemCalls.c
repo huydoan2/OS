@@ -158,7 +158,7 @@ int32_t syscall_execute(const uint8_t* command)
 {
   cli();
   /*local variable declaration*/
-  uint32_t parent_pid = current_pid[current_terminal] ;
+  uint32_t parent_pid = current_pid[scheduling_terminal] ;
   pcb_struct_t* current_PCB;
   uint8_t filename[FILENAME_MAXLEN]={0};  
   uint8_t  read_buf[small_buf_size]={0};
