@@ -71,18 +71,11 @@ void paging_init()
 
 
 	/*assign the first and second entry of the page directory*/
-	//set the first two enties of the PD
-	// uint32_t vid_directory_index = (0x08400000 >> 22) & 0x3FF;
-	// int vid_page_index = (0x08400000 >> 12) & 0x3FF;
-	// vid_page_table[vid_page_index] = 0x000B9000;
-	// vid_page_table[vid_page_index+1] = 0x000BA000;
-	// vid_page_table[vid_page_index+2] = 0x000BB000;
-
-	 page_directory[0] = ((unsigned int)page_table) | PD_ENTRY_INIT_VAL_0;
-	 //increment the physical address to the next segement 
-	 physAddr += PT_INCREMENT;
-	 page_directory[1] = ((physAddr )| PD_ENTRY_INIT_VAL_1);
-	 page_directory[2] =  ((unsigned int)vid_page_table) | PD_ENTRY_INIT_VAL_3;
+	page_directory[0] = ((unsigned int)page_table) | PD_ENTRY_INIT_VAL_0;
+	//increment the physical address to the next segement 
+	physAddr += PT_INCREMENT;
+	page_directory[1] = ((physAddr )| PD_ENTRY_INIT_VAL_1);
+	page_directory[2] =  ((unsigned int)vid_page_table) | PD_ENTRY_INIT_VAL_3;
 
 	
 	/*load page dir and enable paging*/

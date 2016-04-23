@@ -101,7 +101,7 @@ int32_t open_fd(file_desc_t* FD, const uint8_t* filename)
 	/*obtain the directory entry by filename*/
 	if (read_dentry_by_name(filename, &dentry) == -1)
 		return -1;
-
+	cli();
 	/*file in the file operation table by the file type*/
 	switch(dentry.file_type)
 	{
@@ -132,7 +132,7 @@ int32_t open_fd(file_desc_t* FD, const uint8_t* filename)
 
 		break;
 	}
-
+	sti();
 	/*store the inode number*/
 	fd.inode = dentry.inode_num;
 	fd.file_pos = 0;

@@ -460,7 +460,6 @@ int32_t keyboard_close()
 
 int32_t terminal_read(int32_t * buff, uint32_t offset, int32_t num_bytes, int32_t var)
 {
-	
 	int i = 0;
 	char* read_buff = (char*)buff;
 	//check if the input is valid
@@ -502,11 +501,8 @@ int32_t terminal_read(int32_t * buff, uint32_t offset, int32_t num_bytes, int32_
 int32_t terminal_write(int32_t * buff, int32_t num_bytes)
 { 
 	cli();
-	// if(scheduling_terminal == 1){
-	// 	printf("iteration: %d || ",idx++);
-	// }
 	int i =0;
-	char*write_buff = (char*)buff;
+	char* write_buff = (char*)buff;
 	//Check if the inputs are valid
 	if(buff == NULL || num_bytes < 0)
 		return -1;

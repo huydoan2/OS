@@ -293,28 +293,28 @@ int32_t syscall_execute(const uint8_t* command)
 /*system call 3: read function*/
 int32_t syscall_read(int32_t fd, void* buf, int32_t nbytes)
 {
-  pcb_struct_t * pcb = find_PCB(current_pid[current_terminal]);
+  pcb_struct_t * pcb = find_PCB(current_pid[scheduling_terminal]);
   return read_fd(pcb->fd_array, fd, buf, nbytes);
 }
 
 /*system call 4: write function*/
 int32_t syscall_write(int32_t fd, const void* buf, int32_t nbytes)
 {
-  pcb_struct_t * pcb = find_PCB(current_pid[current_terminal]);
+  pcb_struct_t * pcb = find_PCB(current_pid[scheduling_terminal]);
   return write_fd(pcb->fd_array, fd, buf, nbytes);
 }
 
 /*system call 5: open function*/
 int32_t syscall_open(const uint8_t* filename)
 {
-  pcb_struct_t * pcb = find_PCB(current_pid[current_terminal]);
+  pcb_struct_t * pcb = find_PCB(current_pid[scheduling_terminal]);
   return open_fd(pcb->fd_array, filename);
 }
 
 /*system call 6: close*/
 int32_t syscall_close(int32_t fd)
 {
-  pcb_struct_t * pcb = find_PCB(current_pid[current_terminal]);
+  pcb_struct_t * pcb = find_PCB(current_pid[scheduling_terminal]);
   return close_fd(pcb->fd_array, fd);
 
 }
@@ -344,6 +344,7 @@ int32_t syscall_getargs(uint8_t* buf, int32_t nbytes)
 /*system call 8: vidmap function*/
 int32_t syscall_vidmap(uint8_t** screen_start)
 {
+  cli();
   if(screen_start == NULL || screen_start < (uint8_t**)OneTwentyEight_MB || screen_start >= (uint8_t**)OneThirtyTwo_MB)
     return -1;
  // clear(); //DO WE NEED THIS?!?!?!?
@@ -351,6 +352,7 @@ int32_t syscall_vidmap(uint8_t** screen_start)
   //extern uint32_t vid_mem_array[3];
   *screen_start = (uint8_t*)0x00800000;
  // *screen_start = (uint8_t*)vid_mem_array[current_terminal];
+  sti();
   return 0;
 }
 
