@@ -65,7 +65,6 @@ void rtc_init(){
 	/*initialize the RTC hardware*/
 
 	//set the register A
-
 	outb(REGISTER_A|NMI_DISABLE, RTC_PORT);		//disable NMI and select reg A
 	previous = inb(CMOS_PORT);					//read current value of reg A
 	outb(REGISTER_A|NMI_DISABLE, RTC_PORT);		//disable NMI and select reg A
@@ -73,7 +72,6 @@ void rtc_init(){
 
 	
 	//set the register B
-
 	outb(REGISTER_B|NMI_DISABLE, RTC_PORT);
 	//read the value from register B	
     previous = inb(CMOS_PORT);	
@@ -100,13 +98,10 @@ void rtc_init(){
 void
 rtc_handler(void)
 {
-
-    interrupt_flag[scheduling_terminal] = 1;
-	send_eoi(RTC_IRQ_8);
+    send_eoi(RTC_IRQ_8);
+	interrupt_flag[scheduling_terminal] = 1;
 	outb(REGISTER_C , RTC_PORT);	// select register C
 	inb(CMOS_PORT);		            // just throw away contents
-	
-
 }
 /* 
  * rtc_set_rate
@@ -122,13 +117,11 @@ rtc_handler(void)
 void rtc_set_rate()
 {
 	char previous;
-	//cli();
 	//set the register A
 	outb(REGISTER_A|NMI_DISABLE, RTC_PORT);		//disable NMI and select reg A
 	previous = inb(CMOS_PORT);					//read current value of reg A
 	outb(REGISTER_A|NMI_DISABLE, RTC_PORT);		//disable NMI and select reg A
 	outb((previous & PREV_MASK) | rate, CMOS_PORT);
-	//sti();
 }
 
 /* 
