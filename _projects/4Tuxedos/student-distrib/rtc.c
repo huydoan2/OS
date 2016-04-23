@@ -177,6 +177,7 @@ int32_t rtc_close()
  */
 int32_t rtc_read(int32_t * buff, uint32_t offset,int32_t num_bytes, int32_t var)
 {	
+	
 	while(!interrupt_flag);
 	interrupt_flag = 0;
 	return 0;
