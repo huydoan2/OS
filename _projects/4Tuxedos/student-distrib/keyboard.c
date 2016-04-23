@@ -540,7 +540,7 @@ int32_t terminal_write(int32_t * buff, int32_t num_bytes)
 
 int32_t check_for_max_process()
 {
-	if(current_pid[0] == 6 || current_pid[1] == 6 || current_pid[2] == 6)
+	if(current_pid[0] == MAX_NUM_PCB || current_pid[1] == MAX_NUM_PCB || current_pid[2] == MAX_NUM_PCB)
 		return 1;
 	else
 		return 0;
