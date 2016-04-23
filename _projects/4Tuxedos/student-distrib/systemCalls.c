@@ -325,7 +325,7 @@ int32_t syscall_getargs(uint8_t* buf, int32_t nbytes)
   int32_t length;
 
   //error checking
-  if(buf_length == -1)
+  if(buf == NULL || buf_length == -1)
     return -1;
 
   //get the min(buf_length, nbytes)
