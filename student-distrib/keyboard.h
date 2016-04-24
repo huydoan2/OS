@@ -8,17 +8,9 @@
 #include "i8259.h"
 #include "lib.h"
  
-//Define values for Keyboard
-#define KEYBOARD_DATA 0x60
-#define KEYBOARD_COMMAND 0x64
-#define size_of_keys 128
 
 #ifndef ASM
 
-
-
- //int lb_index;
- //char line_buffer [size_of_keys];
 
 //initialize the keyboard
  void keyboard_init();
