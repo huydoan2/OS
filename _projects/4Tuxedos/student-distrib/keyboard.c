@@ -333,20 +333,21 @@ char getchar()
 	/*if control+L, clear the display */
 	if(c == Up_pressed)
 	{
-		for(i = 1; i < strlen(line_buffer[current_terminal]); ++i)
+		for(i = 0; i < strlen(line_buffer[scheduling_terminal]); ++i)
 		{
-			if(line_buffer[current_terminal][i] != '\n')
+			if(line_buffer[scheduling_terminal][i] != '\n')
 			{
+				lb_index[scheduling_terminal]--;
 				delete(); //delete the character 
 			}
 		}
-		reset_linebuffer();
 		get_command_history(up);
-		for(i=0; i<strlen(line_buffer[current_terminal]); i++)
+		for(i = 0; i < strlen(line_buffer[scheduling_terminal]); i++)
 		{
-			if(line_buffer[current_terminal][i] != '\n')
+			if(line_buffer[scheduling_terminal][i] != '\n')
 			{
-				putc(line_buffer[current_terminal][i]);
+				lb_index[scheduling_terminal]++;
+				putc(line_buffer[scheduling_terminal][i]);
 			}
 		}
 		return 0;
@@ -354,17 +355,21 @@ char getchar()
 
 	if(c == Down_pressed)
 	{
-		for(i=1; i<strlen(line_buffer[current_terminal]); ++i)
+		for(i = 0; i < strlen(line_buffer[scheduling_terminal]); ++i)
 		{
-			delete(); //delete the character 
-		}
-		reset_linebuffer();
-		get_command_history(down);
-		for(i=0; i<strlen(line_buffer[current_terminal]); i++)
-		{
-			if(line_buffer[current_terminal][i] != '\n')
+			if(line_buffer[scheduling_terminal][i] != '\n')
 			{
-				putc(line_buffer[current_terminal][i]);
+				lb_index[scheduling_terminal]--;
+				delete(); //delete the character 
+			}
+		}
+		get_command_history(down);
+		for(i = 0; i < strlen(line_buffer[scheduling_terminal]); i++)
+		{
+			if(line_buffer[scheduling_terminal][i] != '\n')
+			{
+				lb_index[scheduling_terminal]++;
+				putc(line_buffer[scheduling_terminal][i]);
 			}
 		}
 		return 0;
@@ -651,36 +656,35 @@ int32_t check_for_max_process()
  */
 void update_command_array()
 {
-	strcpy(command_history[current_terminal][command_starting_idx[current_terminal]], line_buffer[current_terminal]);
-	command_iter[current_terminal]++ == 10 ? 0: command_iter[current_terminal];
-	command_starting_idx[current_terminal]++ == 10 ? 0: command_starting_idx[current_terminal];
-	num_existing_command[current_terminal]++ == 10 ? 10: num_existing_command[current_terminal];
-	num_up[0] = 0;
-	num_up[1] = 0;
-	num_up[2] = 0;
+	strncpy(command_history[scheduling_terminal][command_starting_idx[scheduling_terminal]], line_buffer[scheduling_terminal],lb_index[scheduling_terminal]+1);
+	num_existing_command[scheduling_terminal]++;
+	if(num_existing_command[scheduling_terminal] == 11)
+		num_existing_command[scheduling_terminal] = 10;
+	command_starting_idx[scheduling_terminal]++;
+	command_iter[scheduling_terminal] = command_starting_idx[scheduling_terminal];
+	num_up[scheduling_terminal] = 0;
 }
-
 
 void get_command_history(int dir)
 {
 	if(dir)
 	{
 		//case 1: up
-		if(num_up[current_terminal] <= num_existing_command[current_terminal])
+		if(num_up[scheduling_terminal] < num_existing_command[scheduling_terminal])
 		{
-			command_iter[current_terminal]-- == -1 ? 9: command_iter[current_terminal];
-			num_up[current_terminal]++;
-			strcpy(line_buffer[current_terminal], command_history[current_terminal][command_iter[current_terminal]]);
+			command_iter[scheduling_terminal]--;
+			num_up[scheduling_terminal]++;
+			strcpy(line_buffer[scheduling_terminal], command_history[scheduling_terminal][command_iter[scheduling_terminal]]);
 		}
 	}
 	else
 	{
 		//case 2: down
-		if(num_up[current_terminal] > 0)
+		if(num_up[scheduling_terminal] > 1)
 		{
-			command_iter[current_terminal]++ == 10 ? 0: command_iter[current_terminal];
-			num_up[current_terminal]--;
-			strcpy(line_buffer[current_terminal], command_history[current_terminal][command_iter[current_terminal]]);
+			command_iter[scheduling_terminal]++;
+			num_up[scheduling_terminal]--;
+			strcpy(line_buffer[scheduling_terminal], command_history[scheduling_terminal][command_iter[scheduling_terminal]]);
 		}
 	}
 }
