@@ -335,7 +335,10 @@ char getchar()
 	{
 		for(i = 1; i < strlen(line_buffer[current_terminal]); ++i)
 		{
-			delete(); //delete the character 
+			if(line_buffer[current_terminal][i] != '\n')
+			{
+				delete(); //delete the character 
+			}
 		}
 		reset_linebuffer();
 		get_command_history(up);
