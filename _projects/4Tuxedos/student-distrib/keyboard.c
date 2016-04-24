@@ -9,7 +9,11 @@
 #include "systemCalls.h"
 #include "Paging.h"
 #include "PCB.h"
-
+//Define values for Keyboard
+#define KEYBOARD_DATA 0x60
+#define KEYBOARD_COMMAND 0x64
+#define size_of_keys 128
+#define num_command_history 10
 #define keyboard_irq_num 1
 #define left_shift_on 0x2A
 #define left_shift_off 0xAA
@@ -36,7 +40,10 @@
 #define F1_pressed 0x3B
 #define F2_pressed 0x3C
 #define F3_pressed 0x3D
-
+#define Up_pressed 0x48
+#define Down_pressed 0x50
+#define up 1
+#define down 0 
 /*current pid for each terminal*/
 extern uint32_t current_pid[MAX_TERMINAL];
 /*terminal that is being processed*/
@@ -45,6 +52,11 @@ extern uint32_t scheduling_terminal;
 extern uint32_t num_active_process;
 /*check if there are maximum number of process running*/
 int32_t check_for_max_process();
+/*update commmand array*/
+void update_command_array();
+/*get commmand history*/
+void get_command_history(int dir);
+
 //scancode array for keyboard
 //0 = no output
 //size of the scancode is 88
@@ -105,6 +117,13 @@ int lb_index[num_terminal];				/*line buffer index*/
 char line_buffer[num_terminal][size_of_keys] = {{0}};		/*initialize line buffer*/
 int current_terminal = 0;				/*index of current terminal*/
 volatile int enter_flag[num_terminal];	/*flag for enter*/
+
+
+char command_history[num_terminal][num_command_history][size_of_keys] = {{{0}}};
+int command_iter[num_terminal] = {0};
+int command_starting_idx[num_terminal] = {0};
+int num_existing_command[num_terminal] = {0};
+int num_up[num_terminal] = {0};
 /* 
  * getScancode
  *   DESCRIPTION: get a keyboard input from keyboard_data address and return the data
@@ -310,6 +329,44 @@ char getchar()
 		}
 	}
 
+	int i;
+	/*if control+L, clear the display */
+	if(c == Up_pressed)
+	{
+		for(i = 1; i < strlen(line_buffer[current_terminal]); ++i)
+		{
+			delete(); //delete the character 
+		}
+		reset_linebuffer();
+		get_command_history(up);
+		for(i=0; i<strlen(line_buffer[current_terminal]); i++)
+		{
+			if(line_buffer[current_terminal][i] != '\n')
+			{
+				putc(line_buffer[current_terminal][i]);
+			}
+		}
+		return 0;
+	}
+
+	if(c == Down_pressed)
+	{
+		for(i=1; i<strlen(line_buffer[current_terminal]); ++i)
+		{
+			delete(); //delete the character 
+		}
+		reset_linebuffer();
+		get_command_history(down);
+		for(i=0; i<strlen(line_buffer[current_terminal]); i++)
+		{
+			if(line_buffer[current_terminal][i] != '\n')
+			{
+				putc(line_buffer[current_terminal][i]);
+			}
+		}
+		return 0;
+	}
+
 	/*caps lock off case, checking if it's even or odd*/
 	if((caps_lock_flag[current_terminal] % 2) ==0)
 	{
@@ -388,6 +445,7 @@ void keyboard_handler()
 	//handle next line input
 	if(c == '\n'|| c == '\r')
 	{
+		update_command_array();
 		if(lb_index[scheduling_terminal] <= max_keys)
 	    {
 	    	lb_index[scheduling_terminal]++;
@@ -573,5 +631,54 @@ int32_t check_for_max_process()
 		return 1;
 	else
 		return 0;
+}
+
+
+/* 
+ * update_command_array
+ *   DESCRIPTION: check if there are maximum number of process running
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: 
+ *   OUTPUTS: 1 if max if running, 0 if not
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: 
+ *
+ *
+ */
+void update_command_array()
+{
+	strcpy(command_history[current_terminal][command_starting_idx[current_terminal]], line_buffer[current_terminal]);
+	command_iter[current_terminal]++ == 10 ? 0: command_iter[current_terminal];
+	command_starting_idx[current_terminal]++ == 10 ? 0: command_starting_idx[current_terminal];
+	num_existing_command[current_terminal]++ == 10 ? 10: num_existing_command[current_terminal];
+	num_up[0] = 0;
+	num_up[1] = 0;
+	num_up[2] = 0;
+}
+
+
+void get_command_history(int dir)
+{
+	if(dir)
+	{
+		//case 1: up
+		if(num_up[current_terminal] <= num_existing_command[current_terminal])
+		{
+			command_iter[current_terminal]-- == -1 ? 9: command_iter[current_terminal];
+			num_up[current_terminal]++;
+			strcpy(line_buffer[current_terminal], command_history[current_terminal][command_iter[current_terminal]]);
+		}
+	}
+	else
+	{
+		//case 2: down
+		if(num_up[current_terminal] > 0)
+		{
+			command_iter[current_terminal]++ == 10 ? 0: command_iter[current_terminal];
+			num_up[current_terminal]--;
+			strcpy(line_buffer[current_terminal], command_history[current_terminal][command_iter[current_terminal]]);
+		}
+	}
 }
 
