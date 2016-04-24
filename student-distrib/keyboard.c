@@ -388,7 +388,7 @@ void keyboard_handler()
 	//handle next line input
 	if(c == '\n'|| c == '\r')
 	{
-		if(lb_index[scheduling_terminal] < max_keys)
+		if(lb_index[scheduling_terminal] <= max_keys)
 	    {
 	    	lb_index[scheduling_terminal]++;
 			line_buffer[scheduling_terminal][lb_index[scheduling_terminal]] = c;
