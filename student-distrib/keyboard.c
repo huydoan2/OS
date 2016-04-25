@@ -123,6 +123,7 @@ int command_iter[num_terminal] = {0};
 int command_starting_idx[num_terminal] = {0};
 int num_existing_command[num_terminal] = {0};
 int num_up[num_terminal] = {0};
+int num_delete[num_terminal] = {0};
 /* 
  * getScancode
  *   DESCRIPTION: get a keyboard input from keyboard_data address and return the data
@@ -191,22 +192,7 @@ char getchar()
 	if(caps_lock_flag[current_terminal] == max_flag)
 		caps_lock_flag[current_terminal] = 0;	
 
-	/*if control+L, clear the display */
-	if(control_flag[current_terminal] && c == L_pressed)
-	{
-		clear();
-		reset_linebuffer();
-		printf("391OS> ");
-		return 0;
-	}
-
-	if(control_flag[current_terminal] && c == C_pressed)
-	{
-		putc('\n');
-		syscall_halt(1);
-		reset_linebuffer();
-		return 0;
-	}
+	
 	/*Check for change of terminal*/
 	if(alt_flag[current_terminal])
 	{
@@ -340,6 +326,23 @@ char getchar()
 		return 0;
 	}
 
+	/*if control+L, clear the display */
+	if(control_flag[current_terminal] && c == L_pressed)
+	{
+		clear();
+		reset_linebuffer();
+		printf("391OS> ");
+		return 0;
+	}
+
+	if(control_flag[current_terminal] && c == C_pressed)
+	{
+		putc('\n');
+		syscall_halt(1);
+		reset_linebuffer();
+		return 0;
+	}
+
 	/*caps lock off case, checking if it's even or odd*/
 	if((caps_lock_flag[current_terminal] % 2) ==0)
 	{
@@ -418,8 +421,18 @@ void keyboard_handler()
 	//handle next line input
 	if(c == '\n'|| c == '\r')
 	{
+		// if(lb_index[scheduling_terminal] == -1 && num_up[scheduling_terminal] == 0)
 		if(lb_index[scheduling_terminal] != -1)
+		{
 			update_command_array();
+		}
+		else
+		{
+			if(num_up[scheduling_terminal] != 0)
+			{
+				command_iter[scheduling_terminal]+=num_up[scheduling_terminal];
+			}
+		}
 		if(lb_index[scheduling_terminal] <= max_keys)
 	    {
 	    	lb_index[scheduling_terminal]++;
@@ -436,7 +449,8 @@ void keyboard_handler()
 		if(lb_index[scheduling_terminal] >= 0)
 		{
 			lb_index[scheduling_terminal]--;
-			delete(); //delete the character 
+			delete(); //delete the character
+			num_delete[scheduling_terminal]++;
 		}
 	}
 	//limit the maximum number of input characters
@@ -445,7 +459,8 @@ void keyboard_handler()
 		
 		    lb_index[scheduling_terminal]++;
 			line_buffer[scheduling_terminal][lb_index[scheduling_terminal]] = c;
-			putc(c);	
+			putc(c);
+			num_delete[scheduling_terminal]--;	
 	}
 }
 
@@ -637,8 +652,9 @@ void update_command_array()
 	command_starting_idx[scheduling_terminal]%=10;
 	/*update command iterator*/
 	command_iter[scheduling_terminal] = command_starting_idx[scheduling_terminal];
-	/*reset number of up arrow pressed*/
+	/*reset number of up arrow and delete and put pressed*/
 	num_up[scheduling_terminal] = 0;
+	num_delete[scheduling_terminal] = 0;
 }
 
 /* 
@@ -655,14 +671,15 @@ void update_command_array()
  */
 void get_command_history(int dir)
 {
-	for(i = 0; i < strlen(line_buffer[scheduling_terminal]); ++i)
+	for(i = 0; i < strlen(line_buffer[scheduling_terminal])-num_delete[scheduling_terminal]; i++)
 	{
-		if(line_buffer[scheduling_terminal][i] != '\n')
+		if(line_buffer[scheduling_terminal][i] != '\n' && lb_index[scheduling_terminal]>-1)
 		{
 			lb_index[scheduling_terminal]--;
 			delete();
 		}
 	}
+	
 	if(dir)
 	{
 		//case 1: up
@@ -695,5 +712,6 @@ void get_command_history(int dir)
 			putc(line_buffer[scheduling_terminal][i]);
 		}
 	}
+	num_delete[scheduling_terminal] = 0;
 }
 
