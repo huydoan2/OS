@@ -316,13 +316,17 @@ char getchar()
 
 	if(c == Up_pressed)
 	{
+		cli();
 		get_command_history(up);
+		sti();
 		return 0;
 	}
 
 	if(c == Down_pressed)
 	{
+		cli();
 		get_command_history(down);
+		sti();
 		return 0;
 	}
 
@@ -416,8 +420,9 @@ void keyboard_init()
 void keyboard_handler()
 {	
 	send_eoi(keyboard_irq_num);
+	cli();
 	char c = getchar();
-
+	sti();
 	//handle next line input
 	if(c == '\n'|| c == '\r')
 	{
