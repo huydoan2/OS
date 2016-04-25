@@ -118,7 +118,7 @@ char line_buffer[num_terminal][size_of_keys] = {{0}};		/*initialize line buffer*
 int current_terminal = 0;				/*index of current terminal*/
 volatile int enter_flag[num_terminal];	/*flag for enter*/
 
-
+int i;
 char command_history[num_terminal][num_command_history][size_of_keys] = {{{0}}};
 int command_iter[num_terminal] = {0};
 int command_starting_idx[num_terminal] = {0};
@@ -329,49 +329,16 @@ char getchar()
 		}
 	}
 
-	int i;
 	/*if control+L, clear the display */
 	if(c == Up_pressed)
 	{
-		for(i = 0; i < strlen(line_buffer[scheduling_terminal]); ++i)
-		{
-			if(line_buffer[scheduling_terminal][i] != '\n')
-			{
-				lb_index[scheduling_terminal]--;
-				delete(); //delete the character 
-			}
-		}
 		get_command_history(up);
-		for(i = 0; i < strlen(line_buffer[scheduling_terminal]); i++)
-		{
-			if(line_buffer[scheduling_terminal][i] != '\n')
-			{
-				lb_index[scheduling_terminal]++;
-				putc(line_buffer[scheduling_terminal][i]);
-			}
-		}
 		return 0;
 	}
 
 	if(c == Down_pressed)
 	{
-		for(i = 0; i < strlen(line_buffer[scheduling_terminal]); ++i)
-		{
-			if(line_buffer[scheduling_terminal][i] != '\n')
-			{
-				lb_index[scheduling_terminal]--;
-				delete(); //delete the character 
-			}
-		}
 		get_command_history(down);
-		for(i = 0; i < strlen(line_buffer[scheduling_terminal]); i++)
-		{
-			if(line_buffer[scheduling_terminal][i] != '\n')
-			{
-				lb_index[scheduling_terminal]++;
-				putc(line_buffer[scheduling_terminal][i]);
-			}
-		}
 		return 0;
 	}
 
@@ -453,7 +420,8 @@ void keyboard_handler()
 	//handle next line input
 	if(c == '\n'|| c == '\r')
 	{
-		update_command_array();
+		if(lb_index[scheduling_terminal] != -1)
+			update_command_array();
 		if(lb_index[scheduling_terminal] <= max_keys)
 	    {
 	    	lb_index[scheduling_terminal]++;
@@ -656,23 +624,36 @@ int32_t check_for_max_process()
  */
 void update_command_array()
 {
+	for (i = 0; i < 128; ++i)
+		command_history[scheduling_terminal][command_starting_idx[scheduling_terminal]][i] = 0;
 	strncpy(command_history[scheduling_terminal][command_starting_idx[scheduling_terminal]], line_buffer[scheduling_terminal],lb_index[scheduling_terminal]+1);
 	num_existing_command[scheduling_terminal]++;
 	if(num_existing_command[scheduling_terminal] == 11)
 		num_existing_command[scheduling_terminal] = 10;
 	command_starting_idx[scheduling_terminal]++;
+	command_starting_idx[scheduling_terminal]%=10;
 	command_iter[scheduling_terminal] = command_starting_idx[scheduling_terminal];
 	num_up[scheduling_terminal] = 0;
 }
 
 void get_command_history(int dir)
 {
+	for(i = 0; i < strlen(line_buffer[scheduling_terminal]); ++i)
+	{
+		if(line_buffer[scheduling_terminal][i] != '\n')
+		{
+			lb_index[scheduling_terminal]--;
+			delete(); //delete the character 
+		}
+	}
 	if(dir)
 	{
 		//case 1: up
 		if(num_up[scheduling_terminal] < num_existing_command[scheduling_terminal])
 		{
 			command_iter[scheduling_terminal]--;
+			if(command_iter[scheduling_terminal] == -1)
+				command_iter[scheduling_terminal] = 9;
 			num_up[scheduling_terminal]++;
 			strcpy(line_buffer[scheduling_terminal], command_history[scheduling_terminal][command_iter[scheduling_terminal]]);
 		}
@@ -683,8 +664,18 @@ void get_command_history(int dir)
 		if(num_up[scheduling_terminal] > 1)
 		{
 			command_iter[scheduling_terminal]++;
+			if(command_iter[scheduling_terminal] == 10)
+				command_iter[scheduling_terminal] = 0;
 			num_up[scheduling_terminal]--;
 			strcpy(line_buffer[scheduling_terminal], command_history[scheduling_terminal][command_iter[scheduling_terminal]]);
+		}
+	}
+	for(i = 0; i < strlen(line_buffer[scheduling_terminal]); i++)
+	{
+		if(line_buffer[scheduling_terminal][i] != '\n')
+		{
+			lb_index[scheduling_terminal]++;
+			putc(line_buffer[scheduling_terminal][i]);
 		}
 	}
 }
