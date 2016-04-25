@@ -27,7 +27,7 @@
 #define caps_lock_off 0xBA
 #define end_of_press 0x81
 #define empty_char 87
-#define max_keys_index 127
+#define max_keys 126
 #define max_flag	8
 #define L_pressed 0x26
 #define C_pressed 0x2E
@@ -420,7 +420,7 @@ void keyboard_handler()
 	{
 		if(lb_index[scheduling_terminal] != -1)
 			update_command_array();
-		if(lb_index[scheduling_terminal] < max_keys_index)
+		if(lb_index[scheduling_terminal] <= max_keys)
 	    {
 	    	lb_index[scheduling_terminal]++;
 			line_buffer[scheduling_terminal][lb_index[scheduling_terminal]] = c;
