@@ -26,9 +26,8 @@
 #define caps_lock_on 0x3A
 #define caps_lock_off 0xBA
 #define end_of_press 0x81
-#define size_of_keys 128
 #define empty_char 87
-#define max_keys 126
+#define max_keys_index 127
 #define max_flag	8
 #define L_pressed 0x26
 #define C_pressed 0x2E
@@ -329,7 +328,6 @@ char getchar()
 		}
 	}
 
-	/*if control+L, clear the display */
 	if(c == Up_pressed)
 	{
 		get_command_history(up);
@@ -422,7 +420,7 @@ void keyboard_handler()
 	{
 		if(lb_index[scheduling_terminal] != -1)
 			update_command_array();
-		if(lb_index[scheduling_terminal] <= max_keys)
+		if(lb_index[scheduling_terminal] < max_keys_index)
 	    {
 	    	lb_index[scheduling_terminal]++;
 			line_buffer[scheduling_terminal][lb_index[scheduling_terminal]] = c;
@@ -612,30 +610,49 @@ int32_t check_for_max_process()
 
 /* 
  * update_command_array
- *   DESCRIPTION: check if there are maximum number of process running
+ *   DESCRIPTION: when enter is pressed, the current line buffer is stored in the history buffer
+ * 					also fixes the indexes for history buffers
  *-----------------------------------------------------------------------------------
- *   INPUTS: 
- *   OUTPUTS: 1 if max if running, 0 if not
- *   RETURN VALUE: none
+ *   INPUTS: None
+ *   OUTPUTS: None
+ *   RETURN VALUE: None
  *-----------------------------------------------------------------------------------
- *   SIDE EFFECTS: 
- *
+ *   SIDE EFFECTS: updates history buffer, command_starting_idx, command_iter, num_existing_command and num_up
+ *					
  *
  */
 void update_command_array()
 {
-	for (i = 0; i < 128; ++i)
+	/*clean the history buffer*/
+	for (i = 0; i < size_of_keys; ++i)
 		command_history[scheduling_terminal][command_starting_idx[scheduling_terminal]][i] = 0;
+	/*copy the current buffer to the history buffer*/
 	strncpy(command_history[scheduling_terminal][command_starting_idx[scheduling_terminal]], line_buffer[scheduling_terminal],lb_index[scheduling_terminal]+1);
+	/*increment number of command*/
 	num_existing_command[scheduling_terminal]++;
 	if(num_existing_command[scheduling_terminal] == 11)
 		num_existing_command[scheduling_terminal] = 10;
+	/*fix the starting index of the command buffer*/
 	command_starting_idx[scheduling_terminal]++;
 	command_starting_idx[scheduling_terminal]%=10;
+	/*update command iterator*/
 	command_iter[scheduling_terminal] = command_starting_idx[scheduling_terminal];
+	/*reset number of up arrow pressed*/
 	num_up[scheduling_terminal] = 0;
 }
 
+/* 
+ * get_command_history
+ *   DESCRIPTION: when up or down is pressed, iterate through the history buffer and print out the commands
+ *-----------------------------------------------------------------------------------
+ *   INPUTS: int dir: direction(1 : up, 2 : down)
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *-----------------------------------------------------------------------------------
+ *   SIDE EFFECTS: only maximum of 10 commands are stored at once 
+ *
+ *
+ */
 void get_command_history(int dir)
 {
 	for(i = 0; i < strlen(line_buffer[scheduling_terminal]); ++i)
@@ -643,7 +660,7 @@ void get_command_history(int dir)
 		if(line_buffer[scheduling_terminal][i] != '\n')
 		{
 			lb_index[scheduling_terminal]--;
-			delete(); //delete the character 
+			delete();
 		}
 	}
 	if(dir)
