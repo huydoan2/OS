@@ -16,7 +16,9 @@
 #define NUM_COLS 80
 #define MAX_X_INDEX 79
 #define NUM_ROWS 25
-#define ATTRIB 0x7
+#define ATTRIB_0 0x3
+#define ATTRIB_1 0x6
+#define ATTRIB_2 0x2
 #define ATTRIB_SHIFT 8
 #define BASE_PORT 0x3D4
 #define CURSOR_PORT 0x3D5

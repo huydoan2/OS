@@ -20,5 +20,6 @@ PIT.o: PIT.c PIT.h lib.h types.h i8259.h
 rtc.o: rtc.c rtc.h i8259.h types.h lib.h
 Scheduler.o: Scheduler.c Scheduler.h types.h PCB.h file_desc.h lib.h \
   i8259.h keyboard.h x86_desc.h Paging.h
+signal.o: signal.c
 systemCalls.o: systemCalls.c systemCalls.h types.h file.h lib.h Paging.h \
   x86_desc.h keyboard.h i8259.h PCB.h file_desc.h

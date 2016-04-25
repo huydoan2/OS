@@ -11,6 +11,7 @@ extern int current_terminal;
 extern uint32_t scheduling_terminal;
 static char* video_mem = (char *)VIDEO;
 uint32_t vid_mem[3] = {0xB9000, 0xBA000, 0xBB000};
+uint32_t attrib[3] = {ATTRIB_0, ATTRIB_1, ATTRIB_2}; 
 /*set the video memory space in accordance to the current termianl ID*/
 
 /*
@@ -26,7 +27,7 @@ clear(void)
     int32_t i;
     for(i=0; i<NUM_ROWS*NUM_COLS; i++) {
         *(uint8_t *)(video_mem + (i << 1)) = ' ';
-        *(uint8_t *)(video_mem + (i << 1) + 1) = ATTRIB;
+        *(uint8_t *)(video_mem + (i << 1) + 1) = attrib[scheduling_terminal];
     }
     //reset the cursor location to left top corner
     cursor_t[current_terminal][0] = 0;	
@@ -210,7 +211,7 @@ putc(uint8_t c)
 			--cursor_t[scheduling_terminal][1];
 		}
         *(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[scheduling_terminal][1] + cursor_t[scheduling_terminal][0]) << 1)) = c;
-        *(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[scheduling_terminal][1] + cursor_t[scheduling_terminal][0]) << 1) + 1) = ATTRIB;
+        *(uint8_t *)(video_mem + ((NUM_COLS*cursor_t[scheduling_terminal][1] + cursor_t[scheduling_terminal][0]) << 1) + 1) = attrib[scheduling_terminal];
         cursor_t[scheduling_terminal][0]++;
 	    cursor_t[scheduling_terminal][1] = (cursor_t[scheduling_terminal][1] + (cursor_t[scheduling_terminal][0] / NUM_COLS));
 	    cursor_t[scheduling_terminal][0] %= NUM_COLS;
@@ -679,7 +680,7 @@ void scroll_screen()
 	/*set the black color*/
 	for (i = 0; i < NUM_COLS; ++i)
 	{
-		blank_row[i] = ATTRIB << ATTRIB_SHIFT;
+		blank_row[i] = attrib[scheduling_terminal] << ATTRIB_SHIFT;
 	}
 	/*if the current screen is not scheduling  screen, scroll background */
 	if(current_terminal != scheduling_terminal)
