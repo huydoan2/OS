@@ -16,6 +16,7 @@
 #define SIGNAL_H
 
 #include "types.h"
+#include "PCB.h"
 #include "lib.h"
 /*define the signal flag values*/
 #define KILL_TASK 1 
@@ -27,21 +28,7 @@
 #define ALARM	  3
 #define USER1     4
 
-/*signal handling structures*/
-/*structure that stores the properties of a signal */
-typedef struct sigaction{
-	 void* sa_handler;	// specifies the type of action (0 = default)
-	 uint32_t sa_flags; // specifies how the signal must be handled
-	 uint32_t sa_mask;  // specifies the signals to be masked  
 
-}sigaction_t;
-
-/*structure that stores all the information about a signal */
-typedef struct siginfo{
-	uint32_t sig_num;	//the signal numer
-	uint32_t sig_err;   //the error code of the instruction 
-	sigaction_t sigaction; //handler info
-};
 
 /*helper functions for signal handling*/
 /*function that sends a signal to a specific process
@@ -57,7 +44,8 @@ typedef struct siginfo{
  uint32_t setup_frame();
  uint32_t setup_rt_frame();
  uint32_t restore_sigcontext();
- void kill_task();
+ void sig_kill(); //cannot be masked, cannot be blocked 
+ void sig_ignore(); //does nothing
 
 
 
