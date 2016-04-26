@@ -28,7 +28,32 @@
 #define ALARM	  3
 #define USER1     4
 
+typedef struct sig_stack_frame{
+	uint32_t ret_addr;
+	uint32_t sig_num;
+	hardware_context_t hw_context;
+	uint32_t sigreturn_ptr;
+}sig_stack_frame_t;
 
+typedef struct hw_context{
+	uint32_t ebx;
+	uint32_t ecx;
+	uint32_t edx;
+	uint32_t esi;
+	uint32_t edi;
+	uint32_t ebp;
+	uint32_t eax;
+	uint32_t ds;
+	uint32_t es;
+	uint32_t fs;
+	uint32_t irq_exp_num;
+	uint32_t err_code;
+	uint32_t  ret_addr;
+	uint32_t cs;
+	uint32_t eflags;
+	uint32_t esp;
+	uint32_t ss;
+}hardware_context_t;
 
 /*helper functions for signal handling*/
 /*function that sends a signal to a specific process
