@@ -31,7 +31,7 @@
 void exception_termination();
 
 /* 
- * Exception_Handler_0
+ * EX_0
  *   DESCRIPTION: the exception handler that handles the Divide-by-zero Error
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -42,7 +42,7 @@ void exception_termination();
  *
  */
 
-void Exception_Handler_0(){
+void EX_0(){
 
 	//print out the error message
     clear();
@@ -51,7 +51,7 @@ void Exception_Handler_0(){
 }
 
 /* 
- * Exception_Handler_1
+ * EX_1
  *   DESCRIPTION: the exception handler that handles the Debug 
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -62,7 +62,7 @@ void Exception_Handler_0(){
  *
  */
 
-void Exception_Handler_1(){
+void EX_1(){
 
 	//print out the error message
     clear();
@@ -70,7 +70,7 @@ void Exception_Handler_1(){
 	exception_termination();
 }
 /* 
- * Exception_Handler_2
+ * EX_2
  *   DESCRIPTION: the exception handler that handles the Non-maskable Interrupt
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -81,7 +81,7 @@ void Exception_Handler_1(){
  *
  */
 
-void Exception_Handler_2(){
+void EX_2(){
 
 	//print out the error message
     clear();
@@ -90,7 +90,7 @@ void Exception_Handler_2(){
 }
 
 /* 
- * Exception_Handler_3
+ * EX_3
  *   DESCRIPTION: the exception handler that handles the Breakpoint
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -101,7 +101,7 @@ void Exception_Handler_2(){
  *
  */
 
-void Exception_Handler_3(){
+void EX_3(){
 
 	//print out the error message
     clear();
@@ -110,7 +110,7 @@ void Exception_Handler_3(){
 }
 
 /* 
- * Exception_Handler_4
+ * EX_4
  *   DESCRIPTION: the exception handler that handles the Overflow
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -121,7 +121,7 @@ void Exception_Handler_3(){
  *
  */
 
-void Exception_Handler_4(){
+void EX_4(){
 
 	//print out the error message
     clear();
@@ -130,7 +130,7 @@ void Exception_Handler_4(){
 }
 
 /* 
- * Exception_Handler_5
+ * EX_5
  *   DESCRIPTION: the exception handler that handles the Bound Range Exceeded
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -141,7 +141,7 @@ void Exception_Handler_4(){
  *
  */
 
-void Exception_Handler_5(){
+void EX_5(){
 
 	//print out the error message
     clear();
@@ -150,7 +150,7 @@ void Exception_Handler_5(){
 }
 
 /* 
- * Exception_Handler_6
+ * EX_6
  *   DESCRIPTION: the exception handler that handles the Invalid Opcode
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -161,7 +161,7 @@ void Exception_Handler_5(){
  *
  */
 
-void Exception_Handler_6(){
+void EX_6(){
 
 	//print out the error message
     clear();
@@ -170,7 +170,7 @@ void Exception_Handler_6(){
 }
 
 /* 
- * Exception_Handler_7
+ * EX_7
  *   DESCRIPTION: the exception handler that handles the Device Not Available
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -181,7 +181,7 @@ void Exception_Handler_6(){
  *
  */
 
-void Exception_Handler_7(){
+void EX_7(){
 
 	//print out the error message
     clear();
@@ -190,7 +190,7 @@ void Exception_Handler_7(){
 }
 
 /* 
- * Exception_Handler_8
+ * EX_8
  *   DESCRIPTION: the exception handler that handles the Double Fault
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -201,7 +201,7 @@ void Exception_Handler_7(){
  *
  */
 
-void Exception_Handler_8(){
+void EX_8(){
 
 	//print out the error message
     clear();
@@ -210,7 +210,7 @@ void Exception_Handler_8(){
 }
 
 /* 
- * Exception_Handler_9
+ * EX_9
  *   DESCRIPTION: the exception handler that handles the Coprocessor Segment Overrun
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -221,7 +221,7 @@ void Exception_Handler_8(){
  *
  */
 
-void Exception_Handler_9(){
+void EX_9(){
 
 	//print out the error message
     clear();
@@ -230,7 +230,7 @@ void Exception_Handler_9(){
 }
 
 /* 
- * Exception_Handler_10
+ * EX_10
  *   DESCRIPTION: the exception handler that handles the Invalid TSS
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -241,7 +241,7 @@ void Exception_Handler_9(){
  *
  */
 
-void Exception_Handler_10(){
+void EX_10(){
 
 	//print out the error message
     clear();
@@ -250,7 +250,7 @@ void Exception_Handler_10(){
 }
 
 /* 
- * Exception_Handler_11
+ * EX_11
  *   DESCRIPTION: the exception handler that handles the Segment Not Present
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -261,7 +261,7 @@ void Exception_Handler_10(){
  *
  */
 
-void Exception_Handler_11(){
+void EX_11(){
 
 	//print out the error message
     clear();
@@ -270,7 +270,7 @@ void Exception_Handler_11(){
 }
 
 /* 
- * Exception_Handler_12
+ * EX_12
  *   DESCRIPTION: the exception handler that handles the Stack-Segment Fault
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -281,7 +281,7 @@ void Exception_Handler_11(){
  *
  */
 
-void Exception_Handler_12(){
+void EX_12(){
 
 	//print out the error message
     clear();
@@ -290,7 +290,7 @@ void Exception_Handler_12(){
 }
 
 /* 
- * Exception_Handler_13
+ * EX_13
  *   DESCRIPTION: the exception handler that handles the General Protection Fault
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -301,7 +301,7 @@ void Exception_Handler_12(){
  *
  */
 
-void Exception_Handler_13(){
+void EX_13(){
 
 	//print out the error message
     clear();
@@ -310,7 +310,7 @@ void Exception_Handler_13(){
 }
 
 /* 
- * Exception_Handler_14
+ * EX_14
  *   DESCRIPTION: the exception handler that handles the Page Fault
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -321,7 +321,7 @@ void Exception_Handler_13(){
  *
  */
 
-void Exception_Handler_14(){
+void EX_14(){
 
 	//print out the error message
     //clear(); 
@@ -331,7 +331,7 @@ void Exception_Handler_14(){
 
 
 /* 
- * Exception_Handler_16
+ * EX_16
  *   DESCRIPTION: the exception handler that handles the x87 Floating-Point Exception 
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -341,7 +341,7 @@ void Exception_Handler_14(){
  *   SIDE EFFECTS: print out the error message and stop the current execution 
  *
  */
-void Exception_Handler_16()
+void EX_16()
 {
 	//print out the error message
     clear();
@@ -350,7 +350,7 @@ void Exception_Handler_16()
 }
 
 /* 
- * Exception_Handler_17
+ * EX_17
  *   DESCRIPTION: the exception handler that handles the Alignment Check
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -360,7 +360,7 @@ void Exception_Handler_16()
  *   SIDE EFFECTS: print out the error message and stop the current execution 
  *
  */
-void Exception_Handler_17()
+void EX_17()
 {
 	//print out the error message
     clear();
@@ -369,7 +369,7 @@ void Exception_Handler_17()
 }
 
 /* 
- * Exception_Handler_18
+ * EX_18
  *   DESCRIPTION: the exception handler that handles the Machine Check
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -379,7 +379,7 @@ void Exception_Handler_17()
  *   SIDE EFFECTS: print out the error message and stop the current execution 
  *
  */
-void Exception_Handler_18()
+void EX_18()
 {
 	//print out the error message
     clear();
@@ -388,7 +388,7 @@ void Exception_Handler_18()
 }
 
 /* 
- * Exception_Handler_19
+ * EX_19
  *   DESCRIPTION: the exception handler that handles the SIMD Floating-Point Exception
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -398,7 +398,7 @@ void Exception_Handler_18()
  *   SIDE EFFECTS: print out the error message and stop the current execution 
  *
  */
-void Exception_Handler_19()
+void EX_19()
 {
 	//print out the error message
     clear();
@@ -407,7 +407,7 @@ void Exception_Handler_19()
 }
 
 /* 
- * Exception_Handler_20
+ * EX_20
  *   DESCRIPTION: the exception handler that handles the Virtualization Exception
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -417,7 +417,7 @@ void Exception_Handler_19()
  *   SIDE EFFECTS: print out the error message and stop the current execution 
  *
  */
-void Exception_Handler_20()
+void EX_20()
 {
 	//print out the error message
     clear();
@@ -426,7 +426,7 @@ void Exception_Handler_20()
 }
 
 /* 
- * Exception_Handler_30
+ * EX_30
  *   DESCRIPTION: the exception handler that handles the Security Exception 
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -436,7 +436,7 @@ void Exception_Handler_20()
  *   SIDE EFFECTS: print out the error message and stop the current execution 
  *
  */
-void Exception_Handler_30()
+void EX_30()
 {
 	//print out the error message
     clear();

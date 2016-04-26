@@ -12,6 +12,22 @@
 #define IN_USE		1
 #define EMPTY		0
 
+
+/*signal handling structures*/
+/*structure that stores the properties of a signal */
+typedef struct sigaction{
+	 void* sa_handler;	// specifies the type of action (0 = default)
+	 uint32_t sa_flags; // specifies how the signal must be handled
+	 uint32_t sa_mask;  // specifies the signals to be masked  
+
+}sigaction_t;
+
+/*structure that stores all the information about a signal */
+typedef struct siginfo{
+	uint32_t sig_num;	//the signal numer
+	uint32_t sig_err;   //the error code of the instruction 
+	sigaction_t sigaction; //handler info
+}siginfo_t;
 /*structure for the parent process information */
 typedef struct {
 	uint32_t pid;	
@@ -45,6 +61,7 @@ typedef struct {
 	process_info_t registers;
 	uint8_t* arg_buf;
 	uint32_t active; 
+	siginfo_t siginfo[3];
 }pcb_struct_t;
 
 

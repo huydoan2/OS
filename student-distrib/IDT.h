@@ -9,50 +9,51 @@
 #include "lib.h"
 #include "x86_desc.h"
 #include "keyboard.h"
+#include "exp_handler.h"
 #include "rtc.h"
 
 /*all the exception handlers*/
-extern void Exception_Handler_0();
+extern void EX_0();
 
-extern void Exception_Handler_1();
+extern void EX_1();
 
-extern void Exception_Handler_2();
+extern void EX_2();
 
-extern void Exception_Handler_3();
+extern void EX_3();
 
-extern void Exception_Handler_4();
+extern void EX_4();
 
-extern void Exception_Handler_5();
+extern void EX_5();
 
-extern void Exception_Handler_6();
+extern void EX_6();
 
-extern void Exception_Handler_7();
+extern void EX_7();
 
-extern void Exception_Handler_8();
+extern void EX_8();
 
-extern void Exception_Handler_9();
+extern void EX_9();
 
-extern void Exception_Handler_10();
+extern void EX_10();
 
-extern void Exception_Handler_11();
+extern void EX_11();
 
-extern void Exception_Handler_12();
+extern void EX_12();
 
-extern void Exception_Handler_13();
+extern void EX_13();
 
-extern void Exception_Handler_14();
+extern void EX_14();
 
-extern void Exception_Handler_16();
+extern void EX_16();
 
-extern void Exception_Handler_17();
+extern void EX_17();
 
-extern void Exception_Handler_18();
+extern void EX_18();
 
-extern void Exception_Handler_19();
+extern void EX_19();
 
-extern void Exception_Handler_20();
+extern void EX_20();
 
-extern void Exception_Handler_30();
+extern void EX_30();
 
 /*all the system calls handlers*/
 /*
