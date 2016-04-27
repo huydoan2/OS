@@ -20,7 +20,7 @@
         EXP_TABLE_SIZE = 20
         FAIL_VALUE = -1
 
-.globl regs
+.globl regs, sig_return_size, sf_start
 regs:
         .rept 16
         .long 0
@@ -88,6 +88,17 @@ common_Xinterrupt:
 common_Xinterrupt_default:
         movl $FAIL_VALUE, %eax        
         ret     
+
+sig_return_size:
+        .long sf_end - sf_start
+
+sf_start:
+        movl $10, %EAX
+        INT $0x80
+sf_end:
+
+
+
 
 .extern EX_0
 .extern EX_1
