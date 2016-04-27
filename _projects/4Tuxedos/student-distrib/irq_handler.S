@@ -20,11 +20,8 @@
         IRQ_TABLE_SIZE = 16
         FAIL_VALUE = -1
 
-.globl regs
-regs:
-        .rept 16
-        .long 0
-        .endr        
+.extern regs
+      
 
 .section .text
 
@@ -51,13 +48,14 @@ common_interrupt:
         movw %CS, %CX
         movl %ECX, CS(%eax)
         pushf
-        popl %ECX
-        movl %ECX, EFLAGS(%eax)
+        popl EFLAGS(%eax)
+        #movl %ECX, EFLAGS(%eax)
         movl %ESP, ESP(%eax)
         XORL %ECX, %ECX
         movw %SS, %CX
         movl %ECX, SS(%eax)
         
+        movl ECX(%eax), %ecx            #Recover EAX
         movl EAX(%eax), %eax            #Recover EAX
 
         cmpl $IRQ_TABLE_SIZE, %eax
@@ -66,7 +64,7 @@ common_interrupt:
         jb common_interrupt_default                
         movl jumb_table(,%eax,4), %eax        #push the address of the function to eax
         call *%eax                      #call the appropriate function     
-        # call do_signal                  #send signal   
+        #call do_signal                  #send signal   
         ret                               #return from interrupt
 
 common_interrupt_default:        
