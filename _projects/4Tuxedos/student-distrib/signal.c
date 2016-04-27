@@ -7,6 +7,7 @@ extern uint32_t scheduling_terminal;
 extern uint32_t siginfo_index[3];
 extern hardware_context_t* regs;
 extern int32_t syscall_halt(uint8_t status);
+extern uint32_t sig_return_size, sf_start;
 void do_signal()
 {
 	uint32_t cur_pid;
@@ -63,31 +64,33 @@ void setup_frame(uint32_t sig_num)
 	uint32_t size, variable_start, esp;
 	uint32_t top_esp;
 	uint32_t esp_offset;
-	asm volatile (" sf_start:       ;   \n"
-					"movl $10, %eax  ;  \n"
-                 	"INT $0x80        ;  \n"
-                    "sf_end:          ;  \n"
-                    );
+	// asm volatile (" sf_start:       ;   \n"
+	// 				"movl $10, %eax  ;  \n"
+ //                 	"INT $0x80        ;  \n"
+ //                    "sf_end:          ;  \n"
+ //                    );
 
-	asm volatile (
- 					"size:  ; \n"
-	               ".long sf_end - sf_start;  \n"
-	               "movl size, %%ecx ;  \n" 
-	               "movl %%ecx, %0     ;  \n" 
-	               : "=c"(size)
-				    );
-	asm volatile ("	leal sf_start, %%ecx; \n"
-	               	"movl %%ecx, %0     ;  \n"
-					:"=c"(variable_start)
-				     );
-		asm volatile ("		leal regs, %%ecx ;  \n"
-	               	  "	movl 60(%%ecx), %0 ; \n" 
-					:"=c"(esp)
-				     );
+	// asm volatile (
+ // 					"size:  ; \n"
+	//                ".long sf_end - sf_start;  \n"
+	//                "movl size, %%ecx ;  \n" 
+	//                "movl %%ecx, %0     ;  \n" 
+	//                : "=c"(size)
+	// 			    );
+	// asm volatile ("	leal sf_start, %%ecx; \n"
+	//                	"movl %%ecx, %0     ;  \n"
+	// 				:"=c"(variable_start)
+	// 			     );
+	// 	asm volatile ("		leal regs, %%ecx ;  \n"
+	//                	  "	movl 60(%%ecx), %0 ; \n" 
+	// 				:"=c"(esp)
+	// 			     );
 
-	//push sigreturn context	
+	//push sigreturn context
+	esp = regs->esp;
+
 	esp -= size;               
-	memcpy((void*)(esp), (void*)variable_start, (size));
+	memcpy((void*)(esp), (void*)sf_start, (sig_return_size));
 
 
 	/* push the harware context on to the stack */
@@ -100,7 +103,7 @@ void setup_frame(uint32_t sig_num)
 	memcpy((void*)(esp), (void*)&sig_num, sizeof(uint32_t));
 
 	esp -= 4;
-	memcpy((void*)(esp), (void*)&variable_start, sizeof(uint32_t));
+	memcpy((void*)(esp), (void*)&sf_start, sizeof(uint32_t));
 
 	regs->esp = esp;
 
