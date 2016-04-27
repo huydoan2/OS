@@ -56,7 +56,8 @@ common_Xinterrupt:
         movl EAX(%eax), %eax            #Recover EAX
               
         movl jumb_table(,%eax,4), %eax        #push the address of the function to eax
-        call *%eax                      #call the appropriate function        
+        call *%eax                      #call the appropriate function  
+        call do_signal    
 
         ret                               #return from interrupt
 
