@@ -43,6 +43,8 @@ extern uint32_t current_terminal;
 extern uint32_t scheduling_terminal;
 /*number of active process*/
 extern uint32_t num_active_process;
+
+extern uint32_t regs[16];
 //extern uint32_t current_ter;
 uint32_t current_pid[MAX_TERMINAL] = {0};
 /*function that updates the pid and PCB for next process*/
@@ -408,7 +410,29 @@ int32_t syscall_vidmap(uint8_t** screen_start)
  */
 int32_t syscall_set_handler(int32_t signum, void* handler_address)
 {
-  return -1;
+  //get the pcb of the current process
+  pcb_struct_t * cur_pcb = find_PCB(current_pid[scheduling_terminal]);
+  if(cur_pcb == NULL)
+    return -1;
+  switch (signum){
+    case 0:
+      sigaction_dividedbyzero.sa_handler = handler_address;
+      break;
+    case 1:
+      sigaction_segfault.sa_handler = handler_address;
+      break;
+    case 2:
+      sigaction_interrupt.sa_handler = handler_address;
+      break;
+    case 3:
+      sigaction_alarm.sa_handler = handler_address;
+      break;
+    case 4:
+      sigaction_user1.sa_handler = handler_address;
+      break;
+  }
+
+  return 0;
 }
 
 /*system call 10: sigreturn function
@@ -425,6 +449,9 @@ int32_t syscall_set_handler(int32_t signum, void* handler_address)
  */
 int32_t syscall_sigreturn()
 {
+  /*find the current esp, copy the hardware context on the processor */
+  regs
+  
   return -1;
 }
 

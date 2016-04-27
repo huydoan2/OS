@@ -8,6 +8,7 @@
 #include "syscall_linkage.h"
 #include "irq_handler.h"
 #include "systemCalls.h"
+#include "PCB.h"
 
 //Define values for IDT entry
 #define RESERVED4 0x0000
@@ -27,8 +28,13 @@
 #define exception_status 2
 #define exception_retval 255
 
-
 void exception_termination();
+extern uint32_t current_pid[3];
+extern uint32_t scheduling_terminal;
+void update_siginfo_exp(uint32_t sig_num, uint32_t err_code);
+uint32_t find_avail_siginfo(pcb_struct_t * cur_pcb);
+uint32_t siginfo_index[3] = {-1};
+
 
 /* 
  * EX_0
@@ -47,7 +53,8 @@ void EX_0(){
 	//print out the error message
     clear();
 	printf("Exception: Divide-by-zero Error. \n");
-	exception_termination();
+	update_siginfo_exp(0, 0);
+
 }
 
 /* 
@@ -67,7 +74,7 @@ void EX_1(){
 	//print out the error message
     clear();
 	printf("Exception: Debug. \n");
-	exception_termination();
+	update_siginfo_exp(1, 1);
 }
 /* 
  * EX_2
@@ -86,7 +93,7 @@ void EX_2(){
 	//print out the error message
     clear();
 	printf("Exception: Non-maskable Interrupt. \n");
-	exception_termination();
+	update_siginfo_exp(1, 2);
 }
 
 /* 
@@ -106,7 +113,7 @@ void EX_3(){
 	//print out the error message
     clear();
 	printf("Exception: Breakpoint. \n");
-	exception_termination();
+	update_siginfo_exp(1, 3);
 }
 
 /* 
@@ -126,7 +133,7 @@ void EX_4(){
 	//print out the error message
     clear();
 	printf("Exception: Overflow. \n");
-	exception_termination();
+	update_siginfo_exp(1, 4);
 }
 
 /* 
@@ -146,7 +153,7 @@ void EX_5(){
 	//print out the error message
     clear();
 	printf("Exception: Bound Range Exceeded. \n");
-	exception_termination();
+	update_siginfo_exp(1, 5);
 }
 
 /* 
@@ -166,7 +173,7 @@ void EX_6(){
 	//print out the error message
     clear();
 	printf("Exception: Invalid Opcode. \n");
-	exception_termination();
+	update_siginfo_exp(1, 6);
 }
 
 /* 
@@ -186,7 +193,7 @@ void EX_7(){
 	//print out the error message
     clear();
 	printf("Exception: Device Not Available. \n");
-	exception_termination();
+	update_siginfo_exp(1, 7);
 }
 
 /* 
@@ -206,7 +213,7 @@ void EX_8(){
 	//print out the error message
     clear();
 	printf("Exception: Double Fault. \n");
-	exception_termination();
+	update_siginfo_exp(1, 8);
 }
 
 /* 
@@ -226,7 +233,7 @@ void EX_9(){
 	//print out the error message
     clear();
 	printf("Exception: Coprocessor Segment Overrun. \n");
-	exception_termination();
+	update_siginfo_exp(1, 9);
 }
 
 /* 
@@ -246,7 +253,7 @@ void EX_10(){
 	//print out the error message
     clear();
 	printf("Exception: Invalid TSS. \n");
-	exception_termination();
+	update_siginfo_exp(1, 10);
 }
 
 /* 
@@ -266,7 +273,7 @@ void EX_11(){
 	//print out the error message
     clear();
 	printf("Exception: Segment Not Present. \n");
-	exception_termination();
+	update_siginfo_exp(1, 11);
 }
 
 /* 
@@ -286,7 +293,7 @@ void EX_12(){
 	//print out the error message
     clear();
 	printf("Exception: Stack-Segment Fault. \n");
-	exception_termination();
+	update_siginfo_exp(1, 12);
 }
 
 /* 
@@ -306,7 +313,7 @@ void EX_13(){
 	//print out the error message
     clear();
 	printf("Exception: General Protection Fault. \n");
-	exception_termination();
+	update_siginfo_exp(1, 13);
 }
 
 /* 
@@ -326,7 +333,7 @@ void EX_14(){
 	//print out the error message
     //clear(); 
 	printf("Exception: Page Fault. \n");
-	exception_termination();
+	update_siginfo_exp(1, 14);
 }
 
 
@@ -346,7 +353,7 @@ void EX_16()
 	//print out the error message
     clear();
 	printf("EXCPETION: x87 Floating-Point Exception\n");
-	exception_termination();
+	update_siginfo_exp(1, 16);
 }
 
 /* 
@@ -365,7 +372,7 @@ void EX_17()
 	//print out the error message
     clear();
 	printf("EXCPETION: Alignment Check\n");
-	exception_termination();
+	update_siginfo_exp(1, 17);
 }
 
 /* 
@@ -384,7 +391,7 @@ void EX_18()
 	//print out the error message
     clear();
 	printf("EXCPETION: Machine Check\n");
-	exception_termination();
+	update_siginfo_exp(1, 18);
 }
 
 /* 
@@ -403,7 +410,7 @@ void EX_19()
 	//print out the error message
     clear();
 	printf("EXCPETION: SIMD Floating-Point Exception\n");
-	exception_termination();
+	update_siginfo_exp(1, 19);
 }
 
 /* 
@@ -422,7 +429,7 @@ void EX_20()
 	//print out the error message
     clear();
 	printf("EXCPETION: Virtualization Exception\n");
-	exception_termination();
+	update_siginfo_exp(1, 20);
 }
 
 /* 
@@ -441,7 +448,7 @@ void EX_30()
 	//print out the error message
     clear();
 	printf("EXCPETION: Security Exception\n");
-	exception_termination();
+	update_siginfo_exp(1, 30);
 }
 
 /* 
@@ -630,4 +637,42 @@ void exception_termination()
 	exception_flag = 1;
 	syscall_halt(exception_retval);
 }
+/**/
+uint32_t find_avail_siginfo(pcb_struct_t * cur_pcb){
+	uint32_t i;
+	for(i = 0; i < 3; i++){
+		if(cur_pcb->siginfo[i].sig_num == -1)
+			return i;
+	}
+	return -1;
+}
+/* update the signal information in the PCB block */
+void update_siginfo_exp(uint32_t sig_num, uint32_t err_code ){
+	uint32_t cur_pid;
+	uint32_t siginfo_idx;
+	pcb_struct_t * cur_pcb;
+	//find the current pid scheduling_terminal
+	cur_pid = current_pid[scheduling_terminal];
+	//find the PCB of this process 
+	cur_pcb = find_PCB(cur_pid);
+
+	//update the signal informatio 
+	siginfo_idx = find_avail_siginfo(cur_pcb);
+	
+	cur_pcb->siginfo[siginfo_idx].sig_num = sig_num;
+    cur_pcb->siginfo[siginfo_idx].sig_err = err_code;
+    if(sig_num == 0){
+   		cur_pcb->siginfo[siginfo_idx].sigaction.sa_handler = sigaction_dividedbyzero.sa_handler;
+   	}
+   	else{
+   		cur_pcb->siginfo[siginfo_idx].sigaction.sa_handler = sigaction_segfault.sa_handler;
+   	}
+
+   	cur_pcb->siginfo[siginfo_idx].sigaction.sa_flags = 0; //kill the task
+
+   	cur_pcb->siginfo[siginfo_idx].sigaction.sa_mask = 0; //DONT KNOW THAT THIS IS SHABI
+    siginfo_index[scheduling_terminal] = siginfo_idx;
+
+}
+
 

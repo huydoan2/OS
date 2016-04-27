@@ -20,44 +20,45 @@
         IRQ_TABLE_SIZE = 16
         FAIL_VALUE = -1
 
-
+.globl regs
 regs:
         .rept 16
         .long 0
         .endr        
 
 .section .text
-.globl regs
+
 
 
 .extern do_signal
 common_interrupt:       
-        movl %EBX, EBX(regs)
-        movl %ECX, ECX(regs)
-        movl %EDX, EDX(regs)
-        movl %ESI, ESI(regs)
-        movl %EDI, EDI(regs)
-        movl %EBP, EBP(regs)
-        movl %EAX, EAX(regs)
-        XORL %EAX, %EAX
-        movw %DS, %AX        
-        movl %EAX, DS(regs)
-        movw %ES, %AX  
-        movl %EAX, ES(regs)
-        movw %FS, %AX
-        movl %EAX, FS(regs)
-        movw %CS, %AX
-        movl %EAX, CS(regs)
+         pushl %eax
+        leal  regs, %eax
+        movl %EBX, EBX(%eax)
+        movl %ECX, ECX(%eax)
+        movl %EDX, EDX(%eax)
+        movl %ESI, ESI(%eax)
+        movl %EDI, EDI(%eax)
+        movl %EBP, EBP(%eax)
+        popl EAX(%eax)
+        XORL %ecx, %ecx
+        movw %DS, %cx     
+        movl %ECX, DS(%eax)
+        movw %ES, %CX  
+        movl %ECX, ES(%eax)
+        movw %FS, %CX
+        movl %ECX, FS(%eax)
+        movw %CS, %CX
+        movl %ECX, CS(%eax)
         pushf
-        popf %EAX
-        movl %EAX, EFLAGS(regs)
-        movl %ESP, ESP(regs)
-        XORL %EAX, %EAX
-        movw %SS, %AX
-        movl %EAX, SS(regs)
+        popl %ECX
+        movl %ECX, EFLAGS(%eax)
+        movl %ESP, ESP(%eax)
+        XORL %ECX, %ECX
+        movw %SS, %CX
+        movl %ECX, SS(%eax)
         
-        movl EAX(regs), %eax            #Recover EAX
-
+        movl EAX(%eax), %eax            #Recover EAX
 
         cmpl $IRQ_TABLE_SIZE, %eax
         ja common_interrupt_default
