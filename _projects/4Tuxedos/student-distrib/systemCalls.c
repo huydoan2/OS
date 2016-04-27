@@ -449,10 +449,59 @@ int32_t syscall_set_handler(int32_t signum, void* handler_address)
  */
 int32_t syscall_sigreturn()
 {
-  /*find the current esp, copy the hardware context on the processor */
-  //regs
+ 
+  uint32_t curr_pid = current_pid[scheduling_terminal];
   
-  return -1;
+  pcb_struct_t* cur_PCB;
+  uint32_t par_esp = 0;
+  uint32_t par_ebp = 0;
+  uint32_t * virtAddr;
+  virtAddr = (uint32_t *)program_img_start_addr;
+
+
+  /*get parent PCB and information of the parent*/
+
+  cur_PCB =find_PCB(curr_pid);
+  par_esp = cur_PCB->parent.esp;
+  par_ebp = cur_PCB->parent.ebp;
+  cur_PCB->active = EMPTY;
+  current_pid[scheduling_terminal] = cur_PCB->parent.pid;
+
+  if(cur_PCB->parent.pid == 0)
+  {
+    //remove the current proccess from the PCB array and start a new shell
+    printf("Can't exit the first shell!   ");
+    syscall_execute((uint8_t*)"shell");
+  }
+
+  num_active_process--;
+  /*remap the parent code to the virtual memory*/
+  //Set up paging
+  curr_pid = cur_PCB->parent.pid;
+  map_page(curr_pid);
+
+  /*set tss registers*/
+   tss.ss0 = cur_PCB->parent.ss0;
+   tss.esp0 = cur_PCB->parent.esp0;
+
+   current_pid[scheduling_terminal] = curr_pid;
+   /*set esp and ebp to the parent stack*/
+   asm volatile("movl %0, %%esp"
+                     :
+                     :"c"(par_esp)
+                     :"%esp"
+                     );
+   asm volatile("movl %0, %%ebp" 
+                     :
+                     :"c"(par_ebp)
+                     :"%ebp"
+                     );
+
+  /*jump back to the execute*/ 
+  sti();
+  asm volatile("jmp halt_ret_label;");
+
+
 }
 
 /* 

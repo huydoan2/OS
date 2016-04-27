@@ -72,7 +72,7 @@ void setup_frame(uint32_t sig_num)
 	asm volatile (
  					"size:  ; \n"
 	               ".long sf_end - sf_start - 1 ;  \n"
-	               "movl $size, %%ecx ;  \n" 
+	               "movl(size), %%ecx ;  \n" 
 	               "movl %%ecx, %0     ;  \n" 
 	               : "=c"(size)
 				    );
@@ -104,7 +104,7 @@ void setup_frame(uint32_t sig_num)
 				 :
 				 :"c"(sig_num)
 		);
-	/*push the return address*/
+	 /*push the return address*/
 		asm volatile(" movl %0, %%ecx ; \n"
 				 " pushl %%ecx  ; \n"
 				 :
