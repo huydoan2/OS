@@ -65,9 +65,9 @@ common_interrupt:
         cmpl $0, %eax
         jb common_interrupt_default                
         movl jumb_table(,%eax,4), %eax        #push the address of the function to eax
-        call *%eax			#call the appropriate function     
+        call *%eax                      #call the appropriate function     
         # call do_signal                  #send signal   
-        ret		                  #return from interrupt
+        ret                               #return from interrupt
 
 common_interrupt_default:        
         ret     
@@ -82,11 +82,11 @@ jumb_table:
 
 #define IRQ_HANDLER(name,number)   \
 .GLOBL name                   ;\
-name:   PUSHA	              ;\
-	MOVL	$number,%EAX  ;\
-	CALL    common_interrupt ;\
-	POPA	              ;\
-	IRET
+name:   PUSHA                 ;\
+        MOVL    $number,%EAX  ;\
+        CALL    common_interrupt ;\
+        POPA                  ;\
+        IRET
 
 /* the system call library wrappers */
 IRQ_HANDLER(pit_irq,0)

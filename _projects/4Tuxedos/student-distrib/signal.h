@@ -42,7 +42,7 @@ typedef struct hw_context{
 	uint32_t fs;
 	uint32_t irq_exp_num;
 	uint32_t err_code;
-	uint32_t  ret_addr;
+	uint32_t ret_addr;
 	uint32_t cs;
 	uint32_t eflags;
 	uint32_t esp;

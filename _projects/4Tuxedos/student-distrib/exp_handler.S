@@ -56,10 +56,9 @@ common_Xinterrupt:
         movl EAX(%eax), %eax            #Recover EAX
               
         movl jumb_table(,%eax,4), %eax        #push the address of the function to eax
-        call *%eax			#call the appropriate function        
-        call do_signal 
+        call *%eax                      #call the appropriate function        
 
-        ret		                  #return from interrupt
+        ret                               #return from interrupt
 
 
 
@@ -98,11 +97,11 @@ jumb_table:
 
 #define EXP_HANDLER(name,number)   \
 .GLOBL name                   ;\
-name:   PUSHA	              ;\
-	MOVL	$number,%EAX  ;\
-	CALL    common_Xinterrupt ;\
-	POPA	              ;\
-	IRET
+name:   PUSHA                 ;\
+        MOVL    $number,%EAX  ;\
+        CALL    common_Xinterrupt ;\
+        POPA                  ;\
+        IRET
 
 /* the system call library wrappers */
 EXP_HANDLER(Exception_Handler_0,0)
