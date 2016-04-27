@@ -19,7 +19,8 @@ common_Xinterrupt:
         call *%eax			#call the appropriate function        
         ret		                  #return from interrupt
 
-common_Xinterrupt_default:        
+common_Xinterrupt_default:
+        movl $FAIL_VALUE, %eax        
         ret     
 
 .extern EX_0
