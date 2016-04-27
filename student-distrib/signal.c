@@ -5,7 +5,7 @@
 extern uint32_t current_pid[3];
 extern uint32_t scheduling_terminal;
 extern uint32_t siginfo_index[3];
-extern uint32_t regs[16];
+extern hardware_context_t* regs;
 extern int32_t syscall_halt(uint8_t status);
 void do_signal()
 {
@@ -71,8 +71,8 @@ void setup_frame(uint32_t sig_num)
 
 	asm volatile (
  					"size:  ; \n"
-	               ".long sf_end - sf_start - 1 ;  \n"
-	               "movl(size), %%ecx ;  \n" 
+	               ".long sf_end - sf_start;  \n"
+	               "movl size, %%ecx ;  \n" 
 	               "movl %%ecx, %0     ;  \n" 
 	               : "=c"(size)
 				    );
@@ -85,31 +85,42 @@ void setup_frame(uint32_t sig_num)
 					:"=c"(esp)
 				     );
 
-               
-	memcpy((void*)(esp - size*4), (void*)variable_start, (size*4));
+	//push sigreturn context	
+	esp -= size;               
+	memcpy((void*)(esp), (void*)variable_start, (size));
 
 
 	/* push the harware context on to the stack */
-	memcpy((void*)(esp - size*4 - sizeof(uint32_t)*16), (void*)regs, sizeof(uint32_t)*16 );
+	esp -= sizeof(hardware_context_t);
+
+	memcpy((void*)(esp), (void*)regs, sizeof(hardware_context_t));
 
 	/* push the sig_num */
-	esp_offset = (size*4 + sizeof(uint32_t)*16)/4 ; //the number of address lines we have to move up
-	top_esp = esp - esp_offset;
-	asm volatile(" movl %0, %%esp;  \n "
-				:
-				:"c"(top_esp)
-		);
-	asm volatile(" movl %0, %%ecx ; \n"
-				 " pushl %%ecx  ; \n"
-				 :
-				 :"c"(sig_num)
-		);
-	 /*push the return address*/
-		asm volatile(" movl %0, %%ecx ; \n"
-				 " pushl %%ecx  ; \n"
-				 :
-				 :"c"(esp)
-		);
+	esp -= 4;
+	memcpy((void*)(esp), (void*)&sig_num, sizeof(uint32_t));
+
+	esp -= 4;
+	memcpy((void*)(esp), (void*)&variable_start, sizeof(uint32_t));
+
+	regs->esp = esp;
+
+	// esp_offset = (size*4 + sizeof(uint32_t)*16)/4 ; //the number of address lines we have to move up
+	// top_esp = esp - esp_offset;
+	// asm volatile(" movl %0, %%esp;  \n "
+	// 			:
+	// 			:"c"(top_esp)
+	// 	);
+	// asm volatile(" movl %0, %%ecx ; \n"
+	// 			 " pushl %%ecx  ; \n"
+	// 			 :
+	// 			 :"c"(sig_num)
+	// 	);
+	// /*push the return address*/
+	// 	asm volatile(" movl %0, %%ecx ; \n"
+	// 			 " pushl %%ecx  ; \n"
+	// 			 :
+	// 			 :"c"(esp)
+	// 	);
 
 	
 }

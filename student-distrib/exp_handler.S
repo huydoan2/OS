@@ -20,31 +20,35 @@
         EXP_TABLE_SIZE = 20
         FAIL_VALUE = -1
 
-.extern regs
+.globl regs
+regs:
+        .rept 16
+        .long 0
+        .endr  
 
 .section .text
 
 .extern do_signal
 
 common_Xinterrupt:  
-        pushl %eax
-        leal  regs, %eax
-        movl %EBX, EBX(%eax)
-        movl %ECX, ECX(%eax)
-        movl %EDX, EDX(%eax)
-        movl %ESI, ESI(%eax)
-        movl %EDI, EDI(%eax)
-        movl %EBP, EBP(%eax)
-        popl EAX(%eax)
-        XORL %ecx, %ecx
-        movw %DS, %cx     
-        movl %ECX, DS(%eax)
+        pushl %EAX
+        leal  regs, %EAX
+        movl %EBX, EBX(%EAX)
+        movl %ECX, ECX(%EAX)
+        movl %EDX, EDX(%EAX)
+        movl %ESI, ESI(%EAX)
+        movl %EDI, EDI(%EAX)
+        movl %EBP, EBP(%EAX)
+        popl EAX(%EAX)
+        XORL %ECX, %ECX
+        movw %DS, %CX     
+        movl %ECX, DS(%EAX)
         movw %ES, %CX  
-        movl %ECX, ES(%eax)
+        movl %ECX, ES(%EAX)
         movw %FS, %CX
-        movl %ECX, FS(%eax)
+        movl %ECX, FS(%EAX)
         movw %CS, %CX
-        movl %ECX, CS(%eax)
+        movl %ECX, CS(%EAX)
         pushf
         popl %ECX
         movl %ECX, EFLAGS(%eax)
@@ -53,12 +57,27 @@ common_Xinterrupt:
         movw %SS, %CX
         movl %ECX, SS(%eax)
         
-        movl EAX(%eax), %eax            #Recover EAX
-              
+        movl ECX(%eax), %ECX            #Recover ECX     
+        movl EAX(%eax), %EAX            #Recover EAX
         movl jumb_table(,%eax,4), %eax        #push the address of the function to eax
-        call *%eax                      #call the appropriate function  
-        call do_signal    
-
+        call *%eax                      #call the appropriate function        
+        call do_signal
+        leal regs, %eax        
+        movl EBX(%eax), %EBX
+        movl ECX(%eax), %EBX
+        movl EDX(%eax), %EBX
+        movl ESI(%eax), %EBX
+        movl EDI(%eax), %EBX
+        movl EBP(%eax), %EBX        
+        movw DS(%eax),  %DS
+        movw ES(%eax),  %ES
+        movw FS(%eax),  %FS
+        movw CS(%eax),  %CS
+        pushl EFLAGS(%eax)
+        popf
+        movl ESP(%eax), %ESP
+        movw SS(%eax),  %SS        
+        movl EAX(%eax), %EBX
         ret                               #return from interrupt
 
 
@@ -98,10 +117,8 @@ jumb_table:
 
 #define EXP_HANDLER(name,number)   \
 .GLOBL name                   ;\
-name:   PUSHA                 ;\
-        MOVL    $number,%EAX  ;\
+name:   MOVL    $number,%EAX  ;\
         CALL    common_Xinterrupt ;\
-        POPA                  ;\
         IRET
 
 /* the system call library wrappers */
