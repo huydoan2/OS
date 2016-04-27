@@ -450,7 +450,7 @@ int32_t syscall_set_handler(int32_t signum, void* handler_address)
 int32_t syscall_sigreturn()
 {
   /*find the current esp, copy the hardware context on the processor */
-  regs
+  //regs
   
   return -1;
 }
