@@ -28,12 +28,6 @@
 #define ALARM	  3
 #define USER1     4
 
-typedef struct sig_stack_frame{
-	uint32_t ret_addr;
-	uint32_t sig_num;
-	hardware_context_t hw_context;
-	uint32_t sigreturn_ptr;
-}sig_stack_frame_t;
 
 typedef struct hw_context{
 	uint32_t ebx;
@@ -55,6 +49,18 @@ typedef struct hw_context{
 	uint32_t ss;
 }hardware_context_t;
 
+typedef struct sig_stack_frame{
+	uint32_t ret_addr;
+	uint32_t sig_num;
+	hardware_context_t hw_context;
+	uint32_t sigreturn_ptr;
+}sig_stack_frame_t;
+
+sig_stack_frame_t sig_stack_frame;
+
+
+
+hardware_context_t hardware_context;
 /*helper functions for signal handling*/
 /*function that sends a signal to a specific process
   - @param: 
@@ -64,12 +70,12 @@ typedef struct hw_context{
 */
  uint32_t specific_send_sig_info(uint32_t sig_num, void* info, pcb_struct_t* des_pcb);
  uint32_t send_signal( );
- uint32_t do_signal( );
+ void do_signal( );
  uint32_t handle_signal( );
- uint32_t setup_frame();
+ void setup_frame();
  uint32_t setup_rt_frame();
  uint32_t restore_sigcontext();
- void sig_kill(); //cannot be masked, cannot be blocked 
+ void sig_kill(uint32_t pid); //cannot be masked, cannot be blocked 
  void sig_ignore(); //does nothing
 
 

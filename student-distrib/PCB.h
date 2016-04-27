@@ -11,8 +11,6 @@
 #define PCB_OFFSET 0x1FFF
 #define IN_USE		1
 #define EMPTY		0
-
-
 /*signal handling structures*/
 /*structure that stores the properties of a signal */
 typedef struct sigaction{
@@ -28,6 +26,22 @@ typedef struct siginfo{
 	uint32_t sig_err;   //the error code of the instruction 
 	sigaction_t sigaction; //handler info
 }siginfo_t;
+
+/*crate a sigaction structure for each signal*/
+sigaction_t sigaction_dividedbyzero;
+
+sigaction_t sigaction_segfault;
+
+
+sigaction_t sigaction_interrupt;
+
+
+sigaction_t sigaction_alarm;
+
+
+sigaction_t sigaction_user1;
+
+
 /*structure for the parent process information */
 typedef struct {
 	uint32_t pid;	

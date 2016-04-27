@@ -9,7 +9,8 @@ file_desc.o: file_desc.c file_desc.h types.h file.h rtc.h i8259.h lib.h \
   keyboard.h
 i8259.o: i8259.c i8259.h types.h lib.h
 IDT.o: IDT.c IDT.h lib.h types.h x86_desc.h keyboard.h i8259.h \
-  exp_handler.h rtc.h syscall_linkage.h irq_handler.h systemCalls.h
+  exp_handler.h rtc.h syscall_linkage.h irq_handler.h systemCalls.h PCB.h \
+  file_desc.h
 kernel.o: kernel.c multiboot.h types.h x86_desc.h lib.h i8259.h debug.h \
   keyboard.h IDT.h exp_handler.h rtc.h Paging.h systemCalls.h file.h \
   PIT.h
@@ -22,6 +23,6 @@ PIT.o: PIT.c PIT.h lib.h types.h i8259.h
 rtc.o: rtc.c rtc.h i8259.h types.h lib.h
 Scheduler.o: Scheduler.c Scheduler.h types.h PCB.h file_desc.h lib.h \
   i8259.h keyboard.h x86_desc.h Paging.h
-signal.o: signal.c
+signal.o: signal.c signal.h types.h PCB.h file_desc.h lib.h
 systemCalls.o: systemCalls.c systemCalls.h types.h file.h lib.h Paging.h \
   x86_desc.h keyboard.h i8259.h PCB.h file_desc.h
