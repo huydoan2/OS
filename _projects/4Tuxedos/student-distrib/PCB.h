@@ -3,7 +3,7 @@
  */
 
 #ifndef PCB_H
-#define PCH_H
+#define PCB_H
 
 #include "types.h"
 #include "file_desc.h"

@@ -19,8 +19,8 @@
 #include "PCB.h"
 #include "lib.h"
 /*define the signal flag values*/
-#define KILL_TASK 1 
-#define IGNORE    2
+#define KILL_TASK 0
+#define IGNORE    1
 /*define the signal numbers*/
 #define DIV_ZERO  0
 #define SEGFAULT  1
