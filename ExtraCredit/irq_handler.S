@@ -17,7 +17,7 @@
         EFLAGS = 56
         ESP = 60
         SS = 64       
-        IRQ_TABLE_SIZE = 16
+        IRQ_TABLE_SIZE = 17
         FAIL_VALUE = -1
 
 .extern regs
@@ -49,7 +49,6 @@ common_interrupt:
         movl %ECX, CS(%eax)
         pushf
         popl EFLAGS(%eax)
-        #movl %ECX, EFLAGS(%eax)
         movl %ESP, ESP(%eax)
         XORL %ECX, %ECX
         movw %SS, %CX
