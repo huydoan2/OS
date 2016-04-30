@@ -22,7 +22,7 @@
 
 .globl regs, sig_return_size, sf_start
 regs:
-        .rept 16
+        .rept 17
         .long 0
         .endr  
 
@@ -32,7 +32,7 @@ regs:
 
 common_Xinterrupt:  
         pushl %EAX
-        leal  regs, %EAX
+        leal regs, %EAX
         movl %EBX, EBX(%EAX)
         movl %ECX, ECX(%EAX)
         movl %EDX, EDX(%EAX)
@@ -47,11 +47,14 @@ common_Xinterrupt:
         movl %ECX, ES(%EAX)
         movw %FS, %CX
         movl %ECX, FS(%EAX)
+        movl $0, IRQ_NUM(%EAX)
+        movl $0, ERRNO(%EAX)
+        movl %EAX, RET_ADDR(%EAX)
         movw %CS, %CX
         movl %ECX, CS(%EAX)
+
         pushf
-        popl %ECX
-        movl %ECX, EFLAGS(%eax)
+        popl EFLAGS(%eax)
         movl %ESP, ESP(%eax)
         XORL %ECX, %ECX
         movw %SS, %CX
@@ -80,11 +83,6 @@ common_Xinterrupt:
         movl EAX(%eax), %EBX
         ret                               #return from interrupt
 
-
-
-
-
-
 common_Xinterrupt_default:
         movl $FAIL_VALUE, %eax        
         ret     
@@ -96,9 +94,6 @@ sf_start:
         movl $10, %EAX
         INT $0x80
 sf_end:
-
-
-
 
 .extern EX_0
 .extern EX_1

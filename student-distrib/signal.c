@@ -5,7 +5,7 @@
 extern uint32_t current_pid[3];
 extern uint32_t scheduling_terminal;
 extern uint32_t siginfo_index[3];
-extern hardware_context_t* regs;
+extern uint32_t regs[17];
 extern int32_t syscall_halt(uint8_t status);
 extern uint32_t sig_return_size, sf_start;
 void do_signal()
@@ -54,43 +54,20 @@ void do_signal()
        asm volatile("call *%eax");
 
 	}
-
+	printf("do_signal done\n");
 	return;
 }
 
 void setup_frame(uint32_t sig_num)
 {
 	/* push the sigreturn on to the sigreturn */
-	uint32_t size, variable_start, esp;
-	uint32_t top_esp;
-	uint32_t esp_offset;
-	// asm volatile (" sf_start:       ;   \n"
-	// 				"movl $10, %eax  ;  \n"
- //                 	"INT $0x80        ;  \n"
- //                    "sf_end:          ;  \n"
- //                    );
-
-	// asm volatile (
- // 					"size:  ; \n"
-	//                ".long sf_end - sf_start;  \n"
-	//                "movl size, %%ecx ;  \n" 
-	//                "movl %%ecx, %0     ;  \n" 
-	//                : "=c"(size)
-	// 			    );
-	// asm volatile ("	leal sf_start, %%ecx; \n"
-	//                	"movl %%ecx, %0     ;  \n"
-	// 				:"=c"(variable_start)
-	// 			     );
-	// 	asm volatile ("		leal regs, %%ecx ;  \n"
-	//                	  "	movl 60(%%ecx), %0 ; \n" 
-	// 				:"=c"(esp)
-	// 			     );
-
+	uint32_t esp;
+	uint32_t temp_num = sig_num;
 	//push sigreturn context
-	esp = regs->esp;
+	esp = regs[15];
 
-	esp -= size;               
-	memcpy((void*)(esp), (void*)sf_start, (sig_return_size));
+	esp -= sig_return_size;               
+	memcpy((void*)(esp), (void*)&sf_start, (sig_return_size));
 
 
 	/* push the harware context on to the stack */
@@ -100,32 +77,15 @@ void setup_frame(uint32_t sig_num)
 
 	/* push the sig_num */
 	esp -= 4;
-	memcpy((void*)(esp), (void*)&sig_num, sizeof(uint32_t));
+	memcpy((void*)(esp), (void*)&temp_num, sizeof(uint32_t));
 
 	esp -= 4;
 	memcpy((void*)(esp), (void*)&sf_start, sizeof(uint32_t));
 
-	regs->esp = esp;
+	regs[15] = esp;
 
-	// esp_offset = (size*4 + sizeof(uint32_t)*16)/4 ; //the number of address lines we have to move up
-	// top_esp = esp - esp_offset;
-	// asm volatile(" movl %0, %%esp;  \n "
-	// 			:
-	// 			:"c"(top_esp)
-	// 	);
-	// asm volatile(" movl %0, %%ecx ; \n"
-	// 			 " pushl %%ecx  ; \n"
-	// 			 :
-	// 			 :"c"(sig_num)
-	// 	);
-	// /*push the return address*/
-	// 	asm volatile(" movl %0, %%ecx ; \n"
-	// 			 " pushl %%ecx  ; \n"
-	// 			 :
-	// 			 :"c"(esp)
-	// 	);
+	return;
 
-	
 }
 
  void sig_kill(uint32_t pid){//cannot be masked, cannot be blocked
@@ -134,7 +94,5 @@ void setup_frame(uint32_t sig_num)
  } 
 
 void sig_ignore(){ //does nothing
-
 	return;
-
 }
