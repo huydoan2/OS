@@ -67,7 +67,8 @@ void setup_frame(uint32_t sig_num)
 	//uint32_t temp_num = sig_num;
 	//push sigreturn context
 	
-	esp = regs[15];
+	asm volatile("mov %%esp, %0" :"=c"(esp));
+	//esp = regs[15];
 
 	esp -= sig_return_size;               
 	memcpy((void*)(esp), (void*)&sf_start, (sig_return_size));
