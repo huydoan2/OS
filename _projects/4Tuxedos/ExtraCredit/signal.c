@@ -2,6 +2,8 @@
 
 #include "signal.h"
 #include "lib.h"
+#include "x86_desc.h"
+
 extern uint32_t current_pid[3];
 extern uint32_t scheduling_terminal;
 extern uint32_t siginfo_index[3];
@@ -62,8 +64,9 @@ void setup_frame(uint32_t sig_num)
 {
 	/* push the sigreturn on to the sigreturn */
 	uint32_t esp;
-	uint32_t temp_num = sig_num;
+	//uint32_t temp_num = sig_num;
 	//push sigreturn context
+	
 	esp = regs[15];
 
 	esp -= sig_return_size;               
@@ -77,10 +80,11 @@ void setup_frame(uint32_t sig_num)
 
 	/* push the sig_num */
 	esp -= 4;
-	memcpy((void*)(esp), (void*)&temp_num, sizeof(uint32_t));
+	memcpy((void*)(esp), (void*)&sig_num, sizeof(uint32_t));
+
 
 	esp -= 4;
-	memcpy((void*)(esp), (void*)&sf_start, sizeof(uint32_t));
+	memcpy((void*)(esp), (void*)sf_start, sizeof(uint32_t));
 
 	regs[15] = esp;
 
