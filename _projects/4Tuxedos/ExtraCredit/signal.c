@@ -38,25 +38,25 @@ void do_signal()
     //set up the stack frame 
 	setup_frame(sig_num);
 
-	//execute the signal handler 
-	if(sa_handler == NULL){
-		if(sa_flags == 0){
-			sig_kill(cur_pid);
-		}
-		else{
-			sig_ignore();
-		}
-	}
-	else {
-		asm volatile("movl %0, %%eax"
-                     :
-                     :"c"(sa_handler)
-                     :"%eax"                     //could be wrong
-                     );
-       asm volatile("call *%eax");
+	// //execute the signal handler 
+	// if(sa_handler == NULL){
+	// 	if(sa_flags == 0){
+	// 		sig_kill(cur_pid);
+	// 	}
+	// 	else{
+	// 		sig_ignore();
+	// 	}
+	// }
+	// else {
+	// 	asm volatile("movl %0, %%eax"
+ //                     :
+ //                     :"c"(sa_handler)
+ //                     :"%eax"                     //could be wrong
+ //                     );
+ //       asm volatile("call *%eax");
 
-	}
-	printf("do_signal done\n");
+	// }
+	// printf("do_signal done\n");
 	return;
 }
 

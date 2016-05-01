@@ -57,7 +57,7 @@ common_Xinterrupt:
         movl %ECX, CS(%EAX)
         pushf
         popl EFLAGS(%eax)
-        movl 8(%ESP), %ECX
+        movl 20(%ESP), %ECX
         movl %ECX, ESP(%eax)
         XORL %ECX, %ECX
         movw %SS, %CX
@@ -68,8 +68,7 @@ common_Xinterrupt:
         call *%eax                      #call the appropriate function        
         call do_signal
         leal regs, %eax        
-        movl EBX(%eax), %EBX
-        movl ECX(%eax), %ECX
+        movl EBX(%eax), %EBX        
         movl EDX(%eax), %EDX
         movl ESI(%eax), %ESI
         movl EDI(%eax), %EDI
@@ -77,12 +76,17 @@ common_Xinterrupt:
         movw DS(%eax),  %DS
         movw ES(%eax),  %ES
         movw FS(%eax),  %FS
-        movw CS(%eax),  %CS
+        # movw CS(%eax),  %CS
         pushl EFLAGS(%eax)
         popf
-        movl ESP(%eax), %ESP
+        
+        movl ESP(%eax), %ECX              #Huy added these lines
+        movl %ECX, 20(%ESP)                #I am modifying the ESP in the IRET context
+        movl ECX(%eax), %ECX              #so that the new ESP is handled by the user program
+
         movw SS(%eax),  %SS        
-        movl EAX(%eax), %EBX
+        movl EAX(%eax), %EAX
+        leave
         ret                               #return from interrupt
 
 common_Xinterrupt_default:
