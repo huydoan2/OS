@@ -46,26 +46,6 @@ extern int32_t file_write(int32_t* buff, int32_t num_bytes);
 /*helper function to the size of the file*/
 extern int32_t get_fileSize(const uint8_t* filename);
 
-
-//bootblock starting address
-/*
-|| Joel's note on the BOOTBLOCK:
-===============================================
-file syststem is contiguous
-
-Confirmed mod->mod_start is starting address of bootblock
-printf("Module %d loaded at address: 0x%#x\n", mod_count, (unsigned int)mod->mod_start);
-printf("Module %d ends at address: 0x%#x\n", mod_count, (unsigned int)mod->mod_end);
-
-TA said this to get
-bootblock_t *bootblock;
-inode_t *inodes = (inode_t*)(bootblock + 1) //gets you to starting i node
-
-something similar is done to get data blocks
-
-
-*/
-
 /*structure for each entry in a directory*/
 typedef struct dentry_t{
 	int8_t filename[FILENAME_MAX_SIZE];

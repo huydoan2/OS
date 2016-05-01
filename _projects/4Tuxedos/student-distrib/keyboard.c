@@ -43,6 +43,7 @@
 #define Down_pressed 0x50
 #define up 1
 #define down 0 
+#define max_process 6
 /*current pid for each terminal*/
 extern uint32_t current_pid[MAX_TERMINAL];
 /*terminal that is being processed*/
@@ -621,7 +622,7 @@ int32_t terminal_write(int32_t * buff, int32_t num_bytes)
 int32_t check_for_max_process()
 {
 	/*if num_active_process is 6, return 1*/
-	if(num_active_process == 6)
+	if(num_active_process == max_process)
 		return 1;
 	else
 		return 0;
@@ -650,11 +651,11 @@ void update_command_array()
 	strncpy(command_history[scheduling_terminal][command_starting_idx[scheduling_terminal]], line_buffer[scheduling_terminal],lb_index[scheduling_terminal]+1);
 	/*increment number of command*/
 	num_existing_command[scheduling_terminal]++;
-	if(num_existing_command[scheduling_terminal] == 11)
-		num_existing_command[scheduling_terminal] = 10;
+	if(num_existing_command[scheduling_terminal] == num_command_history+1)
+		num_existing_command[scheduling_terminal] = num_command_history;
 	/*fix the starting index of the command buffer*/
 	command_starting_idx[scheduling_terminal]++;
-	command_starting_idx[scheduling_terminal]%=10;
+	command_starting_idx[scheduling_terminal]%=num_command_history;
 	/*update command iterator*/
 	command_iter[scheduling_terminal] = command_starting_idx[scheduling_terminal];
 	/*reset number of up arrow and delete and put pressed*/
@@ -692,7 +693,7 @@ void get_command_history(int dir)
 		{
 			command_iter[scheduling_terminal]--;
 			if(command_iter[scheduling_terminal] == -1)
-				command_iter[scheduling_terminal] = 9;
+				command_iter[scheduling_terminal] = num_command_history-1;
 			num_up[scheduling_terminal]++;
 			strcpy(line_buffer[scheduling_terminal], command_history[scheduling_terminal][command_iter[scheduling_terminal]]);
 		}
@@ -703,7 +704,7 @@ void get_command_history(int dir)
 		if(num_up[scheduling_terminal] > 1)
 		{
 			command_iter[scheduling_terminal]++;
-			if(command_iter[scheduling_terminal] == 10)
+			if(command_iter[scheduling_terminal] == num_command_history)
 				command_iter[scheduling_terminal] = 0;
 			num_up[scheduling_terminal]--;
 			strcpy(line_buffer[scheduling_terminal], command_history[scheduling_terminal][command_iter[scheduling_terminal]]);

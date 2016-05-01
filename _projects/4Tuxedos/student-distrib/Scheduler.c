@@ -123,7 +123,7 @@ uint32_t find_next_pid()
     original = scheduling_terminal;
 	do{
 		scheduling_terminal+=1;
-		scheduling_terminal%=3;
+		scheduling_terminal%=MAX_TERMINAL;
 		if(original == scheduling_terminal)
          break;
 	}while(current_pid[scheduling_terminal] == 0);

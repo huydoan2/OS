@@ -410,29 +410,7 @@ int32_t syscall_vidmap(uint8_t** screen_start)
  */
 int32_t syscall_set_handler(int32_t signum, void* handler_address)
 {
-  //get the pcb of the current process
-  pcb_struct_t * cur_pcb = find_PCB(current_pid[scheduling_terminal]);
-  if(cur_pcb == NULL)
-    return -1;
-  switch (signum){
-    case 0:
-      sigaction_dividedbyzero.sa_handler = handler_address;
-      break;
-    case 1:
-      sigaction_segfault.sa_handler = handler_address;
-      break;
-    case 2:
-      sigaction_interrupt.sa_handler = handler_address;
-      break;
-    case 3:
-      sigaction_alarm.sa_handler = handler_address;
-      break;
-    case 4:
-      sigaction_user1.sa_handler = handler_address;
-      break;
-  }
-
-  return 0;
+  return -1;
 }
 
 /*system call 10: sigreturn function
