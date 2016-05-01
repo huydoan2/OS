@@ -1,0 +1,164 @@
+﻿4Tuxedos MP3 Bug Log
+
+
+Checkpoint 1: Everyone worked together
+
+3/10/2016
+Bug:	Segmentation fault during loading GDT 
+Desc:	We were dereferencing the gdt_desc_ptr, so whenever the system was booted, we experienced a segmentation fault. We fixed it by deleting the dereferencing parenthesis.
+Time:	1 hour
+	
+3/11/2016
+Bug:	Compile Error during initializing IDT (stray error)
+Desc:	We copied codes from our bitbucket without going into “raw” mode, causing every new line to contain a special key. We had to find and remove every special key to compile. 
+Time:	½ hour
+
+3/11/2016
+Bug:	Wrong parameter order for functions outb and inb
+Desc:	We were putting the parameters in reverse orders for outb and inb functions. So we had to swap them make them work. 
+Time:	2 hours
+
+3/11/2016
+Bug:	Handlers not returning control to kernel
+Desc:	After each device handler, they were not return the control to the kernel. We had to put assembly code at the end of the handler to fix it. (leave and iret)
+Time:	1 hour
+
+3/11/2016
+Bug:	RTC not initializing
+Desc:	We forgot to enable the irq in Master that is connected to the irq in Slave we were trying to enable. We fixed it by enabling the corresponding irq in Master.
+Time:	1 hour
+
+3/12/2016
+Bug:	Runtime termination when system boots up
+Desc:	When we booted up the system, we got an error message saying runtime was terminated due to an error. We fixed it by setting CR0 after CR4. CR0 has to be initialized after CR4 because CR0 enables paging and CR4 enables 4MB page table. 
+Time:	1 day
+	
+
+Checkpoint 2: Everyone worked together
+
+3/15/2016
+Bug:	Ctrl+L chopped characters off from buffer
+Desc:	When ctrl+L is pressed, one character in the buffer got deleted in the front and end. Also added last characters deleted into the end before the new typed characters.
+Time:	1 hour
+
+3/16/2016
+Bug:	RTC write function returning wrong rate 
+Desc:	RTC write was returning wong rate even though we were putting in correct buffer and num_bytes parameters. We found that we needed break; for every cases.
+Time:	1 hour
+
+3/18/2016
+Bug:	Failed to parsing the filesystem image correctly
+Desc:	The filesystem are not being parsed correctly. We had page fault we calling read_dentry_by_index function. We had the bug because we are using the wrong offset for skipping a block. We used 4096, but we should be using 1024 since we are reading 4B at a time 
+Time:	2 hours
+
+3/19/2016
+Bug:	Read_data function are using the offset wrong
+Desc:	We thought the offset is for the entry index in the data block array for each inode. But, by interpreting offset this way, we could not read from the middle of a data block. We either read the entire data block or we don’t read that block at all, which is not a desired behavior. So we changed offset to the starting byte of the file. Now we can read any length of data from any start point.   
+Time:	2 hours
+
+3/20/2016
+Bug:	System call open function does not link the right function 
+Desc:	We assigned wrong functions to the PCB block when calling the open function. We fixed that by redefining the functions structure in the PCB block and changed all the function prototypes
+Time:	2 hours
+
+3/22/2016
+Bug:	In the demo test function the RTC rate cannot be changed after being changed five times
+Desc:	We can only change the rate of RTC for the first five times. This bug is caused by the testing function is not up-to-date. We changed the read function but didn’t change the parameter we passed in the read function 
+Time:	30 min
+
+
+Checkpoint 3: Everyone worked together
+
+3/29/2016
+Bug:	Syscall linkage
+Desc:	Function Syscall() works as the entry for system calls is declared as uint32_t syscall instead of uint32_t syscall()
+Time:	1 day
+
+3/30/2016
+Bug:	Counter page fault
+Desc:	Counter program caused page fault at random location when running long counter. It was due to our rtc testing and clock displaying. We got it of them and fixed the issue.
+Time:	2 hours
+
+3/30/2016
+Bug:	IRET General Protection Exception
+Desc:	I had this bug because we were using the wrong ESP value. Also, we use the wrong syntax for the inline assembly to get the esp value 
+Time:	2 hours 
+
+	
+
+Checkpoint 4: Everyone worked together
+
+4/2/2016
+Bug:	Fish only displaying first row with random characters 
+Desc:	the read_data function was not checking the length of the file correctly. 
+Time:	2 Days
+
+4/5/2016
+Bug:	Fish only displaying frame1.txt correctly
+Desc:	the function interface for the read_fd (the function called by the read system call)function is wrong
+	We were using the buffer to pass in the node number of the file. Then we chagned it by adding another parameter
+	to pass in the node number 
+Time:	3 Days
+
+4/8/2016
+Bug:	Vid_map error
+Desc:	use the wrong flags for the page directory and page table entry (wrong privilege level)
+	fixed by creating page table for the vid_map system call 
+Time:	4 hours
+
+4/9/2016
+Bug:	Hello bug when name length is max
+Desc:	When the length of name input for hello was max, it didn’t print out the name. We fixed this by changing < to <= for checking line buffer index condition.
+	1 hour
+
+4/10/2016
+Bug:	Grep bug
+Desc:	grep because the FD_7 in file_desc.c was set to 2 instead of 7
+Time:	1 hour
+	
+
+
+Checkpoint 5: Everyone worked together
+
+4/15/2016
+Bug:	Multi-terminal caused page faults and triple faults switching video memory
+Desc:	Multi-terminal caused page faults and triple faults switching video memory. Fixed by changing current terminal variable to scheduling terminal variable in terminal switch and also by changing the TSS esp0 equation to use the correct pid number.
+Time:	5 Days
+
+4/21/2016
+Bug:	Halt caused page faults with scheduling
+Desc:	Called halt on current terminal being displayed regardless if the program was running infinitely while the program that needed to halt didn’t. Fixed by changing current terminal variable to scheduling terminal variable in halt.
+Time:	1 hour
+
+4/21/2016
+Bug:	Keyboard typing would go to other terminals
+Desc:	Keyboard inputs was going to different terminals. We fixed it by using scheduling terminal index instead of using currently displayed terminal index.
+Time:	2 hours
+
+4/21/2016
+Bug:	Terminal switch causing wrong cursor locations
+Desc:	Cursor location was wrong when we switched terminals. We fixed it by using scheduling terminal index instead of using currently displayed terminal index.
+Time:	2 hour
+
+4/23/2016
+Bug:	Terminal switching causing scroll bug
+Desc:	The scrolling has weird bug when switching terminals. We fixed it by using scheduling terminal index instead of using currently displayed terminal index.
+Time:	1 hours
+	
+
+Extra Credit: Everyone worked together
+
+4/25/2016
+Bug:	Command history cursor error when editing history
+Desc:	When we changed a saved command and deleted or added characters to it, it would mess up the cursor location if we try to access the other commands in the array. We fixed it by updating number of characters to delete when we loop the commands and also by adding a condition to check line buffer index.
+Time:	2 hours
+
+4/26/2016
+Bug:	Terminal read not recognizing command when using history
+Desc:	When we used the saved command, it didn’t execute the program. It was because the line buffer index was messed up. We fixed it by adding buffer index updates.
+Time:	30 mins
+
+4/29/2016
+Bug:	Shell wouldn't start
+Desc:	Initial shell was not starting. We found out that our filsys_img file was corrupted for some reason. We got the original file and fixed the issue.
+Time:	1 hour
