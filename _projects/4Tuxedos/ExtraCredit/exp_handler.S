@@ -20,15 +20,18 @@
         EXP_TABLE_SIZE = 20
         FAIL_VALUE = -1
 
+        .align 4
+# regs:
+#         .rept 17
+#         .long 0
+#         .endr  
+
 .globl regs, sig_return_size, sf_start
-regs:
-        .rept 17
-        .long 0
-        .endr  
 
 .section .text
 
 .extern do_signal
+.extern regs
 
 common_Xinterrupt:  
         pushl %EAX
@@ -52,26 +55,25 @@ common_Xinterrupt:
         movl %EAX, RET_ADDR(%EAX)
         movw %CS, %CX
         movl %ECX, CS(%EAX)
-
         pushf
         popl EFLAGS(%eax)
-        movl %ESP, ESP(%eax)
+        movl 8(%ESP), %ECX
+        movl %ECX, ESP(%eax)
         XORL %ECX, %ECX
         movw %SS, %CX
-        movl %ECX, SS(%eax)
-        
-        movl ECX(%eax), %ECX            #Recover ECX     
-        movl EAX(%eax), %EAX            #Recover EAX
+        movl %ECX, SS(%eax)        
+        movl ECX(%EAX), %ECX            #Recover ECX     
+        movl EAX(%EAX), %EAX            #Recover EAX
         movl jumb_table(,%eax,4), %eax        #push the address of the function to eax
         call *%eax                      #call the appropriate function        
         call do_signal
         leal regs, %eax        
         movl EBX(%eax), %EBX
-        movl ECX(%eax), %EBX
-        movl EDX(%eax), %EBX
-        movl ESI(%eax), %EBX
-        movl EDI(%eax), %EBX
-        movl EBP(%eax), %EBX        
+        movl ECX(%eax), %ECX
+        movl EDX(%eax), %EDX
+        movl ESI(%eax), %ESI
+        movl EDI(%eax), %EDI
+        movl EBP(%eax), %EBP       
         movw DS(%eax),  %DS
         movw ES(%eax),  %ES
         movw FS(%eax),  %FS
@@ -94,6 +96,9 @@ sf_start:
         movl $10, %EAX
         INT $0x80
 sf_end:
+
+
+
 
 .extern EX_0
 .extern EX_1
