@@ -30,10 +30,10 @@
 #define PHYS_ADDR_OFFSET_MASK_1 0x003FFFFF//the mask for 4MB page
 #define PAGE_SIZE_MASK 0x0000080 //mask to extract the page size bit from the pd 
 
-#define VIDEO 0xB8000
 #define FIRST_PROG 0x00800000 //8MB
 #define PROG_VIRTADDR 0x08000000
 #define FOUR_MB 0x0400000
+#define INDEX 184
 //uint32_t vid_mem_array[3] = {0x08400000, 0x08401000, 0x08402000};
 uint32_t vid_mem_array[3] = {0x000B9000, 0x000BA000, 0x000BB000};
 extern int current_terminal;
@@ -203,23 +203,23 @@ void process_switch_mem_map(uint32_t next_pid_terminal){
 	/*change the video memory mapping*/
 	/*if the next terminal is the terminal is currently on display*/
 	if(next_pid_terminal == current_terminal){
-		page_table[184] = 0xB8000 | PT_ENTRY_INIT_VAL_2;
-		vid_page_table[0] = (0xB8000|PT_ENTRY_INIT_VAL_2);
+		page_table[INDEX] = VIDEO | PT_ENTRY_INIT_VAL_2;
+		vid_page_table[0] = (VIDEO|PT_ENTRY_INIT_VAL_2);
 	}
 	else{
 		/* map the video memory based on the next terminal*/
 		switch (next_pid_terminal){
 			case 0:
-				page_table[184] =  0xB9000 | PT_ENTRY_INIT_VAL_2;
-				vid_page_table[0] = (0xB9000|PT_ENTRY_INIT_VAL_2);
+				page_table[INDEX] =  VIDEO_0 | PT_ENTRY_INIT_VAL_2;
+				vid_page_table[0] = (VIDEO_0|PT_ENTRY_INIT_VAL_2);
 				break;
 			case 1:
-				page_table[184] =  0xBA000 | PT_ENTRY_INIT_VAL_2;
-				vid_page_table[0] = (0xBA000|PT_ENTRY_INIT_VAL_2);
+				page_table[INDEX] =  VIDEO_1 | PT_ENTRY_INIT_VAL_2;
+				vid_page_table[0] = (VIDEO_1|PT_ENTRY_INIT_VAL_2);
 				break;
 			case 2:
-				page_table[184] =  0xBB000 | PT_ENTRY_INIT_VAL_2;
-				vid_page_table[0] = (0xBB000|PT_ENTRY_INIT_VAL_2);	
+				page_table[INDEX] =  VIDEO_2 | PT_ENTRY_INIT_VAL_2;
+				vid_page_table[0] = (VIDEO_2|PT_ENTRY_INIT_VAL_2);	
 				break;
 		}
 	}
@@ -321,7 +321,7 @@ void vidmap_mapping()
 void set_vid_mem(uint32_t cur_terminal_id, uint32_t next_terminal_id){
 		/* map the virtual video memory to the physical video memory */
 		int32_t CR3 = 0;   
-		page_table[184] = 0xB8000 | PT_ENTRY_INIT_VAL_2;
+		page_table[INDEX] = VIDEO | PT_ENTRY_INIT_VAL_2;
 		asm volatile("mov %%CR3, %0":"=c"(CR3));
 		CR3 = (unsigned int)page_directory;
 		asm volatile("mov %0, %%CR3"::"c"(CR3));  

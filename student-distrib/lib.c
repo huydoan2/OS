@@ -10,7 +10,7 @@ static uint16_t blank_row[NUM_COLS];
 extern int current_terminal;
 extern uint32_t scheduling_terminal;
 static char* video_mem = (char *)VIDEO;
-uint32_t vid_mem[3] = {0xB9000, 0xBA000, 0xBB000};
+uint32_t vid_mem[3] = {VIDEO_0, VIDEO_1, VIDEO_2};
 uint32_t attrib[3] = {ATTRIB_0, ATTRIB_1, ATTRIB_2}; 
 /*set the video memory space in accordance to the current termianl ID*/
 
