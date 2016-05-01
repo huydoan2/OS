@@ -8,7 +8,6 @@
 #include "syscall_linkage.h"
 #include "irq_handler.h"
 #include "systemCalls.h"
-#include "PCB.h"
 
 //Define values for IDT entry
 #define RESERVED4 0x0000
@@ -28,16 +27,11 @@
 #define exception_status 2
 #define exception_retval 255
 
-void exception_termination();
-extern uint32_t current_pid[3];
-extern uint32_t scheduling_terminal;
-void update_siginfo_exp(uint32_t sig_num, uint32_t err_code);
-uint32_t find_avail_siginfo(pcb_struct_t * cur_pcb);
-uint32_t siginfo_index[3] = {-1};
 
+void exception_termination();
 
 /* 
- * EX_0
+ * Exception_Handler_0
  *   DESCRIPTION: the exception handler that handles the Divide-by-zero Error
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -48,17 +42,16 @@ uint32_t siginfo_index[3] = {-1};
  *
  */
 
-void EX_0(){
+void Exception_Handler_0(){
 
 	//print out the error message
     clear();
 	printf("Exception: Divide-by-zero Error. \n");
-	update_siginfo_exp(0, 0);
-
+	exception_termination();
 }
 
 /* 
- * EX_1
+ * Exception_Handler_1
  *   DESCRIPTION: the exception handler that handles the Debug 
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -69,15 +62,15 @@ void EX_0(){
  *
  */
 
-void EX_1(){
+void Exception_Handler_1(){
 
 	//print out the error message
     clear();
 	printf("Exception: Debug. \n");
-	update_siginfo_exp(1, 1);
+	exception_termination();
 }
 /* 
- * EX_2
+ * Exception_Handler_2
  *   DESCRIPTION: the exception handler that handles the Non-maskable Interrupt
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -88,16 +81,16 @@ void EX_1(){
  *
  */
 
-void EX_2(){
+void Exception_Handler_2(){
 
 	//print out the error message
     clear();
 	printf("Exception: Non-maskable Interrupt. \n");
-	update_siginfo_exp(1, 2);
+	exception_termination();
 }
 
 /* 
- * EX_3
+ * Exception_Handler_3
  *   DESCRIPTION: the exception handler that handles the Breakpoint
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -108,16 +101,16 @@ void EX_2(){
  *
  */
 
-void EX_3(){
+void Exception_Handler_3(){
 
 	//print out the error message
     clear();
 	printf("Exception: Breakpoint. \n");
-	update_siginfo_exp(1, 3);
+	exception_termination();
 }
 
 /* 
- * EX_4
+ * Exception_Handler_4
  *   DESCRIPTION: the exception handler that handles the Overflow
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -128,16 +121,16 @@ void EX_3(){
  *
  */
 
-void EX_4(){
+void Exception_Handler_4(){
 
 	//print out the error message
     clear();
 	printf("Exception: Overflow. \n");
-	update_siginfo_exp(1, 4);
+	exception_termination();
 }
 
 /* 
- * EX_5
+ * Exception_Handler_5
  *   DESCRIPTION: the exception handler that handles the Bound Range Exceeded
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -148,16 +141,16 @@ void EX_4(){
  *
  */
 
-void EX_5(){
+void Exception_Handler_5(){
 
 	//print out the error message
     clear();
 	printf("Exception: Bound Range Exceeded. \n");
-	update_siginfo_exp(1, 5);
+	exception_termination();
 }
 
 /* 
- * EX_6
+ * Exception_Handler_6
  *   DESCRIPTION: the exception handler that handles the Invalid Opcode
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -168,16 +161,16 @@ void EX_5(){
  *
  */
 
-void EX_6(){
+void Exception_Handler_6(){
 
 	//print out the error message
     clear();
 	printf("Exception: Invalid Opcode. \n");
-	update_siginfo_exp(1, 6);
+	exception_termination();
 }
 
 /* 
- * EX_7
+ * Exception_Handler_7
  *   DESCRIPTION: the exception handler that handles the Device Not Available
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -188,16 +181,16 @@ void EX_6(){
  *
  */
 
-void EX_7(){
+void Exception_Handler_7(){
 
 	//print out the error message
     clear();
 	printf("Exception: Device Not Available. \n");
-	update_siginfo_exp(1, 7);
+	exception_termination();
 }
 
 /* 
- * EX_8
+ * Exception_Handler_8
  *   DESCRIPTION: the exception handler that handles the Double Fault
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -208,16 +201,16 @@ void EX_7(){
  *
  */
 
-void EX_8(){
+void Exception_Handler_8(){
 
 	//print out the error message
     clear();
 	printf("Exception: Double Fault. \n");
-	update_siginfo_exp(1, 8);
+	exception_termination();
 }
 
 /* 
- * EX_9
+ * Exception_Handler_9
  *   DESCRIPTION: the exception handler that handles the Coprocessor Segment Overrun
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -228,16 +221,16 @@ void EX_8(){
  *
  */
 
-void EX_9(){
+void Exception_Handler_9(){
 
 	//print out the error message
     clear();
 	printf("Exception: Coprocessor Segment Overrun. \n");
-	update_siginfo_exp(1, 9);
+	exception_termination();
 }
 
 /* 
- * EX_10
+ * Exception_Handler_10
  *   DESCRIPTION: the exception handler that handles the Invalid TSS
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -248,16 +241,16 @@ void EX_9(){
  *
  */
 
-void EX_10(){
+void Exception_Handler_10(){
 
 	//print out the error message
     clear();
 	printf("Exception: Invalid TSS. \n");
-	update_siginfo_exp(1, 10);
+	exception_termination();
 }
 
 /* 
- * EX_11
+ * Exception_Handler_11
  *   DESCRIPTION: the exception handler that handles the Segment Not Present
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -268,16 +261,16 @@ void EX_10(){
  *
  */
 
-void EX_11(){
+void Exception_Handler_11(){
 
 	//print out the error message
     clear();
 	printf("Exception: Segment Not Present. \n");
-	update_siginfo_exp(1, 11);
+	exception_termination();
 }
 
 /* 
- * EX_12
+ * Exception_Handler_12
  *   DESCRIPTION: the exception handler that handles the Stack-Segment Fault
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -288,16 +281,16 @@ void EX_11(){
  *
  */
 
-void EX_12(){
+void Exception_Handler_12(){
 
 	//print out the error message
     clear();
 	printf("Exception: Stack-Segment Fault. \n");
-	update_siginfo_exp(1, 12);
+	exception_termination();
 }
 
 /* 
- * EX_13
+ * Exception_Handler_13
  *   DESCRIPTION: the exception handler that handles the General Protection Fault
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -308,16 +301,16 @@ void EX_12(){
  *
  */
 
-void EX_13(){
+void Exception_Handler_13(){
 
 	//print out the error message
-    clear();
+    //clear();
 	printf("Exception: General Protection Fault. \n");
-	update_siginfo_exp(1, 13);
+	exception_termination();
 }
 
 /* 
- * EX_14
+ * Exception_Handler_14
  *   DESCRIPTION: the exception handler that handles the Page Fault
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -328,17 +321,23 @@ void EX_13(){
  *
  */
 
-void EX_14(){
+void Exception_Handler_14(){
 
 	//print out the error message
     //clear(); 
+
 	printf("Exception: Page Fault. \n");
-	update_siginfo_exp(1, 14);
+
+    uint32_t CR2 = 0;   
+    asm volatile("mov %%CR2, %0":"=c"(CR2));
+    printf("ERROR CODE: %x\n", CR2);
+
+	exception_termination();
 }
 
 
 /* 
- * EX_16
+ * Exception_Handler_16
  *   DESCRIPTION: the exception handler that handles the x87 Floating-Point Exception 
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -348,16 +347,16 @@ void EX_14(){
  *   SIDE EFFECTS: print out the error message and stop the current execution 
  *
  */
-void EX_16()
+void Exception_Handler_16()
 {
 	//print out the error message
     clear();
 	printf("EXCPETION: x87 Floating-Point Exception\n");
-	update_siginfo_exp(1, 16);
+	exception_termination();
 }
 
 /* 
- * EX_17
+ * Exception_Handler_17
  *   DESCRIPTION: the exception handler that handles the Alignment Check
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -367,16 +366,16 @@ void EX_16()
  *   SIDE EFFECTS: print out the error message and stop the current execution 
  *
  */
-void EX_17()
+void Exception_Handler_17()
 {
 	//print out the error message
     clear();
 	printf("EXCPETION: Alignment Check\n");
-	update_siginfo_exp(1, 17);
+	exception_termination();
 }
 
 /* 
- * EX_18
+ * Exception_Handler_18
  *   DESCRIPTION: the exception handler that handles the Machine Check
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -386,16 +385,16 @@ void EX_17()
  *   SIDE EFFECTS: print out the error message and stop the current execution 
  *
  */
-void EX_18()
+void Exception_Handler_18()
 {
 	//print out the error message
     clear();
 	printf("EXCPETION: Machine Check\n");
-	update_siginfo_exp(1, 18);
+	exception_termination();
 }
 
 /* 
- * EX_19
+ * Exception_Handler_19
  *   DESCRIPTION: the exception handler that handles the SIMD Floating-Point Exception
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -405,16 +404,16 @@ void EX_18()
  *   SIDE EFFECTS: print out the error message and stop the current execution 
  *
  */
-void EX_19()
+void Exception_Handler_19()
 {
 	//print out the error message
     clear();
 	printf("EXCPETION: SIMD Floating-Point Exception\n");
-	update_siginfo_exp(1, 19);
+	exception_termination();
 }
 
 /* 
- * EX_20
+ * Exception_Handler_20
  *   DESCRIPTION: the exception handler that handles the Virtualization Exception
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -424,16 +423,16 @@ void EX_19()
  *   SIDE EFFECTS: print out the error message and stop the current execution 
  *
  */
-void EX_20()
+void Exception_Handler_20()
 {
 	//print out the error message
     clear();
 	printf("EXCPETION: Virtualization Exception\n");
-	update_siginfo_exp(1, 20);
+	exception_termination();
 }
 
 /* 
- * EX_30
+ * Exception_Handler_30
  *   DESCRIPTION: the exception handler that handles the Security Exception 
  *-----------------------------------------------------------------------------------
  *   INPUTS: none
@@ -443,12 +442,12 @@ void EX_20()
  *   SIDE EFFECTS: print out the error message and stop the current execution 
  *
  */
-void EX_30()
+void Exception_Handler_30()
 {
 	//print out the error message
     clear();
 	printf("EXCPETION: Security Exception\n");
-	update_siginfo_exp(1, 30);
+	exception_termination();
 }
 
 /* 
@@ -637,42 +636,4 @@ void exception_termination()
 	exception_flag = 1;
 	syscall_halt(exception_retval);
 }
-/**/
-uint32_t find_avail_siginfo(pcb_struct_t * cur_pcb){
-	uint32_t i;
-	for(i = 0; i < 3; i++){
-		if(cur_pcb->siginfo[i].sig_num == -1)
-			return i;
-	}
-	return -1;
-}
-/* update the signal information in the PCB block */
-void update_siginfo_exp(uint32_t sig_num, uint32_t err_code ){
-	uint32_t cur_pid;
-	uint32_t siginfo_idx;
-	pcb_struct_t * cur_pcb;
-	//find the current pid scheduling_terminal
-	cur_pid = current_pid[scheduling_terminal];
-	//find the PCB of this process 
-	cur_pcb = find_PCB(cur_pid);
-
-	//update the signal informatio 
-	siginfo_idx = find_avail_siginfo(cur_pcb);
-	
-	cur_pcb->siginfo[siginfo_idx].sig_num = sig_num;
-    cur_pcb->siginfo[siginfo_idx].sig_err = err_code;
-    if(sig_num == 0){
-   		cur_pcb->siginfo[siginfo_idx].sigaction.sa_handler = sigaction_dividedbyzero.sa_handler;
-   	}
-   	else{
-   		cur_pcb->siginfo[siginfo_idx].sigaction.sa_handler = sigaction_segfault.sa_handler;
-   	}
-
-   	cur_pcb->siginfo[siginfo_idx].sigaction.sa_flags = 0; //kill the task
-
-   	cur_pcb->siginfo[siginfo_idx].sigaction.sa_mask = 0; //DONT KNOW THAT THIS IS SHABI
-    siginfo_index[scheduling_terminal] = siginfo_idx;
-
-}
-
 
