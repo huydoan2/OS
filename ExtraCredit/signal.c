@@ -7,7 +7,7 @@
 extern uint32_t current_pid[3];
 extern uint32_t scheduling_terminal;
 extern uint32_t siginfo_index[3];
-extern uint32_t regs[17];
+uint32_t regs[17];
 extern int32_t syscall_halt(uint8_t status);
 extern uint32_t sig_return_size, sf_start;
 void do_signal()
@@ -67,8 +67,8 @@ void setup_frame(uint32_t sig_num)
 	//uint32_t temp_num = sig_num;
 	//push sigreturn context
 	
-	asm volatile("mov %%esp, %0" :"=c"(esp));
-	//esp = regs[15];
+	//asm volatile("mov %%esp, %0" :"=c"(esp));
+	esp = regs[15];
 
 	esp -= sig_return_size;               
 	memcpy((void*)(esp), (void*)&sf_start, (sig_return_size));
@@ -85,7 +85,8 @@ void setup_frame(uint32_t sig_num)
 
 
 	esp -= 4;
-	memcpy((void*)(esp), (void*)sf_start, sizeof(uint32_t));
+	uint32_t ret_addr = &sf_start;
+	memcpy((void*)(esp), (void*)&ret_addr, sizeof(uint32_t));
 
 	regs[15] = esp;
 
