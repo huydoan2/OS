@@ -56,6 +56,7 @@ common_Xinterrupt:
         movl %ECX, RET_ADDR(%EAX)
         XORL %ECX, %ECX
         movl 12(%ESP), %ECX
+
         movl %ECX, CS(%EAX)
         XORL %ECX, %ECX
         movl 16(%ESP), %ECX

@@ -455,8 +455,6 @@ int32_t syscall_sigreturn()
                : "c" (regs[15])         /* input */
                );
   asm volatile("add $8, %esp ;\n");
-  // asm volatile("pop ;\n");
-  // asm volatile("pop ;\n");
   asm volatile("popl %ebx;\n");
   asm volatile("popl %ecx;\n");
   asm volatile("popl %edx;\n");
@@ -468,9 +466,6 @@ int32_t syscall_sigreturn()
   asm volatile("popl %es;\n");
   asm volatile("popl %fs;\n");
   asm volatile("add $8, %esp ;\n");
-  // asm volatile("pop ;\n");
-  // asm volatile("pop ;\n");
-    /*IRET*/
   asm volatile("IRET");
   return -1;
 }
