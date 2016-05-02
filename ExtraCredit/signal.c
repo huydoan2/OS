@@ -27,9 +27,6 @@ void do_signal()
 	cur_pid = current_pid[scheduling_terminal];
 	//find the PCB of this process 
 	cur_pcb = find_PCB(cur_pid);
-	//have to do masking
-    //???????
-    //get the siginfo
 
     sig_num = cur_pcb->siginfo[siginfo_idx].sig_num;
     err_code = cur_pcb->siginfo[siginfo_idx].sig_err;
@@ -68,10 +65,7 @@ uint32_t setup_frame(uint32_t sig_num)
 {
 	/* push the sigreturn on to the sigreturn */
 	uint32_t esp, ret_esp;
-	//uint32_t temp_num = sig_num;
-	//push sigreturn context
 	
-	//asm volatile("mov %%esp, %0" :"=c"(esp));
 	esp = regs[15];
 
 	esp -= 8;
