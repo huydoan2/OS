@@ -50,21 +50,17 @@ void do_signal()
 		}
 	}
 	else {
-		asm volatile("movl %0, %%eax"
+		asm volatile("movl %0, %%esp"
                      :
-                     :"c"(ret_esp)
-                     :"%eax"                     //could be wrong
+                     :"c"(regs[15])
                      );
-		asm volatile("pushl (%eax)");
 		asm volatile("movl %0, %%eax"
                      :
                      :"c"(sa_handler)
-                     :"%eax"                     //could be wrong
                      );
-       asm volatile("call *%eax");
+       	asm volatile("jmp %eax");
 
 	}
-	printf("do_signal done\n");
 	return;
 }
 
@@ -78,8 +74,8 @@ uint32_t setup_frame(uint32_t sig_num)
 	//asm volatile("mov %%esp, %0" :"=c"(esp));
 	esp = regs[15];
 
-	esp -= sig_return_size;               
-	memcpy((void*)(esp), (void*)&sf_start, (sig_return_size));
+	esp -= 8;
+	memcpy((void*)(esp), (void*)&sf_start, (8));               
 
 
 	/* push the harware context on to the stack */
