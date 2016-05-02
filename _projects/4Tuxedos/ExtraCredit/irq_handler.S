@@ -20,7 +20,7 @@
         IRQ_TABLE_SIZE = 17
         FAIL_VALUE = -1
 
-.extern regs
+.extern regs_x
       
 
 .section .text
@@ -30,7 +30,7 @@
 .extern do_signal
 common_interrupt:       
          pushl %eax
-        leal  regs, %eax
+        leal  regs_x, %eax
         movl %EBX, EBX(%eax)
         movl %ECX, ECX(%eax)
         movl %EDX, EDX(%eax)

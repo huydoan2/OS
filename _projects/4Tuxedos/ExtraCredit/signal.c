@@ -8,11 +8,13 @@ extern uint32_t current_pid[3];
 extern uint32_t scheduling_terminal;
 extern uint32_t siginfo_index[3];
 uint32_t regs[17];
+uint32_t regs_x[17];
 extern int32_t syscall_halt(uint8_t status);
 extern uint32_t sig_return_size, sf_start;
 void do_signal()
 {
 	uint32_t cur_pid;
+	uint32_t ret_esp;
 	uint32_t sig_num;
 	uint32_t err_code;
 	uint32_t sa_flags;
@@ -36,34 +38,40 @@ void do_signal()
     sa_mask = cur_pcb->siginfo[siginfo_idx].sigaction.sa_mask;
 
     //set up the stack frame 
-	setup_frame(sig_num);
+	ret_esp = setup_frame(sig_num);
 
-	// //execute the signal handler 
-	// if(sa_handler == NULL){
-	// 	if(sa_flags == 0){
-	// 		sig_kill(cur_pid);
-	// 	}
-	// 	else{
-	// 		sig_ignore();
-	// 	}
-	// }
-	// else {
-	// 	asm volatile("movl %0, %%eax"
- //                     :
- //                     :"c"(sa_handler)
- //                     :"%eax"                     //could be wrong
- //                     );
- //       asm volatile("call *%eax");
+	//execute the signal handler 
+	if(sa_handler == NULL){
+		if(sa_flags == 0){
+			sig_kill(cur_pid);
+		}
+		else{
+			sig_ignore();
+		}
+	}
+	else {
+		asm volatile("movl %0, %%eax"
+                     :
+                     :"c"(ret_esp)
+                     :"%eax"                     //could be wrong
+                     );
+		asm volatile("pushl (%eax)");
+		asm volatile("movl %0, %%eax"
+                     :
+                     :"c"(sa_handler)
+                     :"%eax"                     //could be wrong
+                     );
+       asm volatile("call *%eax");
 
-	// }
-	// printf("do_signal done\n");
+	}
+	printf("do_signal done\n");
 	return;
 }
 
-void setup_frame(uint32_t sig_num)
+uint32_t setup_frame(uint32_t sig_num)
 {
 	/* push the sigreturn on to the sigreturn */
-	uint32_t esp;
+	uint32_t esp, ret_esp;
 	//uint32_t temp_num = sig_num;
 	//push sigreturn context
 	
@@ -81,6 +89,7 @@ void setup_frame(uint32_t sig_num)
 
 	/* push the sig_num */
 	esp -= 4;
+    ret_esp = esp;
 	memcpy((void*)(esp), (void*)&sig_num, sizeof(uint32_t));
 
 
@@ -90,7 +99,7 @@ void setup_frame(uint32_t sig_num)
 
 	regs[15] = esp;
 
-	return;
+	return ret_esp;
 
 }
 
