@@ -1,7 +1,7 @@
 ﻿4Tuxedos MP3 Bug Log
 
 
-Checkpoint 1: Everyone worked together
+Checkpoint 1: Everyone worked together and debugged together
 
 3/10/2016
 Bug:	Segmentation fault during loading GDT 
@@ -34,7 +34,7 @@ Desc:	When we booted up the system, we got an error message saying runtime was t
 Time:	1 day
 	
 
-Checkpoint 2: Everyone worked together
+Checkpoint 2: Everyone worked together and debugged together
 
 3/15/2016
 Bug:	Ctrl+L chopped characters off from buffer
@@ -67,7 +67,7 @@ Desc:	We can only change the rate of RTC for the first five times. This bug is c
 Time:	30 min
 
 
-Checkpoint 3: Everyone worked together
+Checkpoint 3: Everyone worked together and debugged together
 
 3/29/2016
 Bug:	Syscall linkage
@@ -86,7 +86,7 @@ Time:	2 hours
 
 	
 
-Checkpoint 4: Everyone worked together
+Checkpoint 4: Everyone worked together and debugged together
 
 4/2/2016
 Bug:	Fish only displaying first row with random characters 
@@ -118,7 +118,7 @@ Time:	1 hour
 	
 
 
-Checkpoint 5: Everyone worked together
+Checkpoint 5: Everyone worked together and debugged together
 
 4/15/2016
 Bug:	Multi-terminal caused page faults and triple faults switching video memory
@@ -146,7 +146,7 @@ Desc:	The scrolling has weird bug when switching terminals. We fixed it by using
 Time:	1 hours
 	
 
-Extra Credit: Everyone worked together
+Extra Credit: Everyone worked together and debugged together
 
 4/25/2016
 Bug:	Command history cursor error when editing history
