@@ -21,10 +21,6 @@
         FAIL_VALUE = -1
 
         .align 4
-# regs:
-#         .rept 17
-#         .long 0
-#         .endr  
 
 .globl  sig_return_size, sf_start
 
