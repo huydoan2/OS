@@ -26,7 +26,7 @@
 #         .long 0
 #         .endr  
 
-.globl regs, sig_return_size, sf_start
+.globl  sig_return_size, sf_start
 
 .section .text
 
@@ -52,41 +52,30 @@ common_Xinterrupt:
         movl %ECX, FS(%EAX)
         movl $0, IRQ_NUM(%EAX)
         movl $0, ERRNO(%EAX)
-        movl %EAX, RET_ADDR(%EAX)
-        movw %CS, %CX
+        movl 8(%ESP), %ECX
+        movl %ECX, RET_ADDR(%EAX)
+        XORL %ECX, %ECX
+        movl 12(%ESP), %ECX
         movl %ECX, CS(%EAX)
-        pushf
-        popl EFLAGS(%eax)
+        XORL %ECX, %ECX
+        movl 16(%ESP), %ECX
+        movl %ECX, EFLAGS(%eax)
+        XORL %ECX, %ECX
         movl 20(%ESP), %ECX
         movl %ECX, ESP(%eax)
         XORL %ECX, %ECX
-        movw %SS, %CX
-        movl %ECX, SS(%eax)        
+        movl 24(%ESP), %ECX
+        movl %ECX, SS(%EAX)        
         movl ECX(%EAX), %ECX            #Recover ECX     
         movl EAX(%EAX), %EAX            #Recover EAX
-        movl jumb_table(,%eax,4), %eax        #push the address of the function to eax
-        call *%eax                      #call the appropriate function        
-        call do_signal
-        leal regs, %eax        
-        movl EBX(%eax), %EBX        
-        movl EDX(%eax), %EDX
-        movl ESI(%eax), %ESI
-        movl EDI(%eax), %EDI
-        movl EBP(%eax), %EBP       
-        movw DS(%eax),  %DS
-        movw ES(%eax),  %ES
-        movw FS(%eax),  %FS
-        # movw CS(%eax),  %CS
-        pushl EFLAGS(%eax)
-        popf
-        
-        movl ESP(%eax), %ECX              #Huy added these lines
-        movl %ECX, 20(%ESP)                #I am modifying the ESP in the IRET context
-        movl ECX(%eax), %ECX              #so that the new ESP is handled by the user program
 
-        movw SS(%eax),  %SS        
-        movl EAX(%eax), %EAX
-        leave
+        movl jumb_table(,%eax,4), %eax        #push the address of the function to eax
+        call *%eax                      #call the appropriate function                
+        call do_signal
+        leal regs, %ecx        
+        
+        movl ESP(%ecx), %ESP              #Huy added these lines
+      
         ret                               #return from interrupt
 
 common_Xinterrupt_default:

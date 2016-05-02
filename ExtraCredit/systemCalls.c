@@ -44,7 +44,7 @@ extern uint32_t scheduling_terminal;
 /*number of active process*/
 extern uint32_t num_active_process;
 
-extern uint32_t regs[16];
+extern uint32_t regs[17];
 //extern uint32_t current_ter;
 uint32_t current_pid[MAX_TERMINAL] = {0};
 /*function that updates the pid and PCB for next process*/
@@ -450,8 +450,28 @@ int32_t syscall_set_handler(int32_t signum, void* handler_address)
 int32_t syscall_sigreturn()
 {
   /*find the current esp, copy the hardware context on the processor */
-  //regs
-  
+   asm volatile("movl %0, %%esp;\n"
+               :                       /* output */
+               : "c" (regs[15])         /* input */
+               );
+  asm volatile("add $8, %esp ;\n");
+  // asm volatile("pop ;\n");
+  // asm volatile("pop ;\n");
+  asm volatile("popl %ebx;\n");
+  asm volatile("popl %ecx;\n");
+  asm volatile("popl %edx;\n");
+  asm volatile("popl %esi;\n");
+  asm volatile("popl %edi;\n");
+  asm volatile("popl %ebp;\n");
+  asm volatile("popl %eax;\n");
+  asm volatile("popl %ds;\n");
+  asm volatile("popl %es;\n");
+  asm volatile("popl %fs;\n");
+  asm volatile("add $8, %esp ;\n");
+  // asm volatile("pop ;\n");
+  // asm volatile("pop ;\n");
+    /*IRET*/
+  asm volatile("IRET");
   return -1;
 }
 
