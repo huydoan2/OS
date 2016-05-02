@@ -677,6 +677,7 @@ void update_command_array()
  */
 void get_command_history(int dir)
 {
+	//delete the currently displayed characters on the line
 	for(i = 0; i < strlen(line_buffer[scheduling_terminal])-num_delete[scheduling_terminal]; i++)
 	{
 		if(line_buffer[scheduling_terminal][i] != '\n' && lb_index[scheduling_terminal]>-1)
@@ -689,6 +690,7 @@ void get_command_history(int dir)
 	if(dir)
 	{
 		//case 1: up
+		//get the command from history array
 		if(num_up[scheduling_terminal] < num_existing_command[scheduling_terminal])
 		{
 			command_iter[scheduling_terminal]--;
@@ -701,6 +703,7 @@ void get_command_history(int dir)
 	else
 	{
 		//case 2: down
+		//get the command from history array
 		if(num_up[scheduling_terminal] > 1)
 		{
 			command_iter[scheduling_terminal]++;
@@ -710,6 +713,7 @@ void get_command_history(int dir)
 			strcpy(line_buffer[scheduling_terminal], command_history[scheduling_terminal][command_iter[scheduling_terminal]]);
 		}
 	}
+	//write the new command from the history array
 	for(i = 0; i < strlen(line_buffer[scheduling_terminal]); i++)
 	{
 		if(line_buffer[scheduling_terminal][i] != '\n')
@@ -718,6 +722,7 @@ void get_command_history(int dir)
 			putc(line_buffer[scheduling_terminal][i]);
 		}
 	}
+	//reset the number of chars deleted
 	num_delete[scheduling_terminal] = 0;
 }
 
