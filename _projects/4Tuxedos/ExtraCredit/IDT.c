@@ -674,5 +674,35 @@ void update_siginfo_exp(uint32_t sig_num, uint32_t err_code ){
     siginfo_index[scheduling_terminal] = siginfo_idx;
 
 }
+void update_siginfo_int(uint32_t sig_num, uint32_t err_code ){
+	uint32_t cur_pid;
+	uint32_t siginfo_idx;
+	pcb_struct_t * cur_pcb;
+	//find the current pid scheduling_terminal
+	cur_pid = current_pid[scheduling_terminal];
+	//find the PCB of this process 
+	cur_pcb = find_PCB(cur_pid);
+
+	//update the signal informatio 
+	siginfo_idx = find_avail_siginfo(cur_pcb);
+	
+	cur_pcb->siginfo[siginfo_idx].sig_num = sig_num;
+    cur_pcb->siginfo[siginfo_idx].sig_err = err_code;
+    if(sig_num == 0){
+   		cur_pcb->siginfo[siginfo_idx].sigaction.sa_handler = sigaction_dividedbyzero.sa_handler;
+   	}
+   	else{
+   		cur_pcb->siginfo[siginfo_idx].sigaction.sa_handler = sigaction_segfault.sa_handler;
+   	}
+if(sig_num == 2)
+   	cur_pcb->siginfo[siginfo_idx].sigaction.sa_flags = 0; //kill the task
+else
+	cur_pcb->siginfo[siginfo_idx].sigaction.sa_flags = 1; //ignore the task
+
+
+   	cur_pcb->siginfo[siginfo_idx].sigaction.sa_mask = 0; //DONT KNOW THAT THIS IS SHABI
+    siginfo_index[scheduling_terminal] = siginfo_idx;
+
+}
 
 

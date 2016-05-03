@@ -29,6 +29,7 @@ void do_signal()
 	cur_pcb = find_PCB(cur_pid);
 
     sig_num = cur_pcb->siginfo[siginfo_idx].sig_num;
+    cur_pcb->siginfo[siginfo_idx].sig_num = -1;
     err_code = cur_pcb->siginfo[siginfo_idx].sig_err;
     sa_handler = cur_pcb->siginfo[siginfo_idx].sigaction.sa_handler;
     sa_flags = cur_pcb->siginfo[siginfo_idx].sigaction.sa_flags;
@@ -55,7 +56,67 @@ void do_signal()
                      :
                      :"c"(sa_handler)
                      );
-       	asm volatile("jmp %eax");
+       	asm volatile("jmp *%eax");
+
+	}
+	return;
+}
+void do_signal_int()
+{
+	uint32_t cur_pid;
+	uint32_t ret_esp;
+	uint32_t sig_num;
+	uint32_t err_code;
+	uint32_t sa_flags;
+	uint32_t sa_mask;
+	void* sa_handler;
+	uint32_t siginfo_idx = siginfo_index[scheduling_terminal];
+	if(siginfo_idx == -1)
+		return;
+	pcb_struct_t * cur_pcb;
+	//find the current pid scheduling_terminal
+	cur_pid = current_pid[scheduling_terminal];
+	//find the PCB of this process 
+	cur_pcb = find_PCB(cur_pid);
+
+    sig_num = cur_pcb->siginfo[siginfo_idx].sig_num;
+    err_code = cur_pcb->siginfo[siginfo_idx].sig_err;
+    sa_handler = cur_pcb->siginfo[siginfo_idx].sigaction.sa_handler;
+    sa_flags = cur_pcb->siginfo[siginfo_idx].sigaction.sa_flags;
+    sa_mask = cur_pcb->siginfo[siginfo_idx].sigaction.sa_mask;
+    /*check for valid interrupt*/
+   if(sig_num < 2 || sig_num == -1){
+    cur_pcb->siginfo[siginfo_idx].sig_num  = -1;
+    return;
+	}
+	cur_pcb->siginfo[siginfo_idx].sig_num  = -1;
+
+
+    printf("Triggered Signal from interrupt...\n");
+    printf("signal numebr = %d \n", sig_num);
+
+    //set up the stack frame 
+	ret_esp = setup_frame(sig_num);
+
+	//execute the signal handler 
+	if(sa_handler == NULL){
+		if(sa_flags == 0){
+			sig_kill(cur_pid);
+		}
+		else{
+			sig_ignore();
+		}
+	}
+	else {
+		asm volatile("movl %0, %%esp"
+                     :
+                     :"c"(regs[15])
+                     );
+		asm volatile("movl %0, %%eax"
+                     :
+                     :"c"(sa_handler)
+                     );
+       	asm volatile("jmp *%eax");
 
 	}
 	return;
@@ -65,6 +126,8 @@ uint32_t setup_frame(uint32_t sig_num)
 {
 	/* push the sigreturn on to the sigreturn */
 	uint32_t esp, ret_esp;
+
+	regs[10] = sig_num;
 	
 	esp = regs[15];
 

@@ -15,7 +15,7 @@ kernel.o: kernel.c multiboot.h types.h x86_desc.h lib.h i8259.h debug.h \
   keyboard.h IDT.h exp_handler.h rtc.h Paging.h systemCalls.h file.h \
   PIT.h
 keyboard.o: keyboard.c keyboard.h i8259.h types.h lib.h systemCalls.h \
-  Paging.h PCB.h file_desc.h
+  Paging.h PCB.h file_desc.h IDT.h x86_desc.h exp_handler.h rtc.h
 lib.o: lib.c lib.h types.h
 Paging.o: Paging.c Paging.h types.h lib.h
 PCB.o: PCB.c PCB.h types.h file_desc.h

@@ -9,6 +9,7 @@
 #include "systemCalls.h"
 #include "Paging.h"
 #include "PCB.h"
+#include "IDT.h" 
 //Define values for Keyboard
 #define KEYBOARD_DATA 0x60
 #define KEYBOARD_COMMAND 0x64
@@ -338,12 +339,13 @@ char getchar()
 		printf("391OS> ");
 		return 0;
 	}
-
+	/*if contral + c is pressed */
 	if(control_flag[current_terminal] && c == C_pressed)
 	{
 		putc('\n');
-		syscall_halt(1);
+		//syscall_halt(1);
 		reset_linebuffer();
+		update_siginfo_int(2, 0);
 		return 0;
 	}
 

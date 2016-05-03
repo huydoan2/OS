@@ -71,6 +71,9 @@ hardware_context_t hardware_context;
  uint32_t specific_send_sig_info(uint32_t sig_num, void* info, pcb_struct_t* des_pcb);
  uint32_t send_signal( );
  void do_signal( );
+
+ void do_signal_int( );
+
  uint32_t handle_signal( );
  uint32_t setup_frame();
  uint32_t setup_rt_frame();
