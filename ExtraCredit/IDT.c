@@ -688,21 +688,20 @@ void update_siginfo_int(uint32_t sig_num, uint32_t err_code ){
 	
 	cur_pcb->siginfo[siginfo_idx].sig_num = sig_num;
     cur_pcb->siginfo[siginfo_idx].sig_err = err_code;
-    if(sig_num == 0){
-   		cur_pcb->siginfo[siginfo_idx].sigaction.sa_handler = sigaction_dividedbyzero.sa_handler;
+    if(sig_num == 2){
+   		cur_pcb->siginfo[siginfo_idx].sigaction.sa_handler = sigaction_interrupt.sa_handler;
+   		cur_pcb->siginfo[siginfo_idx].sigaction.sa_flags = 0; //kill the task
+   	}
+   	else if(sig_num == 3){
+   		cur_pcb->siginfo[siginfo_idx].sigaction.sa_handler = sigaction_alarm.sa_handler;
+   		cur_pcb->siginfo[siginfo_idx].sigaction.sa_flags = 1; //ignore the task
    	}
    	else{
-   		cur_pcb->siginfo[siginfo_idx].sigaction.sa_handler = sigaction_segfault.sa_handler;
+   		cur_pcb->siginfo[siginfo_idx].sigaction.sa_handler = sigaction_user1.sa_handler;
+   		cur_pcb->siginfo[siginfo_idx].sigaction.sa_flags = 1; //ignore the task
    	}
-if(sig_num == 2)
-   	cur_pcb->siginfo[siginfo_idx].sigaction.sa_flags = 0; //kill the task
-else
-	cur_pcb->siginfo[siginfo_idx].sigaction.sa_flags = 1; //ignore the task
-
-
    	cur_pcb->siginfo[siginfo_idx].sigaction.sa_mask = 0; //DONT KNOW THAT THIS IS SHABI
     siginfo_index[scheduling_terminal] = siginfo_idx;
 
 }
-
 

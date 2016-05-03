@@ -76,6 +76,7 @@ hardware_context_t hardware_context;
 
  uint32_t handle_signal( );
  uint32_t setup_frame();
+ uint32_t setup_frame_x();
  uint32_t setup_rt_frame();
  uint32_t restore_sigcontext();
  void sig_kill(uint32_t pid); //cannot be masked, cannot be blocked 

@@ -45,6 +45,10 @@ extern uint32_t scheduling_terminal;
 extern uint32_t num_active_process;
 
 extern uint32_t regs[17];
+
+extern uint32_t regs_x[17];
+
+extern uint32_t curr_signal;
 //extern uint32_t current_ter;
 uint32_t current_pid[MAX_TERMINAL] = {0};
 /*function that updates the pid and PCB for next process*/
@@ -449,10 +453,16 @@ int32_t syscall_set_handler(int32_t signum, void* handler_address)
  */
 int32_t syscall_sigreturn()
 {
+  int esp;
+  if(curr_signal < 2)
+    esp = regs[15];
+  else
+    esp = regs_x[15];
+  
   /*find the current esp, copy the hardware context on the processor */
    asm volatile("movl %0, %%esp;\n"
                :                       /* output */
-               : "c" (regs[15])         /* input */
+               : "c" (esp)         /* input */
                );
   asm volatile("add $8, %esp ;\n");
   asm volatile("popl %ebx;\n");
