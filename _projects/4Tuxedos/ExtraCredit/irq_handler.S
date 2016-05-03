@@ -20,13 +20,13 @@
         IRQ_TABLE_SIZE = 17
         FAIL_VALUE = -1
 
-.extern regs_x
       
 
 .section .text
 
 
 
+.extern regs_x
 .extern do_signal_int
 common_interrupt:       
         pushl %EAX
@@ -51,7 +51,6 @@ common_interrupt:
         movl %ECX, RET_ADDR(%EAX)
         XORL %ECX, %ECX
         movl 12(%ESP), %ECX
-
         movl %ECX, CS(%EAX)
         XORL %ECX, %ECX
         movl 16(%ESP), %ECX
@@ -71,10 +70,10 @@ common_interrupt:
         jb common_interrupt_default                
         movl jumb_table(,%eax,4), %eax        #push the address of the function to eax
         call *%eax                      #call the appropriate function     
-        call do_signal_int                  #send signal   
-        ret                               #return from interrupt
+        call do_signal_int
 
-common_interrupt_default:        
+common_interrupt_default:
+        movl $FAIL_VALUE, %eax        
         ret     
 
 .extern pit_handler

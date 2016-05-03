@@ -7,6 +7,7 @@
 extern uint32_t current_pid[3];
 extern uint32_t scheduling_terminal;
 extern uint32_t siginfo_index[3];
+uint32_t curr_signal = -1;
 uint32_t regs[17];
 uint32_t regs_x[17];
 extern int32_t syscall_halt(uint8_t status);
@@ -34,7 +35,7 @@ void do_signal()
     sa_handler = cur_pcb->siginfo[siginfo_idx].sigaction.sa_handler;
     sa_flags = cur_pcb->siginfo[siginfo_idx].sigaction.sa_flags;
     sa_mask = cur_pcb->siginfo[siginfo_idx].sigaction.sa_mask;
-
+    curr_signal = sig_num;
     //set up the stack frame 
 	ret_esp = setup_frame(sig_num);
 
@@ -85,32 +86,37 @@ void do_signal_int()
     sa_flags = cur_pcb->siginfo[siginfo_idx].sigaction.sa_flags;
     sa_mask = cur_pcb->siginfo[siginfo_idx].sigaction.sa_mask;
     /*check for valid interrupt*/
-   if(sig_num < 2 || sig_num == -1){
-    cur_pcb->siginfo[siginfo_idx].sig_num  = -1;
-    return;
+    if(sig_num < 2 || sig_num == -1)
+    {
+    	cur_pcb->siginfo[siginfo_idx].sig_num  = -1;
+   		return;
 	}
 	cur_pcb->siginfo[siginfo_idx].sig_num  = -1;
-
-
+	
+	curr_signal = sig_num;
+	
     printf("Triggered Signal from interrupt...\n");
     printf("signal numebr = %d \n", sig_num);
 
     //set up the stack frame 
-	ret_esp = setup_frame(sig_num);
+	ret_esp = setup_frame_x(sig_num);
 
 	//execute the signal handler 
-	if(sa_handler == NULL){
-		if(sa_flags == 0){
+	if(sa_handler == NULL)
+	{
+		if(sa_flags == 0)
+		{
 			sig_kill(cur_pid);
 		}
 		else{
 			sig_ignore();
 		}
 	}
-	else {
+	else 
+	{
 		asm volatile("movl %0, %%esp"
                      :
-                     :"c"(regs[15])
+                     :"c"(regs_x[15])
                      );
 		asm volatile("movl %0, %%eax"
                      :
@@ -151,6 +157,40 @@ uint32_t setup_frame(uint32_t sig_num)
 	memcpy((void*)(esp), (void*)&ret_addr, sizeof(uint32_t));
 
 	regs[15] = esp;
+
+	return ret_esp;
+
+}
+
+uint32_t setup_frame_x(uint32_t sig_num)
+{
+	/* push the sigreturn on to the sigreturn */
+	uint32_t esp, ret_esp;
+
+	regs_x[10] = sig_num;
+	
+	esp = regs_x[15];
+
+	esp -= 8;
+	memcpy((void*)(esp), (void*)&sf_start, (8));               
+
+
+	/* push the harware context on to the stack */
+	esp -= sizeof(hardware_context_t);
+
+	memcpy((void*)(esp), (void*)regs_x, sizeof(hardware_context_t));
+
+	/* push the sig_num */
+	esp -= 4;
+    ret_esp = esp;
+	memcpy((void*)(esp), (void*)&sig_num, sizeof(uint32_t));
+
+
+	esp -= 4;
+	uint32_t ret_addr = &sf_start;
+	memcpy((void*)(esp), (void*)&ret_addr, sizeof(uint32_t));
+
+	regs_x[15] = esp;
 
 	return ret_esp;
 
