@@ -69,11 +69,6 @@ common_Xinterrupt:
         movl jumb_table(,%eax,4), %eax        #push the address of the function to eax
         call *%eax                      #call the appropriate function                
         call do_signal
-        leal regs, %ecx        
-        
-        movl ESP(%ecx), %ESP              #Huy added these lines
-      
-        ret                               #return from interrupt
 
 common_Xinterrupt_default:
         movl $FAIL_VALUE, %eax        

@@ -27,35 +27,43 @@
 
 
 
-.extern do_signal
+.extern do_signal_int
 common_interrupt:       
-         pushl %eax
-        leal  regs_x, %eax
-        movl %EBX, EBX(%eax)
-        movl %ECX, ECX(%eax)
-        movl %EDX, EDX(%eax)
-        movl %ESI, ESI(%eax)
-        movl %EDI, EDI(%eax)
-        movl %EBP, EBP(%eax)
-        popl EAX(%eax)
-        XORL %ecx, %ecx
-        movw %DS, %cx     
-        movl %ECX, DS(%eax)
-        movw %ES, %CX  
-        movl %ECX, ES(%eax)
-        movw %FS, %CX
-        movl %ECX, FS(%eax)
-        movw %CS, %CX
-        movl %ECX, CS(%eax)
-        pushf
-        popl EFLAGS(%eax)
-        movl %ESP, ESP(%eax)
+        pushl %EAX
+        leal regs_x, %EAX
+        movl %EBX, EBX(%EAX)
+        movl %ECX, ECX(%EAX)
+        movl %EDX, EDX(%EAX)
+        movl %ESI, ESI(%EAX)
+        movl %EDI, EDI(%EAX)
+        movl %EBP, EBP(%EAX)
+        popl EAX(%EAX)
         XORL %ECX, %ECX
-        movw %SS, %CX
-        movl %ECX, SS(%eax)
-        
-        movl ECX(%eax), %ecx            #Recover EAX
-        movl EAX(%eax), %eax            #Recover EAX
+        movw %DS, %CX     
+        movl %ECX, DS(%EAX)
+        movw %ES, %CX  
+        movl %ECX, ES(%EAX)
+        movw %FS, %CX
+        movl %ECX, FS(%EAX)
+        movl $0, IRQ_NUM(%EAX)
+        movl $0, ERRNO(%EAX)
+        movl 8(%ESP), %ECX
+        movl %ECX, RET_ADDR(%EAX)
+        XORL %ECX, %ECX
+        movl 12(%ESP), %ECX
+
+        movl %ECX, CS(%EAX)
+        XORL %ECX, %ECX
+        movl 16(%ESP), %ECX
+        movl %ECX, EFLAGS(%eax)
+        XORL %ECX, %ECX
+        movl 20(%ESP), %ECX
+        movl %ECX, ESP(%eax)
+        XORL %ECX, %ECX
+        movl 24(%ESP), %ECX
+        movl %ECX, SS(%EAX)        
+        movl ECX(%EAX), %ECX            #Recover ECX     
+        movl EAX(%EAX), %EAX            #Recover EAX
 
         cmpl $IRQ_TABLE_SIZE, %eax
         ja common_interrupt_default
@@ -63,7 +71,7 @@ common_interrupt:
         jb common_interrupt_default                
         movl jumb_table(,%eax,4), %eax        #push the address of the function to eax
         call *%eax                      #call the appropriate function     
-        #call do_signal                  #send signal   
+        call do_signal_int                  #send signal   
         ret                               #return from interrupt
 
 common_interrupt_default:        

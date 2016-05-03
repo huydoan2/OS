@@ -86,6 +86,9 @@ extern  void fill_interrupt_descriptor_table(); //fill in the entire table
 extern void fill_interrupt_descriptor_table_entry(idt_desc_t * idt_enry, uint16_t seg_selector, uint8_t reserved4, 
   										uint32_t reserved3, uint32_t reserved2, uint32_t reserved1,	uint32_t size,
   									    uint32_t reserved0, uint32_t dpl, uint32_t present);
+void update_siginfo_exp(uint32_t sig_num, uint32_t err_code );
+void update_siginfo_int(uint32_t sig_num, uint32_t err_code );
+
 
 
 #endif
