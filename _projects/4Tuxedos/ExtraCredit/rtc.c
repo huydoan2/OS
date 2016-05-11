@@ -56,9 +56,11 @@ int counter = 0;	//count number of half seconds
 int clk = 0;		//timer to be printed at the right top corner
 int rate = 15;		//rate of rtc, initialize to 15 which is slowest rate
 
+
 extern uint32_t scheduling_terminal;
 extern uint32_t current_terminal;
 volatile int interrupt_flag[3];	//flag for interrupt
+extern void update_siginfo_int(uint32_t sig_num, uint32_t err_code );
 
 void rtc_init(){
 	char previous;
@@ -100,8 +102,15 @@ rtc_handler(void)
 {
     send_eoi(RTC_IRQ_8);
 	interrupt_flag[scheduling_terminal] = 1;
+	++counter;
+	if (counter >= 20){
+		counter = 0;
+		update_siginfo_int(3, 0);
+	}
 	outb(REGISTER_C , RTC_PORT);	// select register C
 	inb(CMOS_PORT);		            // just throw away contents
+	//this is th eplace signal generation 
+	
 }
 /* 
  * rtc_set_rate

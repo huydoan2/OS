@@ -29,41 +29,8 @@
 .extern regs_x
 .extern do_signal_int
 common_interrupt:       
-        pushl %EAX
-        leal regs_x, %EAX
-        movl %EBX, EBX(%EAX)
-        movl %ECX, ECX(%EAX)
-        movl %EDX, EDX(%EAX)
-        movl %ESI, ESI(%EAX)
-        movl %EDI, EDI(%EAX)
-        movl %EBP, EBP(%EAX)
-        popl EAX(%EAX)
-        XORL %ECX, %ECX
-        movw %DS, %CX     
-        movl %ECX, DS(%EAX)
-        movw %ES, %CX  
-        movl %ECX, ES(%EAX)
-        movw %FS, %CX
-        movl %ECX, FS(%EAX)
-        movl $0, IRQ_NUM(%EAX)
-        movl $0, ERRNO(%EAX)
-        movl 8(%ESP), %ECX
-        movl %ECX, RET_ADDR(%EAX)
-        XORL %ECX, %ECX
-        movl 12(%ESP), %ECX
-        movl %ECX, CS(%EAX)
-        XORL %ECX, %ECX
-        movl 16(%ESP), %ECX
-        movl %ECX, EFLAGS(%eax)
-        XORL %ECX, %ECX
-        movl 20(%ESP), %ECX
-        movl %ECX, ESP(%eax)
-        XORL %ECX, %ECX
-        movl 24(%ESP), %ECX
-        movl %ECX, SS(%EAX)        
-        movl ECX(%EAX), %ECX            #Recover ECX     
-        movl EAX(%EAX), %EAX            #Recover EAX
-
+      
+      
         cmpl $IRQ_TABLE_SIZE, %eax
         ja common_interrupt_default
         cmpl $0, %eax
@@ -71,7 +38,7 @@ common_interrupt:
         movl jumb_table(,%eax,4), %eax        #push the address of the function to eax
         call *%eax                      #call the appropriate function     
         call do_signal_int
-
+        ret
 common_interrupt_default:
         movl $FAIL_VALUE, %eax        
         ret     

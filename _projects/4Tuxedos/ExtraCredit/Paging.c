@@ -248,7 +248,7 @@ void map_page(uint32_t pid)
 	/* get the starting address of the prgoram image*/
 	uint32_t prog_startAddr = FIRST_PROG + FOUR_MB* (pid -1);
 	/* map the program image to 128 MB */
-	mapping_virt2Phys_Addr(prog_startAddr, PROG_VIRTADDR);
+	mapping_virt2Phys_Addr (prog_startAddr, PROG_VIRTADDR);
 }
 
 

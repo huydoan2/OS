@@ -664,6 +664,10 @@ void update_siginfo_exp(uint32_t sig_num, uint32_t err_code ){
     if(sig_num == 0){
    		cur_pcb->siginfo[siginfo_idx].sigaction.sa_handler = sigaction_dividedbyzero.sa_handler;
    	}
+   	else if(sig_num == 3){
+
+   		cur_pcb->siginfo[siginfo_idx].sigaction.sa_handler = sigaction_alarm.sa_handler;
+   	}
    	else{
    		cur_pcb->siginfo[siginfo_idx].sigaction.sa_handler = sigaction_segfault.sa_handler;
    	}
