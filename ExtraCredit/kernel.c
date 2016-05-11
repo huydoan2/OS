@@ -175,7 +175,7 @@ entry (unsigned long magic, unsigned long addr)
 	/* Initialize the PIC */
 	i8259_init();
 	/* Initialize the Real-time Clock */
-	// rtc_init();
+	rtc_init();
 	/* Initialize the terminal I/O */
 	keyboard_open();
 	/* initialize Paging*/
@@ -183,7 +183,7 @@ entry (unsigned long magic, unsigned long addr)
 	/* Initialize the filesystem*/
     parsing_fileSystem(fileSys_startAddr); //initialize file system
 	/* Initialize the pit */
-	// pit_init();
+	 pit_init();
 	/* Enable interrupts */
 	
 	clear(); //need to clear screen in terminal driver init

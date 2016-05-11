@@ -345,7 +345,7 @@ char getchar()
 		putc('\n');
 		//syscall_halt(1);
 		reset_linebuffer();
-		update_siginfo_int(2, 0);
+	    update_siginfo_int(2, 0);
 		return 0;
 	}
 
